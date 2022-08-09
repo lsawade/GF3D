@@ -26,6 +26,7 @@ from glob import glob
 
 
 # Check whether cmake is available
+
 if which('cmake3') is None:
     print('cmake is required to install ADIOS 2.')
     print('Please install before proceeding')
@@ -73,6 +74,7 @@ if os.path.exists(ADIOS_DOWNLOAD) is False or reinstall:
         check_call(f'rm -rf {ADIOS_DOWNLOAD}', shell=True)
     check_call(f'git clone {ADIOS_GIT} {ADIOS_DOWNLOAD}', shell=True)
 # sys.exit()
+
 # If you just want to reconfigure just remove dowload and
 if os.path.exists(ADIOS_DOWNLOAD) and reconfigure:
     check_call(f'rm -rf {ADIOS_BUILD}', shell=True)
@@ -90,9 +92,10 @@ os.environ['CC'] = str(which('mpicc'))
 os.environ['CXX'] = str(which('mpicxx'))
 os.environ['MPICC'] = str(which('mpicc'))
 
-PYTHON=os.path.abspath(str(which("python3")))
-PYTHON_INCLUDE_DIRS=os.path.join(os.path.dirname(os.path.dirname(PYTHON)),'include')
-PYTHON_LIB=os.path.join(os.path.dirname(os.path.dirname(PYTHON)),'lib')
+PYTHON = os.path.abspath(str(which("python3")))
+PYTHON_INCLUDE_DIRS = os.path.join(
+    os.path.dirname(os.path.dirname(PYTHON)), 'include')
+PYTHON_LIB = os.path.join(os.path.dirname(os.path.dirname(PYTHON)), 'lib')
 print(70*"=")
 print("PYTHON:        ", PYTHON)
 print("PYTHON INCLUDE:", PYTHON_INCLUDE_DIRS)

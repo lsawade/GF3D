@@ -1,3 +1,4 @@
+
 import sys
 from mpi4py import MPI
 import numpy as np
@@ -10,23 +11,26 @@ from copy import deepcopy
 forward_file = "/home/lsawade/lwsspy/lwsspy.GF/data/forward_database_gf.bp"
 reciprocal_file = "/home/lsawade/lwsspy/lwsspy.GF/data/reciprocal_database_gf.bp"
 seismograms = "/home/lsawade/lwsspy/lwsspy.GF/data/II.BFO.*"
+
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
 # From constants.h.in
-GRAV = 6.67384e-11      # gravitational constant in m3 kg-1 s-2, or equivalently in N.(m/kg)^2
+# gravitational constant in m3 kg-1 s-2, or equivalently in N.(m/kg)^2
+GRAV = 6.67384e-11
 R_PLANET = 6371000.0    # radius of the Earth in m
 RHOAV = 5514.3          # Avergage density of the Earth
 
 # Scaling of the GCMT moment tensor parameters in specfem
-scaleM = 1e7 * RHOAV * (R_PLANET **5) * np.pi * GRAV * RHOAV
+scaleM = 1e7 * RHOAV * (R_PLANET ** 5) * np.pi * GRAV * RHOAV
 
 # Scaling of the FORCESOLUTION parameters
-scaleF = RHOAV * (R_PLANET **5) * np.pi * GRAV * RHOAV
+scaleF = RHOAV * (R_PLANET ** 5) * np.pi * GRAV * RHOAV
 
 # Hello
 NGLLX, NGLLY, NGLLZ = 5, 5, 5
+
 
 class Variable:
 
@@ -80,7 +84,6 @@ class Variable:
             #     f'{varname}/array',
             #      start=start, count=count, step_start=0, step_count=nsteps, block_id=block_id).T
 
-
         elif rtype == 'scalar':
             self.array = fh.read(
                 f'{varname}', block_id=block_id)[block_id]
@@ -95,7 +98,6 @@ class Variable:
 # with-as will call adios2.close on fh at the end
 # if only one rank is active pass MPI.COMM_SELF
 with adios2.open(reciprocal_file, "r", comm) as rh:
-
 
     with adios2.open(forward_file, "r", comm) as fh:
 
@@ -119,7 +121,6 @@ with adios2.open(reciprocal_file, "r", comm) as rh:
 
             # Receiver location in element
             print(rxi.array[0], reta.array[0], rgamma.array[0])
-
 
             # Source
             sxi = Variable(fh, 'xi_source', 4)
@@ -189,21 +190,27 @@ with adios2.open(reciprocal_file, "r", comm) as rh:
             repsilon_xz = Variable(fh, 'epsilon_xz', block_id=0, nsteps=nsteps)
             repsilon_yz = Variable(fh, 'epsilon_yz', block_id=0, nsteps=nsteps)
 
-            repsilon_xx.array = repsilon_xx.array.reshape((5, 5, 5, -1), order='F')
-            repsilon_yy.array = repsilon_yy.array.reshape((5, 5, 5, -1), order='F')
-            repsilon_zz.array = repsilon_zz.array.reshape((5, 5, 5, -1), order='F')
-            repsilon_xy.array = repsilon_xy.array.reshape((5, 5, 5, -1), order='F')
-            repsilon_xz.array = repsilon_xz.array.reshape((5, 5, 5, -1), order='F')
-            repsilon_yz.array = repsilon_yz.array.reshape((5, 5, 5, -1), order='F')
+            repsilon_xx.array = repsilon_xx.array.reshape(
+                (5, 5, 5, -1), order='F')
+            repsilon_yy.array = repsilon_yy.array.reshape(
+                (5, 5, 5, -1), order='F')
+            repsilon_zz.array = repsilon_zz.array.reshape(
+                (5, 5, 5, -1), order='F')
+            repsilon_xy.array = repsilon_xy.array.reshape(
+                (5, 5, 5, -1), order='F')
+            repsilon_xz.array = repsilon_xz.array.reshape(
+                (5, 5, 5, -1), order='F')
+            repsilon_yz.array = repsilon_yz.array.reshape(
+                (5, 5, 5, -1), order='F')
 
-            i,j,k = 0,0,0
+            i, j, k = 0, 0, 0
             plt.figure()
-            plt.plot(epsilon_xx[i,j,k,:], label='xx')
-            plt.plot(epsilon_yy[i,j,k,:], label='yy')
-            plt.plot(epsilon_zz[i,j,k,:], label='zz')
-            plt.plot(epsilon_xy[i,j,k,:], label='xy')
-            plt.plot(epsilon_xz[i,j,k,:], label='xz')
-            plt.plot(epsilon_yz[i,j,k,:], label='yz')
+            plt.plot(epsilon_xx[i, j, k, :], label='xx')
+            plt.plot(epsilon_yy[i, j, k, :], label='yy')
+            plt.plot(epsilon_zz[i, j, k, :], label='zz')
+            plt.plot(epsilon_xy[i, j, k, :], label='xy')
+            plt.plot(epsilon_xz[i, j, k, :], label='xz')
+            plt.plot(epsilon_yz[i, j, k, :], label='yz')
             plt.legend()
             plt.savefig('eps.png', dpi=300)
             # sys.exit()
@@ -212,19 +219,19 @@ with adios2.open(reciprocal_file, "r", comm) as rh:
             shxi, shpxi = lagrange_any(sxi.array[0], xigll, npol)
             sheta, shpeta = lagrange_any(seta.array[0], xigll, npol)
             shgamma, shpgamma = lagrange_any(sgamma.array[0], xigll, npol)
-            sepsilon = np.zeros((6,nsteps))
+            sepsilon = np.zeros((6, nsteps))
 
             for k in range(NGLLZ):
                 for j in range(NGLLY):
                     for i in range(NGLLX):
                         hlagrange = shxi[i] * sheta[j] * shgamma[k]
 
-                        sepsilon[0,:] += epsilon_xx[i,j,k,:] * hlagrange
-                        sepsilon[1,:] += epsilon_yy[i,j,k,:] * hlagrange
-                        sepsilon[2,:] += epsilon_zz[i,j,k,:] * hlagrange
-                        sepsilon[3,:] += epsilon_xy[i,j,k,:] * hlagrange
-                        sepsilon[4,:] += epsilon_xz[i,j,k,:] * hlagrange
-                        sepsilon[5,:] += epsilon_yz[i,j,k,:] * hlagrange
+                        sepsilon[0, :] += epsilon_xx[i, j, k, :] * hlagrange
+                        sepsilon[1, :] += epsilon_yy[i, j, k, :] * hlagrange
+                        sepsilon[2, :] += epsilon_zz[i, j, k, :] * hlagrange
+                        sepsilon[3, :] += epsilon_xy[i, j, k, :] * hlagrange
+                        sepsilon[4, :] += epsilon_xz[i, j, k, :] * hlagrange
+                        sepsilon[5, :] += epsilon_yz[i, j, k, :] * hlagrange
 
             # l;dkfs
             plt.figure()
@@ -235,25 +242,27 @@ with adios2.open(reciprocal_file, "r", comm) as rh:
             # Moment tensor
             fm = 1.0
             M = np.array(
-                [[   Mxx.array[0], fm*Mxy.array[0], fm*Mxz.array[0]],
+                [[Mxx.array[0], fm*Mxy.array[0], fm*Mxz.array[0]],
                  [fm*Mxy.array[0],    Myy.array[0], fm*Myz.array[0]],
                  [fm*Mxz.array[0], fm*Myz.array[0],    Mzz.array[0]]])*scaleM
 
             # print(Mxx.array[0],Mzz.array[0],Mzz.array[0],)
             # Build SGT for dot product
-            f = 1.0 #/np.sqrt(2)
-            sgt = np.zeros((3,3,nsteps))
-            sgt[0,0,:], sgt[0,1,:], sgt[0,2,:] =   sepsilon[0,:], f*sepsilon[3,:], f*sepsilon[4,:]
-            sgt[1,0,:], sgt[1,1,:], sgt[1,2,:] = f*sepsilon[3,:],   sepsilon[1,:], f*sepsilon[5,:]
-            sgt[2,0,:], sgt[2,1,:], sgt[2,2,:] = f*sepsilon[4,:], f*sepsilon[5,:],   sepsilon[2,:]
+            f = 1.0  # /np.sqrt(2)
+            sgt = np.zeros((3, 3, nsteps))
+            sgt[0, 0, :], sgt[0, 1, :], sgt[0, 2, :] = sepsilon[0, :], f * \
+                sepsilon[3, :], f*sepsilon[4, :]
+            sgt[1, 0, :], sgt[1, 1, :], sgt[1, 2, :] = f * \
+                sepsilon[3, :],   sepsilon[1, :], f*sepsilon[5, :]
+            sgt[2, 0, :], sgt[2, 1, :], sgt[2, 2, :] = f * \
+                sepsilon[4, :], f*sepsilon[5, :],   sepsilon[2, :]
 
-            sgt = sgt.transpose(1,0,2)
+            sgt = sgt.transpose(1, 0, 2)
             # dot product
             z = np.einsum('ji,ijk->k', M.T, sgt)
             plt.figure()
             plt.plot(z)
             plt.savefig('sgt_displacement.png', dpi=300)
-
 
             # Strain array
             # sys.exit()
@@ -319,8 +328,8 @@ with adios2.open(reciprocal_file, "r", comm) as rh:
                 # plt.subplot(6, 1, (2*i)+2)
                 plt.plot(st[i].data-s[idx[i], :], 'b', lw=0.5)
 
-                if i==2:
-                    plt.plot(np.roll(z,20)/z.max()*s[idx[i]].max(), 'b:')
+                if i == 2:
+                    plt.plot(np.roll(z, 20)/z.max()*s[idx[i]].max(), 'b:')
 
                 plt.subplots_adjust(hspace=0.45)
             plt.savefig('test.png', dpi=300)

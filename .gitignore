@@ -1,2 +1,7 @@
 .DS_Store
 dependencies
+__pycache__
+*.egg-info
+build
+*.pdf
+*.png

@@ -27,7 +27,7 @@ from glob import glob
 
 # Check whether cmake is available
 
-if which('cmake3') is None:
+if which('cmake') is None:
     print('cmake is required to install ADIOS 2.')
     print('Please install before proceeding')
     sys.exit()
@@ -92,7 +92,8 @@ os.environ['CC'] = str(which('mpicc'))
 os.environ['CXX'] = str(which('mpicxx'))
 os.environ['MPICC'] = str(which('mpicc'))
 
-PYTHON = os.path.abspath(str(which("python3")))
+# os.path.abspath(str(which("python3")))
+PYTHON = "/Users/lucassawade/opt/miniconda3/envs/gf/bin/python"
 PYTHON_INCLUDE_DIRS = os.path.join(
     os.path.dirname(os.path.dirname(PYTHON)), 'include')
 PYTHON_LIB = os.path.join(os.path.dirname(os.path.dirname(PYTHON)), 'lib')
@@ -105,8 +106,8 @@ print(70*"=")
 # Get python executable
 # The capitalization of the '-DPython_EXECUTABLE={PYTHON} ' is important!!!
 configuration_call = (
-    f'cmake3 -DCMAKE_INSTALL_PREFIX={ADIOS_INSTALL} '
-    '-DADIOS2_USE_MPI=OFF '
+    f'cmake -DCMAKE_INSTALL_PREFIX={ADIOS_INSTALL} '
+    '-DADIOS2_USE_MPI=ON '
     '-DADIOS2_USE_Fortran=ON '
     '-DADIOS2_USE_HDF5=OFF '
     '-DADIOS2_USE_Python=ON '
@@ -140,7 +141,7 @@ SOURCE = BINDINGS
 # Link target
 PYTHON_VERSION = SOURCE.split('/')[-3]
 TARGET = os.path.join(os.path.dirname(os.path.dirname(
-    str(which('python')))), 'lib', PYTHON_VERSION, "site-packages", "adios2")
+    os.path.abspath(PYTHON))), 'lib', PYTHON_VERSION, "site-packages", "adios2")
 
 # Remove old link
 if os.path.islink(TARGET):
@@ -153,7 +154,7 @@ check_call(f'ln -s {SOURCE} {TARGET}', shell=True)
 # Link the libraries
 LIBDIR = os.path.join(ADIOS_INSTALL, 'lib')
 PYTHON_DIRECTORY = os.path.join(os.path.dirname(
-    os.path.dirname(str(which('python')))), 'lib')
+    os.path.dirname(os.path.abspath(PYTHON))), 'lib')
 for _file in os.listdir(LIBDIR):
     if _file == 'cmake':
         continue

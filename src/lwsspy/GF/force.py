@@ -13,6 +13,8 @@ component dir vect source Z_UP:  1.d0       ! Upward force
 """
 
 
+from multiprocessing.sharedctypes import Value
+from os import PathLike
 from time import time
 
 
@@ -58,6 +60,25 @@ class Force:
         self.vector_Z_UP = vector_Z_UP
         self.force_no = force_no
 
+    @classmethod
+    def BFO(cls, comp='Z'):
+
+        N, E, Z = 0.0, 0.0, 0.0
+
+        if comp == 'Z':
+            Z = 1.0
+        elif comp == 'E':
+            E = 1.0
+        elif comp == 'N':
+                    N = 1.0
+        else:
+            raise ValueError('Component must be N, E, or Z')
+
+        return cls(
+            timeshift=0.0, hdur=0.0, latitude=48.3319, longitude=8.3311,
+            depth=0.0, stf=2, forcefactor=1e14, vector_E=E, vector_N=N,
+            vector_Z_UP=Z, force_no=1)
+
     @staticmethod
     def float_to_str(x: float, N: int):
 
@@ -77,6 +98,11 @@ class Force:
                 out += '.d0'
 
         return out
+
+    def write(self, outfile: str):
+
+        with open(outfile, 'w') as f:
+            f.write(self.__repr__())
 
     def __repr__(self) -> str:
 

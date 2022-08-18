@@ -1,4 +1,6 @@
 import os
+import subprocess
+from shutil import copytree, ignore_patterns
 import typing as tp
 import numpy as np
 from .source import FORCESOLUTION, CMTSOLUTION
@@ -119,6 +121,43 @@ class Simulation:
             if self.cmtsolutionfile is None:
                 raise ValueError(
                     'For forward test CMTSOLUTION must be provided')
+
+    def create(self):
+        """Actually creates all necessary directories, after .setup() is run."""
+
+        if self.forward_test:
+
+            # ignore the rundirs
+            ignorings = ignore_patterns('run00*')
+
+            # Copy specfemdirectory
+            copytree(self.specfemdir, self.specfemdir_forward, ignore=ignorings)
+
+        # make rundirs
+        for _comp, _compdict in self.compdict.items():
+
+            # Remove pre-existing directory
+            if os.path.exists(_compdict['dir']):
+                subprocess.check_call(f'rm -rf {_compdict["dir"]}', shell=True)
+
+            # Make dir
+            os.makedirs(_compdict["dir"])
+
+            # Create Write all the files
+            self.write_Par_file()
+            self.write_STATIONS()
+            self.write_GF_LOCATIONS()
+            self.write_CMT()
+
+            if self.simultaneous_runs is False:
+
+                # Link DATABASES
+                DATABASES_MPI_SOURCE = os.path.join(
+                    self.specfemdir, "DATABASES_MPI")
+                DATABASES_MPI_TARGET = os.path.join(
+                    _compdict["dir"], "DATABASES_MPI")
+
+                os.symlink(DATABASES_MPI_SOURCE, DATABASES_MPI_TARGET)
 
     def setup(self):
         """Setting up the directory structure for specfem."""

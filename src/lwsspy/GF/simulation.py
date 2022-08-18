@@ -298,6 +298,9 @@ class Simulation:
         if self.simultaneous_runs:
             pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 3
             pardict['BROADCAST_SAME_MESH_AND_MODEL'] = True
+        else:
+            pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
+            pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
 
         # pardict['NSTEP'] = self.nstep
         # pardict['DT'] = self.dt

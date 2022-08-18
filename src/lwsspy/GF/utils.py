@@ -1,3 +1,4 @@
+from asyncio import constants
 from collections import OrderedDict
 from curses.has_key import has_key
 from multiprocessing.sharedctypes import Value
@@ -114,7 +115,7 @@ def par_file2par(value: str, verbose: bool = False) -> float | str | int | bool:
     return rvalue
 
 
-def get_par_file(parfile, savecomments: bool = False, verbose: bool = True) -> dict:
+def get_par_file(parfile, savecomments: bool = False, verbose: bool = True) -> OrderedDict:
 
     pardict = OrderedDict()
     cmtcounter = 0
@@ -230,3 +231,36 @@ def write_par_file(pardict: OrderedDict, par_file: str | None = None, write_comm
     # Close file if defined
     if f is not None:
         f.close()
+
+
+def update_constants(infile: str, outfile: str | None = None, rotation='+'):
+
+    if rotation not in ['+', '-']:
+        raise ValueError('rotation must be "+", or "-".')
+
+    # Read constants.h.in
+    with open(infile, 'r') as inconstants:
+        lines = inconstants.readlines()
+
+    # Replace the set the rotation value to either + or
+    newlines = []
+    for line in lines:
+
+        if 'EARTH_HOURS_PER_DAY' in line:
+            if rotation == '+':
+                newlines.append(
+                    '  double precision, parameter :: EARTH_HOURS_PER_DAY = 24.d0\n')
+            else:
+                newlines.append(
+                    '  double precision, parameter :: EARTH_HOURS_PER_DAY = -24.d0\n')
+
+        else:
+            newlines.append(line)
+
+    # Write to out
+    if outfile is not None:
+        with open(outfile, 'w') as outconstants:
+            outconstants.writelines(newlines)
+    else:
+        for line in newlines:
+            print(line.rstrip())

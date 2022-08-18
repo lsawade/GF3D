@@ -114,6 +114,7 @@ class Simulation:
             self.target_longitude,
             self.target_depth], error='Target location')
 
+        # Check forward test specific values
         if self.forward_test:
             if self.cmtsolutionfile is None:
                 raise ValueError(
@@ -283,20 +284,51 @@ class Simulation:
         """Only for forward test. Otherwise it doesn't matter."""
 
         # Read test cmt
-        cmt = CMTSOLUTION.read(self.cmtsolutionfile)
+        cmt = CMTSOLUTION.read(self.cmtsolutionfile)  # type: ignore
         cmt.write(self.CMTSOLUTION_file)
 
     def write_Par_file(self):
 
         # modify Reciprocal Par_file
+        pardict = self.pardict.copy()
 
-        for _comp, _compdict in self.compdict.items():
+        pardict['SAVE_GREEN_FUNCTIONS'] = True
+
+        # IF runs have to be parallel
+        if self.simultaneous_runs:
+            pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 3
+            pardict['BROADCAST_SAME_MESH_AND_MODEL'] = True
+
+        # pardict['NSTEP'] = self.nstep
+        # pardict['DT'] = self.dt
+        # pardict['T0'] = self.T0
+
+        for _, _compdict in self.compdict.items():
 
             # GF_LOCATIONS file
             par_file = os.path.join(
                 _compdict['dir'], 'DATA', 'Par_file')
 
-            utils.write_par_file()
+            # Write Par file for each sub dir
+            utils.write_par_file(pardict, par_file)
+
+        if self.forward_test:
+
+            # modify Reciprocal Par_file
+            pardict = self.pardict.copy()
+            pardict['SAVE_GREEN_FUNCTIONS'] = False
+
+            pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
+            pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
+
+            # Write Par_file
+            utils.write_par_file(pardict, self.par_file_forward)
+
+            pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 3
+            pardict['BROADCAST_SAME_MESH_AND_MODEL'] = True
+            # pardict['NSTEP'] = self.nstep
+            # pardict['DT'] = self.dt
+            # pardict['T0'] = self.T0
 
     def write_STF(self):
         pass

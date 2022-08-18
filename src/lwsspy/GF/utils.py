@@ -264,3 +264,20 @@ def update_constants(infile: str, outfile: str | None = None, rotation='+'):
     else:
         for line in newlines:
             print(line.rstrip())
+
+
+def checktypes(checklist: list, error: str):
+
+    # Get the type of the first thing in the list
+    firsttype = type(checklist[0])
+
+    # Check if types match
+    if all([isinstance(_c, firsttype) for _c in checklist]) is False:
+        raise ValueError(f'All values have to match for {error}.')
+
+    # If array check if shapes match
+    if firsttype == np.ndarray:
+        shape = np.shape(checklist[0])
+
+        if all([shape == np.shape(_c) for _c in checklist]) is False:
+            raise ValueError(f'All values have to match for {error}.')

@@ -18,7 +18,8 @@ class Simulation:
     pardict: tp.OrderedDict
 
     def __init__(
-            self, specfemdir,
+            self,
+            specfemdir,
             station_latitude: float,
             station_longitude: float,
             station_burial: float,
@@ -28,7 +29,8 @@ class Simulation:
             target_longitude: float | np.ndarray | tp.Iterable,
             target_depth: float | np.ndarray | tp.Iterable,
             force_factor: float = 1e14,
-            t0: float = 0.0, tc: float = 0.0,
+            t0: float = 0.0,
+            tc: float = 0.0,
             duration_in_min: float = 20.0,
             nstep: None | int = None,
             ndt: None | float = None,

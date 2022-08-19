@@ -1,5 +1,7 @@
 import numpy as np
 
+LOG_LEVEL = "DEBUG"
+
 # Some constant numbers
 ONE: float = 1.0
 ZERO: float = 0.0

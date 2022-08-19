@@ -5,6 +5,7 @@ import typing as tp
 import numpy as np
 from .source import FORCESOLUTION, CMTSOLUTION
 from . import utils
+from .logger import logger
 
 
 class Simulation:
@@ -86,6 +87,7 @@ class Simulation:
         self.tc = tc
         self.duration_in_min = duration_in_min
         self.nstep = nstep
+        self.ndt_requested = ndt
         self.ndt = ndt
 
         # Parameters for a forward backward test
@@ -97,6 +99,9 @@ class Simulation:
         # Submission specific options
         self.simultaneous_runs = simultaneous_runs
         self.broadcast_mesh_model = broadcast_mesh_model
+
+        # Logger
+        self.logger = logger
 
         # Run setup
         self.check_inputs()
@@ -131,7 +136,23 @@ class Simulation:
             ignorings = ignore_patterns('run00*')
 
             # Copy specfemdirectory
-            copytree(self.specfemdir, self.specfemdir_forward, ignore=ignorings)
+            copytreecmd = f"""
+            rsync -av \
+                --exclude='run00*' \
+                --exclude='.*' \
+                --exclude='EXAMPLES' \
+                --exclude='tests' \
+                --exclude='utils' \
+                --exclude='doc' \
+                --exclude='DATABASES_MPI/*' \
+                --exclude='obj/*' \
+                --exclude='bin/*' \
+                --delete --ignore-existing \
+                {self.specfemdir}/ {self.specfemdir_forward}"""
+
+            subprocess.check_call(copytreecmd, shell=True)
+            # copytree(self.specfemdir, self.specfemdir_forward, ignore=ignorings)
+
 
         # make rundirs
         for _comp, _compdict in self.compdict.items():
@@ -143,12 +164,6 @@ class Simulation:
             # Make dir
             os.makedirs(_compdict["dir"])
 
-            # Create Write all the files
-            self.write_Par_file()
-            self.write_STATIONS()
-            self.write_GF_LOCATIONS()
-            self.write_CMT()
-
             if self.simultaneous_runs is False:
 
                 # Link DATABASES
@@ -159,10 +174,16 @@ class Simulation:
 
                 os.symlink(DATABASES_MPI_SOURCE, DATABASES_MPI_TARGET)
 
+        # Create Write all the files
+        self.write_Par_file()
+        self.write_STATIONS()
+        self.write_GF_LOCATIONS()
+        self.write_CMT()
+
     def setup(self):
         """Setting up the directory structure for specfem."""
         # Mostly setting up paths
-        self.specfemdir = os.path.abspath(self.specfemdir)
+        # self.specfemdir = os.path.abspath(self.specfemdir)
 
         # Source Time Function file
         self.stf_file = os.path.join(self.specfemdir, 'DATA', 'stf')
@@ -176,7 +197,7 @@ class Simulation:
             self.specfemdir, 'DATA', 'Par_file')
 
         # Read Par_file into dictionary from (include comments for posterity)
-        self.pardict = utils.get_par_file(self.par_file, savecomments=True)
+        self.pardict = utils.get_par_file(self.par_file, savecomments=True, verbose=False)
 
         # Get simulation sampling rate and min period
         self.dt, self.T = utils.get_dt_from_mesh_header(self.specfemdir)
@@ -215,7 +236,7 @@ class Simulation:
 
         # Read Par_file into dictionary from (include comments for posterity)
         self.pardict_forward = utils.get_par_file(
-            self.par_file, savecomments=True)
+            self.par_file, savecomments=True, verbose=False)
 
     def update_rotation(self):
         """Updates the rotation value in the ``constants.h.in``
@@ -322,9 +343,10 @@ class Simulation:
     def write_CMT(self):
         """Only for forward test. Otherwise it doesn't matter."""
 
-        # Read test cmt
-        cmt = CMTSOLUTION.read(self.cmtsolutionfile)  # type: ignore
-        cmt.write(self.CMTSOLUTION_file)
+        if self.forward_test:
+            # Read test cmt
+            cmt = CMTSOLUTION.read(self.cmtsolutionfile)  # type: ignore
+            cmt.write(self.CMTSOLUTION_file)
 
     def write_Par_file(self):
 
@@ -371,6 +393,38 @@ class Simulation:
             # pardict['NSTEP'] = self.nstep
             # pardict['DT'] = self.dt
             # pardict['T0'] = self.T0
+
+    def __str__(self) -> str:
+        rstr = "\n"
+        rstr += "Reciprocal Simulation Setup:\n"
+        rstr += "-----------------------------\n"
+        rstr += f"Specfem basedir:{self.specfemdir:.>56}\n"
+        rstr += f"E:{self.compdict['N']['dir']:.>70}\n"
+        rstr += f"N:{self.compdict['N']['dir']:.>70}\n"
+        rstr += f"Z:{self.compdict['N']['dir']:.>70}\n"
+        rstr += "\n"
+        rstr += f"Force Factor:{self.force_factor:.>59.4g}\n"
+        rstr += f"T0:{self.t0:.>69.4f}\n"
+        rstr += f"TC:{self.tc:.>69.4f}\n"
+        rstr += f"DT:{self.dt:.>69.4f}\n"
+        rstr += f"NDT requested:{self.ndt_requested:.>58.4f}\n"
+        rstr += f"NDT:{self.ndt:.>68.4f}\n"
+        rstr += "\n"
+        rstr += f"ROTATION:{self.pardict['ROTATION']!s:.>63}\n"
+        rstr += f"SIMULTANEOUS_RUNS:{self.simultaneous_runs!s:.>54}\n"
+        rstr += f"BROADCAST_SAME_MESH_AND_MODEL:{self.pardict['BROADCAST_SAME_MESH_AND_MODEL']:.>42}\n"
+
+
+        if self.forward_test:
+            rstr += "\n"
+            rstr += "Forward Test Setup:\n"
+            rstr += "-------------------\n"
+            rstr += f"Specfem forward:{self.specfemdir_forward:.>56}\n"
+
+        return rstr
+
+    def __repr__(self) -> str:
+        self.__str__()
 
     def write_STF(self):
         pass

@@ -5,7 +5,7 @@ from mpi4py import MPI
 import numpy as np
 import adios2
 import matplotlib.pyplot as plt
-from lagrange import lagrange_any, gll_nodes
+from .lagrange import lagrange_any, gll_nodes
 from obspy import read
 from time import sleep
 from copy import deepcopy
@@ -332,15 +332,16 @@ for _dir in dirs:
                 print('subplot:', 511 + counter)
                 ax = fig.add_subplot(511 + counter)
 
-                ax.plot(tr.times(), s[2, :], 'k', lw=0.75, label='GF')
-                ax.plot(tr.times(), tr.data, 'r--',
-                        lw=0.75, label='SF3D_GLOBE')
-                # plt.plot(tr.data-s[2, :], 'b', lw=0.5)
+                ax.plot(tr.times(), tr.data, 'k',
+                        lw=0.75, label='Forward')
+                ax.plot(tr.times(), s[2, :], 'r--', lw=0.75, label='Fw-GF')
                 ax.plot(tr.times(), z/z.max() *
-                        s[2, :].max(), 'b:', lw=0.75, label='Reci')
+                        tr.data.max(), 'b:', lw=0.75, label='Reciprocal')
+                ax.plot(tr.times(), tr.data-z/z.max() *
+                        tr.data.max(), 'b', lw=0.5, label='error*10')
                 ax.set_xlim(200, 600)
                 absmax = np.max(
-                    np.abs(np.hstack((s[2, :], tr.data, z/z.max()*s[2, :].max()))))
+                    np.abs(np.hstack((s[2, :], tr.data, z/z.max()*tr.data.max()))))
                 ax.set_ylim(-absmax, absmax)
                 plot_label(
                     ax, f'{_dir}\nMax Disp: {np.max(absmax): .5} m', fontsize='xx-small', box=False)

@@ -1,4 +1,6 @@
 # setup_logger.py
 import logging
-logging.basicConfig(level=logging.DEBUG)
+from .constants import LOG_LEVEL
+
+logging.basicConfig(level=LOG_LEVEL)
 logger = logging.getLogger('GF')

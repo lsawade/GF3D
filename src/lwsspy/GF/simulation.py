@@ -1,8 +1,8 @@
 import os
 import subprocess
-from shutil import copytree, ignore_patterns
 import typing as tp
 import numpy as np
+from copy import deepcopy
 from .source import FORCESOLUTION, CMTSOLUTION
 from . import utils
 from .logger import logger
@@ -132,8 +132,7 @@ class Simulation:
 
         if self.forward_test:
 
-            # ignore the rundirs
-            ignorings = ignore_patterns('run00*')
+            self.logger.debug('Creating Forward Test directory.')
 
             # Copy specfemdirectory
             copytreecmd = f"""
@@ -151,11 +150,13 @@ class Simulation:
                 {self.specfemdir}/ {self.specfemdir_forward}"""
 
             subprocess.check_call(copytreecmd, shell=True)
-            # copytree(self.specfemdir, self.specfemdir_forward, ignore=ignorings)
 
 
         # make rundirs
         for _comp, _compdict in self.compdict.items():
+
+            # Hello
+            self.logger.debug(f'Creating Simulation Directory for {_comp}: {_compdict["dir"]}')
 
             # Remove pre-existing directory
             if os.path.exists(_compdict['dir']):
@@ -176,7 +177,7 @@ class Simulation:
 
                 # Link DATABASES
                 DATABASES_MPI_SOURCE = os.path.join(
-                    self.specfemdir, "DATABASES_MPI")
+                    '..', "DATABASES_MPI")
                 DATABASES_MPI_TARGET = os.path.join(
                     _compdict["dir"], "DATABASES_MPI")
 
@@ -184,16 +185,33 @@ class Simulation:
 
                 # Link BINs
                 BINS_SOURCE = os.path.join(
-                    self.specfemdir, "bin")
+                    "..", "bin")
                 BINS_TARGET = os.path.join(
                     _compdict["dir"], "bin")
 
                 os.symlink(BINS_SOURCE, BINS_TARGET)
 
         # Create Write all the files
+
+        # Write Rotation files
+        self.logger.debug('Updating Rotation in constants.h.in ...')
+        self.update_rotation()
+
+        # Write Par_files
+        self.logger.debug('Writing Par_file ...')
         self.write_Par_file()
-        self.write_STATIONS()
+
+        # Update forces and STATIONS
+        self.update_forces_and_stations()
+
+    def update_forces_and_stations(self):
+        self.logger.debug('Writing FORCESOLUTIONS ...')
+        self.write_FORCES()
+        self.logger.debug('Writing GF_LOCATIONS ...')
         self.write_GF_LOCATIONS()
+        self.logger.debug('Writing STATIONS ...')
+        self.write_STATIONS()
+        self.logger.debug('Writing CMTSOLUTIONS ...')
         self.write_CMT()
 
     def setup(self):
@@ -213,9 +231,11 @@ class Simulation:
             self.specfemdir, 'DATA', 'Par_file')
 
         # Read Par_file into dictionary from (include comments for posterity)
+        self.logger.debug('Reading Par_file')
         self.pardict = utils.get_par_file(self.par_file, savecomments=True, verbose=False)
 
         # Get simulation sampling rate and min period
+        self.logger.debug('Getting Values from mesher')
         self.dt, self.T = utils.get_dt_from_mesh_header(self.specfemdir)
 
         # Print statement showing the setup
@@ -248,7 +268,10 @@ class Simulation:
 
         # Stations file
         self.CMTSOLUTION_file = os.path.join(
-            self.specfemdir_forward, 'DATA', 'STATIONS')
+            self.specfemdir_forward, 'DATA', 'CMTSOLUTION')
+
+        # Read test cmt
+        self.cmt = CMTSOLUTION.read(self.cmtsolutionfile)  # type: ignore
 
         # Read Par_file into dictionary from (include comments for posterity)
         self.pardict_forward = utils.get_par_file(
@@ -257,14 +280,13 @@ class Simulation:
     def update_rotation(self):
         """Updates the rotation value in the ``constants.h.in``
         """
-
         if self.pardict['ROTATION']:
             utils.update_constants(self.constants_file,
                                    self.constants_file, rotation='-')
 
         if self.forward_test:
-            utils.update_constants(self.constants_file,
-                                   self.constants_file, rotation='+')
+            utils.update_constants(self.constants_file_forward,
+                                   self.constants_file_forward, rotation='+')
 
     def write_GF_LOCATIONS(self):
 
@@ -296,6 +318,22 @@ class Simulation:
                         self.target_depth):
                     f.write(f'{_lat:7.4f}   {_lon:7.4f}   {_dep:7.4f}')
 
+        if self.forward_test:
+
+            # GF_LOCATIONS file
+            locations_file = os.path.join(
+                self.specfemdir_forward, 'DATA', 'GF_LOCATIONS')
+
+            # Open GF locations file for each compenent
+            with open(locations_file, 'w') as f:
+
+                lat, lon, dep = (
+                    self.station_latitude,
+                    self.station_longitude,
+                    self.station_burial)
+
+                f.write(f'{lat:7.4f}   {lon:7.4f}   {dep:7.4f}')
+
     def write_FORCES(self):
 
         for _comp, _compdict in self.compdict.items():
@@ -316,9 +354,16 @@ class Simulation:
             else:
                 raise ValueError('Component must be N, E, or Z')
 
+            if self.forward_test:
+                hdur = self.cmt.hdur
+                time_shift = self.cmt.time_shift
+            else:
+                hdur = 0.0
+                time_shift = 0.0
+
             # Create force and
             force = FORCESOLUTION(
-                time_shift=0.0, hdur=0.0,
+                time_shift=time_shift, hdur=hdur,
                 latitude=self.station_latitude,
                 longitude=self.station_longitude,
                 depth=self.station_burial, stf=2,
@@ -360,16 +405,15 @@ class Simulation:
         """Only for forward test. Otherwise it doesn't matter."""
 
         if self.forward_test:
-            # Read test cmt
-            cmt = CMTSOLUTION.read(self.cmtsolutionfile)  # type: ignore
-            cmt.write(self.CMTSOLUTION_file)
+            self.cmt.write(self.CMTSOLUTION_file)
 
     def write_Par_file(self):
 
         # modify Reciprocal Par_file
-        pardict = self.pardict.copy()
+        pardict = deepcopy(self.pardict)
 
         pardict['SAVE_GREEN_FUNCTIONS'] = True
+        pardict['USE_FORCE_POINT_SOURCE'] = True
 
         # IF runs have to be parallel
         if self.simultaneous_runs:
@@ -385,9 +429,14 @@ class Simulation:
 
         for _, _compdict in self.compdict.items():
 
-            # GF_LOCATIONS file
-            par_file = os.path.join(
-                _compdict['dir'], 'DATA', 'Par_file')
+            # Don't write first Par_file since it is in the
+            # Main directory
+            if self.simultaneous_runs is True and 'run0001' in _compdict['dir']:
+                par_file = os.path.join(
+                    self.specfemdir, 'DATA', 'Par_file')
+            else:
+                par_file = os.path.join(
+                    _compdict['dir'], 'DATA', 'Par_file')
 
             # Write Par file for each sub dir
             utils.write_par_file(pardict, par_file)
@@ -395,8 +444,9 @@ class Simulation:
         if self.forward_test:
 
             # modify Reciprocal Par_file
-            pardict = self.pardict.copy()
-            pardict['SAVE_GREEN_FUNCTIONS'] = False
+            pardict = deepcopy(self.pardict)
+            pardict['SAVE_GREEN_FUNCTIONS'] = True
+            pardict['USE_FORCE_POINT_SOURCE'] = False
 
             pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
             pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
@@ -404,8 +454,6 @@ class Simulation:
             # Write Par_file
             utils.write_par_file(pardict, self.par_file_forward)
 
-            pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 3
-            pardict['BROADCAST_SAME_MESH_AND_MODEL'] = True
             # pardict['NSTEP'] = self.nstep
             # pardict['DT'] = self.dt
             # pardict['T0'] = self.T0
@@ -415,9 +463,9 @@ class Simulation:
         rstr += "Reciprocal Simulation Setup:\n"
         rstr += "-----------------------------\n"
         rstr += f"Specfem basedir:{self.specfemdir:.>56}\n"
-        rstr += f"E:{self.compdict['N']['dir']:.>70}\n"
+        rstr += f"E:{self.compdict['E']['dir']:.>70}\n"
         rstr += f"N:{self.compdict['N']['dir']:.>70}\n"
-        rstr += f"Z:{self.compdict['N']['dir']:.>70}\n"
+        rstr += f"Z:{self.compdict['Z']['dir']:.>70}\n"
         rstr += "\n"
         rstr += f"Force Factor:{self.force_factor:.>59.4g}\n"
         rstr += f"T0:{self.t0:.>69.4f}\n"

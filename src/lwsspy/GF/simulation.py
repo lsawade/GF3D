@@ -164,6 +164,14 @@ class Simulation:
             # Make dir
             os.makedirs(_compdict["dir"])
 
+            # DATA DIR
+            DATADIR = os.path.join(_compdict["dir"], 'DATA')
+            os.makedirs(DATADIR)
+
+            # OUTPUT DIR
+            OUTPUT_DIR = os.path.join(_compdict["dir"], 'OUTPUT_FILES')
+            os.makedirs(OUTPUT_DIR)
+
             if self.simultaneous_runs is False:
 
                 # Link DATABASES
@@ -173,6 +181,14 @@ class Simulation:
                     _compdict["dir"], "DATABASES_MPI")
 
                 os.symlink(DATABASES_MPI_SOURCE, DATABASES_MPI_TARGET)
+
+                # Link BINs
+                BINS_SOURCE = os.path.join(
+                    self.specfemdir, "bin")
+                BINS_TARGET = os.path.join(
+                    _compdict["dir"], "bin")
+
+                os.symlink(BINS_SOURCE, BINS_TARGET)
 
         # Create Write all the files
         self.write_Par_file()

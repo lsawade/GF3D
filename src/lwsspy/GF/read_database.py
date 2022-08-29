@@ -96,12 +96,12 @@ class Variable:
 # if( rank == 0 ):
 # with-as will call adios2.close on fh at the end
 # if only one rank is active pass MPI.COMM_SELF
-
-dirs = ['attenuation_only', 'attenuation_ellipticity_only',
-        'no_gravity_rotation', 'no_rotation', 'all_on']
+# 'attenuation_only', 'attenuation_ellipticity_only', 'no_gravity_rotation', 'no_rotation',
+dirs = ['all_on']
 
 if rank == 0:
     fig = plt.figure(figsize=(10, 11))
+    ax = plt.axes()
 
 counter = 0
 
@@ -330,21 +330,22 @@ for _dir in dirs:
 
                 # plt.subplot(3, 1, (2*i)+1)
                 print('subplot:', 511 + counter)
-                ax = fig.add_subplot(511 + counter)
+                # ax = fig.add_subplot(511 + counter)
 
                 ax.plot(tr.times(), tr.data, 'k',
                         lw=0.75, label='Forward')
-                ax.plot(tr.times(), s[2, :], 'r--', lw=0.75, label='Fw-GF')
+                ax.plot(tr.times(), s[2, :], 'r--', lw=0.75, label=f'Fw-GF {_dir}')
                 ax.plot(tr.times(), z/z.max() *
-                        tr.data.max(), 'b:', lw=0.75, label='Reciprocal')
+                        tr.data.max(), 'b:', lw=0.75, label=f'Reciprocal {_dir}')
                 ax.plot(tr.times(), tr.data-z/z.max() *
-                        tr.data.max(), 'b', lw=0.5, label='error*10')
+                        tr.data.max(), 'b', lw=0.5, label=f'error*10 {_dir}')
                 ax.set_xlim(200, 600)
-                absmax = np.max(
-                    np.abs(np.hstack((s[2, :], tr.data, z/z.max()*tr.data.max()))))
-                ax.set_ylim(-absmax, absmax)
-                plot_label(
-                    ax, f'{_dir}\nMax Disp: {np.max(absmax): .5} m', fontsize='xx-small', box=False)
+
+                # absmax = np.max(
+                #     np.abs(np.hstack((s[2, :], tr.data, z/z.max()*tr.data.max()))))
+                # ax.set_ylim(-absmax, absmax)
+                # plot_label(
+                #     ax, f'{_dir}\nMax Disp: {np.max(absmax): .5} m', fontsize='xx-small', box=False)
 
                 ax.tick_params(labelleft=False, left=False)
                 ax.spines.right.set_visible(False)

@@ -18,11 +18,11 @@ def butter_low_two_pass_filter(data, cutoff, fs, order: int | None = 5):
     return y
 
 
-def cheby1_low_sos(cutoff, fs, order=10, rp=1):
+def cheby1_low_sos(cutoff, fs, order=10, rp: float = 1):
     return cheby1(order, rp, cutoff, 'lowpass', fs=fs, output='sos')
 
 
-def cheby1_lowpass(data, cutoff, fs, order=10, rp=10):
+def cheby1_lowpass(data, cutoff, fs, order: int = 10, rp: float = 10):
     sos = cheby1_low_sos(cutoff, fs, order=order, rp=rp)
     y = sosfiltfilt(sos, data)
     return y

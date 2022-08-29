@@ -1,6 +1,9 @@
+from math import ceil
+from multiprocessing.sharedctypes import Value
 import os
 import subprocess
 import typing as tp
+from lwsspy.GF.stf import create_stf
 import numpy as np
 from copy import deepcopy
 from .source import FORCESOLUTION, CMTSOLUTION
@@ -34,6 +37,7 @@ class Simulation:
             duration_in_min: float = 20.0,
             nstep: None | int = None,
             ndt: None | float = None,
+            lpfilter: str = 'bessel',
             forward_test: bool = False,
             broadcast_mesh_model: bool = False,
             simultaneous_runs: bool = False,
@@ -153,12 +157,12 @@ class Simulation:
 
             subprocess.check_call(copytreecmd, shell=True)
 
-
         # make rundirs
         for _comp, _compdict in self.compdict.items():
 
             # Hello
-            self.logger.debug(f'Creating Simulation Directory for {_comp}: {_compdict["dir"]}')
+            self.logger.debug(
+                f'Creating Simulation Directory for {_comp}: {_compdict["dir"]}')
 
             # Remove pre-existing directory
             if os.path.exists(_compdict['dir']):
@@ -234,11 +238,8 @@ class Simulation:
 
         # Read Par_file into dictionary from (include comments for posterity)
         self.logger.debug('Reading Par_file')
-        self.pardict = utils.get_par_file(self.par_file, savecomments=True, verbose=False)
-
-        # Get simulation sampling rate and min period
-        self.logger.debug('Getting Values from mesher')
-        self.dt, self.T = utils.get_dt_from_mesh_header(self.specfemdir)
+        self.pardict = utils.get_par_file(
+            self.par_file, savecomments=True, verbose=False)
 
         # Print statement showing the setup
         self.compdict = dict(
@@ -289,6 +290,72 @@ class Simulation:
         if self.forward_test:
             utils.update_constants(self.constants_file_forward,
                                    self.constants_file_forward, rotation='+')
+
+    def get_timestep_period(self):
+        """Gets the actual timestep from the mesh header, then takes the
+        requested timestep ndt and fixes it to a subsample. Should the requested
+        timestep be smaller than the simulation timesstep, the timestep is
+        unchanged and self.dt and self.ndt remain the same.
+        """
+
+        # Do nothing if ndt is unchanged.
+        if self.ndt_requested is None:
+            return
+
+        # Get simulation sampling rate and min period
+        self.logger.debug('Getting Values from mesher')
+        self.dt, self.T = utils.get_dt_from_mesh_header(self.specfemdir)
+
+        # Get number of timesteps
+        duration_in_s = self.duration_in_min * 60.0
+
+        # Compute new number of time
+        if self.nstep is not None:
+            self.nstep = int(np.ceil(duration_in_s/self.dt))
+
+        # Get every x sample
+        self.xth_sample = self.ndt_requested//self.dt
+
+        if self.xth_sample == 0:
+            raise ValueError(
+                'Requested dt is smaller than simulation dt, a larger dt\n'
+                'should be chosen, or omit the input parameter.')
+
+        self.logger.debug(
+            f"Number of timesteps for simulation: {self.nsteps:6d}")
+        self.logger.debug(
+            f"Number of timesteps subsampled:     {self.nsteps//self.xth_sample:6d}")
+
+        # Show True sampling rate:
+        self.ndt = self.dt * self.xth_sample
+        self.fs = 1/self.ndt
+
+        # Apparent frequency and required sampling time
+        self.f = 1/self.T
+        self.fs_mesh = 2*self.f
+
+        self.logger.debug(f"Mesh resolves period: {self.T:.4f} s")
+        self.logger.debug(f"Sampling at period:   {self.ndt:.4f} s")
+
+        # Following specfem 3D globe we set the the half duration of the STF to
+        # very short 5*DT, where DT is the subsampled sampling time ``self.ndt``
+        self.hdur = 5*self.ndt
+        self.logger.debug(f"hdur of step:         {self.hdur:.4f} s")
+
+        # The distance between t0 and tc should be larger than the
+        # 1.5 the haf duration, to ensure no abrupt start
+        if 1.5 * self.hdur > np.abs(self.tc-self.t0):
+            raise ValueError(
+                f't0 and tc too close. \n1.5*hdur > |tc-t0| \n[{1.5*self.hdur:.1f} >  {tc-t0:.1f}]')
+
+        # Create new STF using the
+        self.t, self.stf = create_stf(self.t0, self.tc, hdur, )
+
+    def create_STF(self):
+        pass
+
+    def write_STF(self):
+        pass
 
     def write_GF_LOCATIONS(self):
 
@@ -479,7 +546,6 @@ class Simulation:
         rstr += f"ROTATION:{self.pardict['ROTATION']!s:.>63}\n"
         rstr += f"SIMULTANEOUS_RUNS:{self.simultaneous_runs!s:.>54}\n"
         rstr += f"BROADCAST_SAME_MESH_AND_MODEL:{self.pardict['BROADCAST_SAME_MESH_AND_MODEL']:.>42}\n"
-
 
         if self.forward_test:
             rstr += "\n"

@@ -233,7 +233,10 @@ def write_par_file(pardict: OrderedDict, par_file: str | None = None, write_comm
         f.close()
 
 
-def update_constants(infile: str, outfile: str | None = None, rotation='+'):
+def update_constants(
+        infile: str, outfile: str | None = None,
+        rotation: str = '+',
+        external_stf: bool = True):
 
     if rotation not in ['+', '-']:
         raise ValueError('rotation must be "+", or "-".')
@@ -253,7 +256,13 @@ def update_constants(infile: str, outfile: str | None = None, rotation='+'):
             else:
                 newlines.append(
                     '  double precision, parameter :: EARTH_HOURS_PER_DAY = -24.d0\n')
-
+        elif 'EXTERNAL_SOURCE_TIME_FUNCTION' in line:
+            if external_stf:
+                newlines.append(
+                    '  logical, parameter :: EXTERNAL_SOURCE_TIME_FUNCTION = .true.\n')
+            else:
+                newlines.append(
+                    '  logical, parameter :: EXTERNAL_SOURCE_TIME_FUNCTION = .false.\n')
         else:
             newlines.append(line)
 

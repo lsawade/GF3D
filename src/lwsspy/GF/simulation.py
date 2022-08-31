@@ -280,16 +280,28 @@ class Simulation:
         self.pardict_forward = utils.get_par_file(
             self.par_file, savecomments=True, verbose=False)
 
-    def update_rotation(self):
+    def update_constants(self):
         """Updates the rotation value in the ``constants.h.in``
         """
+
         if self.pardict['ROTATION']:
-            utils.update_constants(self.constants_file,
-                                   self.constants_file, rotation='-')
+            rotation = '-'
+        else:
+            rotation = '+'
+
+        if self.ndt is not None:
+            external_stf = True
+        else:
+            external_stf = False
+
+        utils.update_constants(
+            self.constants_file, self.constants_file,
+            rotation=rotation, external_stf=external_stf)
 
         if self.forward_test:
-            utils.update_constants(self.constants_file_forward,
-                                   self.constants_file_forward, rotation='+')
+            utils.update_constants(
+                self.constants_file_forward, self.constants_file_forward,
+                rotation='+', external_stf=external_stf)
 
     def get_timestep_period(self):
         """Gets the actual timestep from the mesh header, then takes the
@@ -310,7 +322,7 @@ class Simulation:
         duration_in_s = self.duration_in_min * 60.0
 
         # Compute new number of time
-        if self.nstep is not None:
+        if self.nstep is None:
             self.nstep = int(np.ceil(duration_in_s/self.dt))
 
         # Get every x sample
@@ -322,9 +334,9 @@ class Simulation:
                 'should be chosen, or omit the input parameter.')
 
         self.logger.debug(
-            f"Number of timesteps for simulation: {self.nsteps:6d}")
+            f"Number of timesteps for simulation: {self.nstep:6d}")
         self.logger.debug(
-            f"Number of timesteps subsampled:     {self.nsteps//self.xth_sample:6d}")
+            f"Number of timesteps subsampled:     {self.nstep//self.xth_sample:6d}")
 
         # Show True sampling rate:
         self.ndt = self.dt * self.xth_sample
@@ -339,7 +351,9 @@ class Simulation:
 
         # Following specfem 3D globe we set the the half duration of the STF to
         # very short 5*DT, where DT is the subsampled sampling time ``self.ndt``
-        self.hdur = 5*self.ndt
+        # For all filters to work fine, we just need to choose a half duration
+        # that is 2.0 the length outgoing smapling interval.
+        self.hdur = 2.0*self.ndt
         self.logger.debug(f"hdur of step:         {self.hdur:.4f} s")
 
         # The distance between t0 and tc should be larger than the
@@ -348,14 +362,53 @@ class Simulation:
             raise ValueError(
                 f't0 and tc too close. \n1.5*hdur > |tc-t0| \n[{1.5*self.hdur:.1f} >  {tc-t0:.1f}]')
 
-        # Create new STF using the
-        self.t, self.stf = create_stf(self.t0, self.tc, hdur, )
+        # Determine low pass filter dependent on ndt and corresponding nyquist
+        # frequency fny or fcutoff = 1/(2*dt)
+        self.cutoff = (1.0/self.ndt)/2.0
 
-    def create_STF(self):
-        pass
+        # Create new STF using the
+        self.t, self.stf = create_stf(
+            self.t0, self.tc, self.nstep, self.dt, self.hdur, self.cutoff)
 
     def write_STF(self):
-        pass
+
+        # STF file write
+        stf_file = os.path.join(
+            self.specfemdir_forward, 'DATA', 'stf')
+
+        # Header for Source time function
+        header = ''
+        header += 'Source Time function\n'
+        header += 'source type point force\n'
+        header += f'scaling factor force =    {self.force_factor:e} (N)\n'
+        header += 'format : #time(s)   #stf   #factor(Newton)\n'
+
+        # Concatenate
+        F = np.ones_like(self.t) * self.force_factor
+        X = np.vstack((self.t, self.stf, F))
+
+        # Write STF to file using numpy
+        np.savetxt(stf_file, X, header=header, comments=' #')
+
+        if self.forward_test:
+
+            # Header
+            header = ''
+            header += 'Source Time function\n'
+            header += 'source type CMT\n'
+            header += f'scaling scalar moment (M0) =    {self.cmt.M0:e}\n'
+            header += 'format: #time(s)   #stf   #scalar_moment\n'
+
+            # Concatenate
+            M0 = np.ones_like(self.t) * self.cmt.M0
+            X = np.vstack((self.t, self.stf, M0))
+
+            # Concatenate
+            stf_forward_file = os.path.join(
+                self.specfemdir_forward, 'DATA', 'stf')
+
+            # Save STF
+            np.savetxt(stf_forward_file, X, header=header, comments=' #')
 
     def write_GF_LOCATIONS(self):
 
@@ -557,6 +610,3 @@ class Simulation:
 
     def __repr__(self) -> str:
         self.__str__()
-
-    def write_STF(self):
-        pass

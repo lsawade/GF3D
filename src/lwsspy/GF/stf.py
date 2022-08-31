@@ -38,20 +38,13 @@ def create_stf(
     # Compute STF
     t = np.arange(t0, t0 + nstep*dt, dt)
 
+    # Compute step
     stf = erf(t, tc, hdur)
-
-    # Low pass the create_STF
-    cutoff = 1/20
-    bcutoff = 1.5*cutoff
-
-    border = 6
-
-    bessorder = 7
 
     # Filter the data, and plot both the original and filtered signals.
     if cutoff is not None:
         if lpfilter == 'bessel':
-            bcutoff = 1.5 * cutoff
+            bcutoff = 1.5*cutoff
             order = 7
             stf = filter.bessel_lowpass(stf, cutoff, 1/dt, order=order)
         elif lpfilter == 'butter':

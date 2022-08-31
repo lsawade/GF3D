@@ -3,7 +3,8 @@ Readers and writers for FORCESOLUTION and CMTSOLUTION for specfem.
 
 
 """
-
+import warnings
+import numpy as np
 from obspy import UTCDateTime
 
 
@@ -342,6 +343,38 @@ class CMTSOLUTION:
     @property
     def cmt_time(self):
         return self.origin_time + self.time_shift
+
+    @property
+    def M0(self):
+        """
+        Scalar Moment M0 in Nm
+        """
+        return (self.Mrr ** 2 + self.Mtt ** 2 + self.Mpp ** 2
+                + 2 * self.Mrt ** 2 + 2 * self.Mrp ** 2
+                + 2 * self.Mtp ** 2) ** 0.5 * 0.5 ** 0.5
+
+    @M0.setter
+    def M0(self, M0):
+        """
+        Scalar Moment M0 in Nm
+        """
+        iM0 = self.M0
+        fM0 = M0
+        factor = fM0/iM0
+        self.Mrr *= factor
+        self.Mtt *= factor
+        self.Mpp *= factor
+        self.Mrt *= factor
+        self.Mrp *= factor
+        self.Mtp *= factor
+
+        self.update_hdur()
+
+    def update_hdur(self):
+        # Updates the half duration
+        Nm_conv = 1 / 1e7
+        self.half_duration = np.round(
+            2.26 * 10**(-6) * (self.M0 * Nm_conv)**(1/3), decimals=1)
 
     @staticmethod
     def float_to_str(x: float, N: int):

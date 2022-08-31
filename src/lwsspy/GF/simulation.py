@@ -201,7 +201,7 @@ class Simulation:
 
         # Write Rotation files
         self.logger.debug('Updating Rotation in constants.h.in ...')
-        self.update_rotation()
+        self.update_constants()
 
         # Write Par_files
         self.logger.debug('Writing Par_file ...')
@@ -211,14 +211,14 @@ class Simulation:
         self.update_forces_and_stations()
 
     def update_forces_and_stations(self):
-        self.logger.debug('Writing FORCESOLUTIONS ...')
+
         self.write_FORCES()
-        self.logger.debug('Writing GF_LOCATIONS ...')
         self.write_GF_LOCATIONS()
-        self.logger.debug('Writing STATIONS ...')
         self.write_STATIONS()
-        self.logger.debug('Writing CMTSOLUTIONS ...')
         self.write_CMT()
+
+        self.get_timestep_period()
+        self.write_STF()
 
     def setup(self):
         """Setting up the directory structure for specfem."""
@@ -372,6 +372,12 @@ class Simulation:
 
     def write_STF(self):
 
+        # Do nothing if ndt is unchanged.
+        if self.ndt_requested is None:
+            return
+
+        self.logger.debug('Writing STATIONS ...')
+
         # STF file write
         stf_file = os.path.join(
             self.specfemdir_forward, 'DATA', 'stf')
@@ -411,6 +417,8 @@ class Simulation:
             np.savetxt(stf_forward_file, X, header=header, comments=' #')
 
     def write_GF_LOCATIONS(self):
+
+        self.logger.debug('Writing GF_LOCATIONS ...')
 
         # If target is a single place make a list
         if isinstance(self.target_latitude, float):
@@ -458,6 +466,8 @@ class Simulation:
 
     def write_FORCES(self):
 
+        self.logger.debug('Writing FORCESOLUTIONS ...')
+
         for _comp, _compdict in self.compdict.items():
 
             # GF_LOCATIONS file
@@ -498,6 +508,8 @@ class Simulation:
     def write_STATIONS(self):
         """Only for forward test. Otherwise it doesn't matter."""
 
+        self.logger.debug('Writing STATIONS ...')
+
         for _comp, _compdict in self.compdict.items():
 
             # GF_LOCATIONS file
@@ -527,6 +539,7 @@ class Simulation:
         """Only for forward test. Otherwise it doesn't matter."""
 
         if self.forward_test:
+            self.logger.debug('Writing CMTSOLUTIONS ...')
             self.cmt.write(self.CMTSOLUTION_file)
 
     def write_Par_file(self):

@@ -212,6 +212,7 @@ def write_par_file(pardict: OrderedDict, par_file: str | None = None, write_comm
                         print(line.strip())
 
         else:
+
             # Skip value comments
             if f'-comment' in key:
                 continue

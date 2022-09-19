@@ -9,6 +9,7 @@ from copy import deepcopy
 from .source import FORCESOLUTION, CMTSOLUTION
 from . import utils
 from .logger import logger
+from pprint import pprint
 
 
 class Simulation:
@@ -36,12 +37,14 @@ class Simulation:
             tc: float = 0.0,
             duration_in_min: float = 20.0,
             nstep: None | int = None,
+            subsample: bool = True,
             ndt: None | float = None,
             lpfilter: str = 'bessel',
             forward_test: bool = False,
             broadcast_mesh_model: bool = False,
             simultaneous_runs: bool = False,
-            cmtsolutionfile: str | None = None) -> None:
+            cmtsolutionfile: str | None = None,
+            par_file: str | None = None) -> None:
         """Makes specfem directory into SGT database simulator.
 
         Note that the specfem Par_file should be written in the same way you
@@ -93,8 +96,11 @@ class Simulation:
         self.tc = tc
         self.duration_in_min = duration_in_min
         self.nstep = nstep
+        self.subsample = subsample
         self.ndt_requested = ndt
         self.ndt = ndt
+        self.dt = None
+        self.lpfilter = lpfilter
 
         # Parameters for a forward backward test
         self.forward_test = forward_test
@@ -105,6 +111,7 @@ class Simulation:
         # Submission specific options
         self.simultaneous_runs = simultaneous_runs
         self.broadcast_mesh_model = broadcast_mesh_model
+        self.par_file = par_file
 
         # Logger
         self.logger = logger
@@ -143,6 +150,7 @@ class Simulation:
             # Copy specfemdirectory
             copytreecmd = f"""
             rsync -av \
+                --include='.git/logs' \
                 --exclude='run00*' \
                 --exclude='.*' \
                 --exclude='EXAMPLES' \
@@ -152,7 +160,7 @@ class Simulation:
                 --exclude='DATABASES_MPI/*' \
                 --exclude='obj/*' \
                 --exclude='bin/*' \
-                --delete --ignore-existing \
+                --delete \
                 {self.specfemdir}/ {self.specfemdir_forward}"""
 
             subprocess.check_call(copytreecmd, shell=True)
@@ -200,18 +208,14 @@ class Simulation:
         # Create Write all the files
 
         # Write Rotation files
-        self.logger.debug('Updating Rotation in constants.h.in ...')
+        self.logger.debug('Updating constants.h.in ...')
         self.update_constants()
-
-        # Write Par_files
-        self.logger.debug('Writing Par_file ...')
-        self.write_Par_file()
 
         # Update forces and STATIONS
         self.update_forces_and_stations()
 
     def update_forces_and_stations(self):
-
+        # Writing all simulation relevant files
         self.write_FORCES()
         self.write_GF_LOCATIONS()
         self.write_STATIONS()
@@ -219,6 +223,7 @@ class Simulation:
 
         self.get_timestep_period()
         self.write_STF()
+        self.write_Par_file()
 
     def setup(self):
         """Setting up the directory structure for specfem."""
@@ -233,8 +238,17 @@ class Simulation:
             self.specfemdir, 'setup', 'constants.h.in')
 
         # Par_file of course has to be updated as well.
-        self.par_file = os.path.join(
-            self.specfemdir, 'DATA', 'Par_file')
+        if self.par_file is None:
+            self.par_file = os.path.join(
+                self.specfemdir, 'DATA', 'Par_file')
+
+            if os.path.exists(self.par_file) is False:
+                self.par_file = os.path.join(
+                    self.specfemdir, 'run0001', 'DATA', 'Par_file')
+
+                if os.path.exists(self.par_file) is False:
+                    raise ValueError(
+                        'No Par_file found. Check ./DATA and ./run0001/DATA for Par_file')
 
         # Read Par_file into dictionary from (include comments for posterity)
         self.logger.debug('Reading Par_file')
@@ -289,7 +303,7 @@ class Simulation:
         else:
             rotation = '+'
 
-        if self.ndt is not None:
+        if self.subsample is True:
             external_stf = True
         else:
             external_stf = False
@@ -311,7 +325,14 @@ class Simulation:
         """
 
         # Do nothing if ndt is unchanged.
+        if self.subsample is False:
+            return
+
         if self.ndt_requested is None:
+            logger.debug(
+                '    .write_STF was called but no new time step was requested.')
+            logger.debug(
+                '        This is ok when the mesher is being prepared.')
             return
 
         # Get simulation sampling rate and min period
@@ -326,7 +347,7 @@ class Simulation:
             self.nstep = int(np.ceil(duration_in_s/self.dt))
 
         # Get every x sample
-        self.xth_sample = self.ndt_requested//self.dt
+        self.xth_sample = int(self.ndt_requested//self.dt)
 
         if self.xth_sample == 0:
             raise ValueError(
@@ -336,7 +357,7 @@ class Simulation:
         self.logger.debug(
             f"Number of timesteps for simulation: {self.nstep:6d}")
         self.logger.debug(
-            f"Number of timesteps subsampled:     {self.nstep//self.xth_sample:6d}")
+            f"Number of timesteps subsampled:     {int(self.nstep//self.xth_sample):6d}")
 
         # Show True sampling rate:
         self.ndt = self.dt * self.xth_sample
@@ -353,14 +374,14 @@ class Simulation:
         # very short 5*DT, where DT is the subsampled sampling time ``self.ndt``
         # For all filters to work fine, we just need to choose a half duration
         # that is 2.0 the length outgoing smapling interval.
-        self.hdur = 2.0*self.ndt
+        self.hdur = 1.0*self.ndt
         self.logger.debug(f"hdur of step:         {self.hdur:.4f} s")
 
         # The distance between t0 and tc should be larger than the
         # 1.5 the haf duration, to ensure no abrupt start
         if 1.5 * self.hdur > np.abs(self.tc-self.t0):
             raise ValueError(
-                f't0 and tc too close. \n1.5*hdur > |tc-t0| \n[{1.5*self.hdur:.1f} >  {tc-t0:.1f}]')
+                f't0 and tc too close. \n1.5*hdur > |tc-t0| \n[{1.5*self.hdur:.1f} >  {self.tc-self.t0:.1f}]')
 
         # Determine low pass filter dependent on ndt and corresponding nyquist
         # frequency fny or fcutoff = 1/(2*dt)
@@ -368,53 +389,65 @@ class Simulation:
 
         # Create new STF using the
         self.t, self.stf = create_stf(
-            self.t0, self.tc, self.nstep, self.dt, self.hdur, self.cutoff)
+            self.t0, self.tc, self.nstep, self.dt, self.hdur, self.cutoff, lpfilter=self.lpfilter)
 
     def write_STF(self):
 
         # Do nothing if ndt is unchanged.
-        if self.ndt_requested is None:
+        if self.subsample is False:
             return
 
-        self.logger.debug('Writing STATIONS ...')
+        if self.ndt_requested is None:
+            logger.debug(
+                '    .write_STF was called but no new time step was requested.')
+            return
 
-        # STF file write
-        stf_file = os.path.join(
-            self.specfemdir_forward, 'DATA', 'stf')
+        self.logger.debug('Writing Source Time Functions ...')
 
-        # Header for Source time function
-        header = ''
-        header += 'Source Time function\n'
-        header += 'source type point force\n'
-        header += f'scaling factor force =    {self.force_factor:e} (N)\n'
-        header += 'format : #time(s)   #stf   #factor(Newton)\n'
+        for _, _compdict in self.compdict.items():
+            # STF file write
+            stf_file = os.path.join(
+                _compdict['dir'], 'DATA', 'stf')
 
-        # Concatenate
-        F = np.ones_like(self.t) * self.force_factor
-        X = np.vstack((self.t, self.stf, F))
+            # Header for Source time function
+            header = ''
+            header += 'Source Time function\n'
+            header += f'T0: {self.t0:f}\n'
+            header += f'TC: {self.tc:f}\n'
+            header += f'DT: {self.dt:f}\n'
+            header += f'NT: {self.nstep:d}\n'
+            header += 'format :  stf'
 
-        # Write STF to file using numpy
-        np.savetxt(stf_file, X, header=header, comments=' #')
+            # Concatenate
+            F = np.ones_like(self.t) * self.force_factor
+            # X = np.vstack((self.t, self.stf, F)).T
+
+            # Write STF to file using numpy
+            np.savetxt(stf_file, self.stf, fmt='% 30.15f',
+                       header=header, comments=' #')
 
         if self.forward_test:
 
             # Header
             header = ''
             header += 'Source Time function\n'
-            header += 'source type CMT\n'
-            header += f'scaling scalar moment (M0) =    {self.cmt.M0:e}\n'
-            header += 'format: #time(s)   #stf   #scalar_moment\n'
+            header += f'T0: {self.t0:f}\n'
+            header += f'TC: {self.tc:f}\n'
+            header += f'DT: {self.dt:f}\n'
+            header += f'NT: {self.nstep:d}\n'
+            header += 'format :  stf'
 
             # Concatenate
             M0 = np.ones_like(self.t) * self.cmt.M0
-            X = np.vstack((self.t, self.stf, M0))
+            X = np.vstack((self.t, self.stf, M0)).T
 
             # Concatenate
             stf_forward_file = os.path.join(
                 self.specfemdir_forward, 'DATA', 'stf')
 
             # Save STF
-            np.savetxt(stf_forward_file, X, header=header, comments=' #')
+            np.savetxt(stf_forward_file, self.stf, fmt='%30.15f',
+                       header=header, comments=' #')
 
     def write_GF_LOCATIONS(self):
 
@@ -544,6 +577,9 @@ class Simulation:
 
     def write_Par_file(self):
 
+        #
+        self.logger.debug("Writing Par_file's")
+
         # modify Reciprocal Par_file
         pardict = deepcopy(self.pardict)
 
@@ -558,9 +594,12 @@ class Simulation:
             pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
             pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
 
-        # pardict['NSTEP'] = self.nstep
+        if self.subsample:
+            if self.ndt_requested is not None:
+                pardict['NSTEP'] = self.nstep
+                pardict['T0'] = self.t0
+                pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
         # pardict['DT'] = self.dt
-        # pardict['T0'] = self.T0
 
         for _, _compdict in self.compdict.items():
 
@@ -586,12 +625,15 @@ class Simulation:
             pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
             pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
 
+            if self.subsample:
+                if self.ndt_requested is not None:
+                    pardict['NSTEP'] = self.nstep
+                    pardict['T0'] = self.t0
+                    pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
+            # pardict['DT'] = self.dt
+
             # Write Par_file
             utils.write_par_file(pardict, self.par_file_forward)
-
-            # pardict['NSTEP'] = self.nstep
-            # pardict['DT'] = self.dt
-            # pardict['T0'] = self.T0
 
     def __str__(self) -> str:
         rstr = "\n"
@@ -605,9 +647,19 @@ class Simulation:
         rstr += f"Force Factor:{self.force_factor:.>59.4g}\n"
         rstr += f"T0:{self.t0:.>69.4f}\n"
         rstr += f"TC:{self.tc:.>69.4f}\n"
-        rstr += f"DT:{self.dt:.>69.4f}\n"
-        rstr += f"NDT requested:{self.ndt_requested:.>58.4f}\n"
-        rstr += f"NDT:{self.ndt:.>68.4f}\n"
+        if self.dt is not None:
+            rstr += f"DT:{self.dt:.>69.4f}\n"
+
+        if self.subsample:
+            if self.ndt_requested is not None:
+                rstr += f"NDT requested:{self.ndt_requested:.>58.4f}\n"
+            if self.ndt is not None:
+                rstr += f"NDT:{self.ndt:.>68.4f}\n"
+                rstr += f"X_TH_SAMPLE:{self.xth_sample:.>60d}\n"
+
+        if self.nstep is not None:
+            rstr += f"NT:{self.nstep:.>69d}\n"
+            rstr += f"T:{self.nstep*self.dt:>70.4f}\n"
         rstr += "\n"
         rstr += f"ROTATION:{self.pardict['ROTATION']!s:.>63}\n"
         rstr += f"SIMULTANEOUS_RUNS:{self.simultaneous_runs!s:.>54}\n"

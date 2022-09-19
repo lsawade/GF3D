@@ -16,9 +16,10 @@ size = comm.Get_size()
 def plot_label(ax, label: str, fontdict=None, **kwargs):
     dist = 0.0
     ax.text(dist, 1.0 - dist, label, horizontalalignment='left',
-                verticalalignment='top', transform=ax.transAxes,
-                bbox={'facecolor': 'none', 'edgecolor': 'none'},
-                fontdict=fontdict, **kwargs)
+            verticalalignment='top', transform=ax.transAxes,
+            bbox={'facecolor': 'none', 'edgecolor': 'none'},
+            fontdict=fontdict, **kwargs)
+
 
 # From constants.h.in
 # gravitational constant in m3 kg-1 s-2, or equivalently in N.(m/kg)^2
@@ -106,8 +107,9 @@ class Variable:
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
 reciprocal_dir = os.path.join(specfemmagic, 'specfem3d_globe')
 forward_dir = os.path.join(specfemmagic, 'specfem3d_globe_forward')
-forward_file = os.path.join(forward_dir,  "OUTPUT_FILES", "save_forward_arrays_GF.bp")
-seismograms = os.path.join(forward_dir, "OUTPUT_FILES", "II.BFO.*")
+forward_file = os.path.join(
+    forward_dir,  "OUTPUT_FILES", "save_forward_arrays_GF.bp")
+seismograms = os.path.join(forward_dir, "OUTPUT_FILES", "II.BFO.*.sac")
 
 comp_dir = dict(
     N=os.path.join(reciprocal_dir, 'run0001'),
@@ -116,7 +118,7 @@ comp_dir = dict(
 )
 
 
-if rank==0:
+if rank == 0:
     st = read(seismograms)
     print(st)
 
@@ -125,7 +127,6 @@ if rank==0:
     xigll, wxi, _ = gll_nodes(npol)
     etagll, weta, _ = gll_nodes(npol)
     gammagll, wgamma, _ = gll_nodes(npol)
-
 
     NGLLX, NGLLY, NGLLZ = 5, 5, 5
 
@@ -244,9 +245,9 @@ if rank == 0:
 counter = 0
 for _comp, _simdir in comp_dir.items():
 
-
     # Get file name
-    reciprocal_file = os.path.join(_simdir, "OUTPUT_FILES", "save_forward_arrays_GF.bp")
+    reciprocal_file = os.path.join(
+        _simdir, "OUTPUT_FILES", "save_forward_arrays_GF.bp")
 
     with adios2.open(reciprocal_file, "r", comm) as rh:
 
@@ -256,7 +257,6 @@ for _comp, _simdir in comp_dir.items():
 
             # Get number of steps in the file
             nsteps = rh.steps()
-
 
             # epsilon_xx = Variable(rh, 'epsilon_xx', block_id=4, nsteps=nsteps)
             # epsilon_yy = Variable(rh, 'epsilon_yy', block_id=4, nsteps=nsteps)
@@ -319,7 +319,6 @@ for _comp, _simdir in comp_dir.items():
                         sepsilon[4, :] += epsilon_xz[i, j, k, :] * hlagrange
                         sepsilon[5, :] += epsilon_yz[i, j, k, :] * hlagrange
 
-
             sgt = np.zeros((3, 3, nsteps))
             sgt[0, 0, :], sgt[0, 1, :], sgt[0, 2, :] = sepsilon[0, :],  \
                 sepsilon[3, :], sepsilon[4, :]
@@ -343,14 +342,22 @@ for _comp, _simdir in comp_dir.items():
             print('subplot:', 311 + counter)
             ax = fig.add_subplot(311 + counter)
 
+            idx = [0, 1, 2]
+            dt = 6.8400
 
-            idx = [0, 1, 2,]
+            # z = np.hstack((np.array([0.0]), z))
+            t = tr.times()[::36]  # np.arange(0.0, (6316//36) * dt, dt)
+            t = np.arange(0, nsteps*dt, dt)
+
             ax.plot(tr.times(), tr.data, 'k', lw=0.75, label='Forward')
-            ax.plot(tr.times(), s[counter, :], 'r--', lw=0.75, label='Fw-GF')
-            ax.plot(tr.times(), z/z.max() * tr.data.max(), 'b:', lw=0.75, label='Reciprocal')
-            ax.plot(tr.times(), 10*(tr.data - z/z.max() * tr.data.max()), 'b', lw=0.5, label='error')
+            ax.plot(t, s[counter, :], 'r--', lw=0.75, label='Fw-GF')
+            ax.plot(t, z[:]/z.max() * s[counter, :].max(),
+                    'b:', lw=0.75, label='Reciprocal')
+            ax.plot(t, 10*(s[counter, :] - z[:]/z.max() *
+                    s[counter, :].max()), 'b', lw=0.5, label='error')
             ax.set_xlim(200, 600)
-            absmax = np.max(np.abs(np.hstack((tr.data, z/z.max() * s[counter, :].max()))))
+            absmax = np.max(
+                np.abs(np.hstack((tr.data, z/z.max() * s[counter, :].max()))))
             ax.set_ylim(-absmax, absmax)
             plot_label(
                 ax, f'{_comp}\nMax Disp: {np.max(absmax): .5} m',

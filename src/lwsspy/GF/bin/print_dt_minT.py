@@ -4,13 +4,10 @@
 
 Usage:
 
-    gf-get-dt <filename1> <filename2> ... <filenameN>
+    gf-get-dt <specfemdir>
 
-This file contains a script that if located on princeton servers copies from
-tigress/temp folder, and if not on Princeton servers secure copies from the same
-folder. This only works if used with VPN or tigressgateway. Otherwise, Duo
-access is required. Works for any number of files.
-
+Script reads mesh header in OUTPUT_FILES, which is created at the end of the
+mesh run.
 
 :Author:
     Lucas Sawade (lsawade-at-princeton.edu)

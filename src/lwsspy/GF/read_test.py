@@ -135,6 +135,8 @@ with adios2.open(forward_file, "r", comm) as fh:
     # Get number of steps in the file
     nsteps = fh.steps()
 
+    print(f"Forward Timesteps: {nsteps}")
+
     if (rank == 0):
 
         blockid = 0
@@ -170,6 +172,9 @@ with adios2.open(forward_file, "r", comm) as fh:
             [[Mxx.array[0], Mxy.array[0], Mxz.array[0]],
              [Mxy.array[0], Myy.array[0], Myz.array[0]],
              [Mxz.array[0], Myz.array[0], Mzz.array[0]]])*scaleM
+
+        # Input scalar moment
+        M0 = np.sqrt(0.5) * np.sqrt(np.sum(M**2))
 
         # Load addressing
         ibool_GF = Variable(fh, 'ibool_GF', 0)
@@ -249,6 +254,8 @@ for _comp, _simdir in comp_dir.items():
     reciprocal_file = os.path.join(
         _simdir, "OUTPUT_FILES", "save_forward_arrays_GF.bp")
 
+    F0 = 1e14
+
     with adios2.open(reciprocal_file, "r", comm) as rh:
 
         if (rank == 0):
@@ -293,13 +300,17 @@ for _comp, _simdir in comp_dir.items():
                 start=start, count=count,
                 step_start=0, step_count=nsteps, block_id=block_id).T
 
+            # Compute the scale displacement
+            scale_displ = rh.read('scale_displ', block_id=0)[4]
+            print(scale_displ)
+
             # epsilon_yz = np.loadtxt('data/epsilon_yz.txt').T
-            epsilon_xx = epsilon_xx.reshape((5, 5, 5, -1), order='F')
-            epsilon_yy = epsilon_yy.reshape((5, 5, 5, -1), order='F')
-            epsilon_zz = epsilon_zz.reshape((5, 5, 5, -1), order='F')
-            epsilon_xy = epsilon_xy.reshape((5, 5, 5, -1), order='F')
-            epsilon_xz = epsilon_xz.reshape((5, 5, 5, -1), order='F')
-            epsilon_yz = epsilon_yz.reshape((5, 5, 5, -1), order='F')
+            epsilon_xx = epsilon_xx.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
+            epsilon_yy = epsilon_yy.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
+            epsilon_zz = epsilon_zz.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
+            epsilon_xy = epsilon_xy.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
+            epsilon_xz = epsilon_xz.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
+            epsilon_yz = epsilon_yz.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
 
             # Get lagrange values at specific GLL poins
             shxi, shpxi = lagrange_any(sxi.array[0], xigll, npol)
@@ -330,7 +341,7 @@ for _comp, _simdir in comp_dir.items():
             sgt = sgt.transpose(1, 0, 2)
             # dot product
             z = np.einsum('ji,ijk->k', M.T, sgt)
-
+            print("scale disp rh", scale_displ)
             plt.figure()
             plt.plot(z)
             plt.savefig('sgt_displacement.png', dpi=300)
@@ -346,13 +357,18 @@ for _comp, _simdir in comp_dir.items():
             dt = 6.8400
 
             # z = np.hstack((np.array([0.0]), z))
-            t = tr.times()[::36]  # np.arange(0.0, (6316//36) * dt, dt)
+            # t = tr.times()[::36]  # np.arange(0.0, (6316//36) * dt, dt)
             t = np.arange(0, nsteps*dt, dt)
-
+            # t = tr.times()
+            print(f"{_comp} -- Reci: {z.max():g}")
+            print(f"{_comp} -- True: {tr.data.max():g}")
+            print(f"{_comp} -- Rati: {z.max()/tr.data.max():g}")
+            print(f"M0:      {M0:g} -- scaleM: {scaleM:g}")
+            print(f"F0:      {F0:g} -- scaleF: {scaleF:g}")
+            print(f"D0:      {scale_displ:g}")
             ax.plot(tr.times(), tr.data, 'k', lw=0.75, label='Forward')
             ax.plot(t, s[counter, :], 'r--', lw=0.75, label='Fw-GF')
-            ax.plot(t, z[:]/z.max() * s[counter, :].max(),
-                    'b:', lw=0.75, label='Reciprocal')
+            ax.plot(t, z[:], 'b:', lw=0.75, label='Reciprocal')
             ax.plot(t, 10*(s[counter, :] - z[:]/z.max() *
                     s[counter, :].max()), 'b', lw=0.5, label='error')
             ax.set_xlim(200, 600)
@@ -375,9 +391,10 @@ for _comp, _simdir in comp_dir.items():
                 ax.set_xlabel('Time [s]')
 
             counter += 1
+        break
 
 if rank == 0:
     # plt.subplots_adjust(hspace=0.45)
-    fig.suptitle(
+    ax.set_title(
         'Z - event (lat,lon,dep)= (35.1500,26.8300,20.0), Crete,Greece', fontsize='small')
     fig.savefig('test.pdf', dpi=300)

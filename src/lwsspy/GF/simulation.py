@@ -586,6 +586,12 @@ class Simulation:
         pardict['SAVE_GREEN_FUNCTIONS'] = True
         pardict['USE_FORCE_POINT_SOURCE'] = True
 
+        # Force STF print
+        if self.subsample:
+            pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
+        else:
+            pardict['PRINT_SOURCE_TIME_FUNCTION'] = True
+
         # IF runs have to be parallel
         if self.simultaneous_runs:
             pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 3
@@ -599,18 +605,17 @@ class Simulation:
                 pardict['NSTEP'] = self.nstep
                 pardict['T0'] = self.t0
                 pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
+        else:
+            pardict['NTSTEP_BETWEEN_FRAMES'] = 1
+            pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
+
         # pardict['DT'] = self.dt
 
         for _, _compdict in self.compdict.items():
 
             # Don't write first Par_file since it is in the
             # Main directory
-            if self.simultaneous_runs is True and 'run0001' in _compdict['dir']:
-                par_file = os.path.join(
-                    self.specfemdir, 'DATA', 'Par_file')
-            else:
-                par_file = os.path.join(
-                    _compdict['dir'], 'DATA', 'Par_file')
+            par_file = os.path.join(_compdict['dir'], 'DATA', 'Par_file')
 
             # Write Par file for each sub dir
             utils.write_par_file(pardict, par_file)
@@ -625,12 +630,20 @@ class Simulation:
             pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
             pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
 
+            # Force STF print
+            if self.subsample:
+                pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
+            else:
+                pardict['PRINT_SOURCE_TIME_FUNCTION'] = True
+
             if self.subsample:
                 if self.ndt_requested is not None:
                     pardict['NSTEP'] = self.nstep
                     pardict['T0'] = self.t0
                     pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
-            # pardict['DT'] = self.dt
+            else:
+                pardict['NTSTEP_BETWEEN_FRAMES'] = 1
+                pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
 
             # Write Par_file
             utils.write_par_file(pardict, self.par_file_forward)

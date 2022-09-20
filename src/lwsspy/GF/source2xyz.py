@@ -31,6 +31,9 @@ def source2xyz(
     phi = lon*DEGREES_TO_RADIANS
     theta, phi = reduce_geocentric(theta, phi)
 
+    print("lat  ", lat, "lon", lon)
+    print("theta", theta, "phi", phi)
+
     sint = np.sin(theta)
     cost = np.cos(theta)
     sinp = np.sin(phi)
@@ -108,6 +111,9 @@ def source2xyz(
     # normalized source radius
     r0 = R_UNIT_SPHERE
 
+    print('depth  ', depth)
+    print('RPLANET', R_PLANET)
+
     # finds elevation of position
     if topography:
         if NX_BATHY is None:
@@ -126,6 +132,9 @@ def source2xyz(
         # Compute local elevatoin
         elevation = get_topo_bathy(
             lat, lon, ibathy_topo, NX_BATHY, NY_BATHY, RESOLUTION_TOPO_FILE)
+
+        print(elevation)
+
         r0 = r0 + elevation/R_PLANET
 
     # ellipticity
@@ -154,6 +163,7 @@ def source2xyz(
         ell = spline_evaluation(rspl, ellipicity_spline,
                                 ellipicity_spline2, radius)
 
+        print("ELL", ell, "p20", p20)
         # this is eq(14.4) in Dahlen and Tromp(1998)
         r0 = r0*(1.0-(2.0/3.0)*ell*p20)
 

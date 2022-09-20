@@ -5,6 +5,8 @@ LOG_LEVEL = "DEBUG"
 # Some constant numbers
 ONE: float = 1.0
 ZERO: float = 0.0
+HALF: float = 0.5
+TWO: float = 2.0
 TINYVAL: float = 1.0e-9
 HUGEVAL: float = 1.0e30
 
@@ -13,6 +15,7 @@ PI: float = np.pi
 TWO_PI: float = 2 * PI
 PI_OVER_TWO: float = 0.5*PI
 DEGREES_TO_RADIANS: float = PI / 180.0
+RADIANS_TO_DEGREES: float = 180.0 / PI
 R_UNIT_SPHERE: float = ONE
 # small tolerance for conversion from x y z to r theta phi
 SMALL_VAL_ANGLE = 1.0e-10

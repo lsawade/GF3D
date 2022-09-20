@@ -24,7 +24,14 @@ def get_topo_bathy(
     Returns
     -------
     float
-        topogrpahy value.
+        topography value.
+
+    Notes
+    -----
+
+    This function does not have a unit test, because it would mean that i ship
+    a version of etopo with the package which is not the plan. This function is
+    an exact python implementation of the same function in specfem3d_globe!
 
     """
 
@@ -58,11 +65,11 @@ def get_topo_bathy(
     samples_per_degree_topo = RESOLUTION_TOPO_FILE / 60.0
 
     # compute offset in data file and avoid edge effects
-    iadd1 = 0 + int((90.0-xlat)/samples_per_degree_topo)
+    iadd1 = int((90.0-xlat)/samples_per_degree_topo)
     iadd1 = 0 if (iadd1 < 0) else iadd1
     iadd1 = NY_BATHY-1 if (iadd1 > NY_BATHY-1) else iadd1
 
-    iel1 = int(xlo/samples_per_degree_topo)
+    iel1 = int(xlo/samples_per_degree_topo) - 1
     iel1 = NX_BATHY-1 if (iel1 <= 0 or iel1 > NX_BATHY-1) else iel1
 
     # Use bilinear interpolation rather nearest point interpolation
@@ -70,8 +77,8 @@ def get_topo_bathy(
     # convert integer value to double precision
     #  value = dble(ibathy_topo(iel1, iadd1))
 
-    lon_corner = iel1 * samples_per_degree_topo
-    lat_corner = 90.0 - iadd1 * samples_per_degree_topo
+    lon_corner = (iel1+1) * samples_per_degree_topo
+    lat_corner = 90.0 - (iadd1+1) * samples_per_degree_topo
 
     ratio_lon = (xlo-lon_corner)/samples_per_degree_topo
     ratio_lat = (xlat-lat_corner)/samples_per_degree_topo
@@ -82,14 +89,14 @@ def get_topo_bathy(
     ratio_lat = 1.0 if (ratio_lat > 1.0) else ratio_lat
 
     # convert integer value to double precision
-    if (iadd1 <= NY_BATHY-1 and iel1 <= NX_BATHY-1):
+    if (iadd1 <= NY_BATHY-2 and iel1 <= NX_BATHY-2):
         # interpolates for points within boundaries
         value = ibathy_topo[iel1, iadd1] * (1.0-ratio_lon) * (1.0-ratio_lat) \
             + ibathy_topo[iel1+1, iadd1] * ratio_lon * (1.0-ratio_lat) \
             + ibathy_topo[iel1+1, iadd1+1] * ratio_lon * ratio_lat \
             + ibathy_topo[iel1, iadd1+1] * (1.0-ratio_lon) * ratio_lat
 
-    elif (iadd1 <= NY_BATHY-1 and iel1 == NX_BATHY):
+    elif (iadd1 <= NY_BATHY-2 and iel1 == NX_BATHY):
         # interpolates for points on longitude border
         value = ibathy_topo[iel1, iadd1] * (1.0 - ratio_lon)*(1.0 - ratio_lat) \
             + ibathy_topo[1, iadd1] * ratio_lon*(1.0 - ratio_lat) \
@@ -98,6 +105,6 @@ def get_topo_bathy(
 
     else:
         # for points on latitude boundaries
-        value = ibathy_topo(iel1, iadd1)
+        value = ibathy_topo[iel1, iadd1]
 
     return value

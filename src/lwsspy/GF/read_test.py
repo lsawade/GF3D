@@ -305,12 +305,18 @@ for _comp, _simdir in comp_dir.items():
             print(scale_displ)
 
             # epsilon_yz = np.loadtxt('data/epsilon_yz.txt').T
-            epsilon_xx = epsilon_xx.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
-            epsilon_yy = epsilon_yy.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
-            epsilon_zz = epsilon_zz.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
-            epsilon_xy = epsilon_xy.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
-            epsilon_xz = epsilon_xz.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
-            epsilon_yz = epsilon_yz.reshape((5, 5, 5, -1), order='F') / (F0*1e7)
+            epsilon_xx = epsilon_xx.reshape(
+                (5, 5, 5, 1, -1), order='F') / (F0*1e7)
+            epsilon_yy = epsilon_yy.reshape(
+                (5, 5, 5, 1, -1), order='F') / (F0*1e7)
+            epsilon_zz = epsilon_zz.reshape(
+                (5, 5, 5, 1, -1), order='F') / (F0*1e7)
+            epsilon_xy = epsilon_xy.reshape(
+                (5, 5, 5, 1, -1), order='F') / (F0*1e7)
+            epsilon_xz = epsilon_xz.reshape(
+                (5, 5, 5, 1, -1), order='F') / (F0*1e7)
+            epsilon_yz = epsilon_yz.reshape(
+                (5, 5, 5, 1, -1), order='F') / (F0*1e7)
 
             # Get lagrange values at specific GLL poins
             shxi, shpxi = lagrange_any(sxi.array[0], xigll, npol)
@@ -323,12 +329,18 @@ for _comp, _simdir in comp_dir.items():
                     for i in range(NGLLX):
                         hlagrange = shxi[i] * sheta[j] * shgamma[k]
 
-                        sepsilon[0, :] += epsilon_xx[i, j, k, :] * hlagrange
-                        sepsilon[1, :] += epsilon_yy[i, j, k, :] * hlagrange
-                        sepsilon[2, :] += epsilon_zz[i, j, k, :] * hlagrange
-                        sepsilon[3, :] += epsilon_xy[i, j, k, :] * hlagrange
-                        sepsilon[4, :] += epsilon_xz[i, j, k, :] * hlagrange
-                        sepsilon[5, :] += epsilon_yz[i, j, k, :] * hlagrange
+                        sepsilon[0,
+                                 :] += np.squeeze(epsilon_xx[i, j, k, :, :]) * hlagrange
+                        sepsilon[1,
+                                 :] += np.squeeze(epsilon_yy[i, j, k, :, :]) * hlagrange
+                        sepsilon[2,
+                                 :] += np.squeeze(epsilon_zz[i, j, k, :, :]) * hlagrange
+                        sepsilon[3,
+                                 :] += np.squeeze(epsilon_xy[i, j, k, :, :]) * hlagrange
+                        sepsilon[4,
+                                 :] += np.squeeze(epsilon_xz[i, j, k, :, :]) * hlagrange
+                        sepsilon[5,
+                                 :] += np.squeeze(epsilon_yz[i, j, k, :, :]) * hlagrange
 
             sgt = np.zeros((3, 3, nsteps))
             sgt[0, 0, :], sgt[0, 1, :], sgt[0, 2, :] = sepsilon[0, :],  \

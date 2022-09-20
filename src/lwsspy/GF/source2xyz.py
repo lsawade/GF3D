@@ -2,7 +2,7 @@ from multiprocessing.sharedctypes import Value
 import numpy as np
 
 from .constants import PI_OVER_TWO, DEGREES_TO_RADIANS, ONE_MINUS_F_SQUARED, \
-    ASSUME_PERFECT_SPHERE, ZERO, PI, TWO_PI, TINYVAL, R_UNIT_SPHERE, R_PLANET, \
+    ASSUME_PERFECT_SPHERE, ZERO, PI, TWO_PI, TINYVAL, R_UNIT_SPHERE, R_PLANET
 
 from .get_topo_bathy import get_topo_bathy
 from .spline_eval import spline_evaluation

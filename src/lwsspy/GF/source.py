@@ -341,6 +341,10 @@ class CMTSOLUTION:
             Mtp=Mtp)
 
     @property
+    def tensor(self):
+        return np.array([self.Mrr, self.Mtt, self.Mpp, self.Mrt, self.Mrp, self.Mtp])
+
+    @property
     def cmt_time(self):
         return self.origin_time + self.time_shift
 

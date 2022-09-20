@@ -68,7 +68,6 @@ def xyz_2_rthetaphi(x, y, z):
                      ZERO), -SMALL_VAL_ANGLE, zmesh)
     zmesh = np.where(np.logical_and(zmesh < SMALL_VAL_ANGLE, zmesh >=
                      ZERO), SMALL_VAL_ANGLE, zmesh)
-
     theta = np.arctan2(np.sqrt(xmesh*xmesh+ymesh*ymesh), zmesh)
 
     # Fix X

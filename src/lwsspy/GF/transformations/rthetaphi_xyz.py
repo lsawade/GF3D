@@ -12,6 +12,7 @@ Most of the routines are take from ``specfem3d_globe`` and adapted to Python.
 
 """
 
+from typing import Iterable
 import numpy as np
 from ..constants import \
     ZERO, SMALL_VAL_ANGLE, PI_OVER_TWO, DEGREES_TO_RADIANS, RADIANS_TO_DEGREES, \
@@ -63,18 +64,18 @@ def xyz_2_rthetaphi(x, y, z):
     zmesh = z
 
     # Fix Z
-    zmesh = -SMALL_VAL_ANGLE if (
-        zmesh > - SMALL_VAL_ANGLE and zmesh <= ZERO) else zmesh
-    zmesh = SMALL_VAL_ANGLE if (
-        zmesh < SMALL_VAL_ANGLE and zmesh >= ZERO) else zmesh
+    zmesh = np.where(np.logical_and(zmesh > - SMALL_VAL_ANGLE, zmesh <=
+                     ZERO), -SMALL_VAL_ANGLE, zmesh)
+    zmesh = np.where(np.logical_and(zmesh < SMALL_VAL_ANGLE, zmesh >=
+                     ZERO), SMALL_VAL_ANGLE, zmesh)
 
     theta = np.arctan2(np.sqrt(xmesh*xmesh+ymesh*ymesh), zmesh)
 
     # Fix X
-    xmesh = -SMALL_VAL_ANGLE if (
-        xmesh > - SMALL_VAL_ANGLE and xmesh <= ZERO) else xmesh
-    xmesh = SMALL_VAL_ANGLE if (
-        xmesh < SMALL_VAL_ANGLE and xmesh >= ZERO) else xmesh
+    xmesh = np.where(np.logical_and(xmesh > - SMALL_VAL_ANGLE, xmesh <=
+                     ZERO), -SMALL_VAL_ANGLE, xmesh)
+    xmesh = np.where(np.logical_and(xmesh < SMALL_VAL_ANGLE, xmesh >=
+                     ZERO), SMALL_VAL_ANGLE, xmesh)
 
     phi = np.arctan2(ymesh, xmesh)
 
@@ -227,7 +228,12 @@ def xyz_2_rlatlon(x, y, z):
     r, theta, phi = xyz_2_rthetaphi(x, y, z)
 
     # reduces range for colatitude to 0 and PI, for longitude to 0 and 2*PI
-    reduce_geocentric(theta, phi)
+    if isinstance(theta, Iterable):
+        vreduce = np.vectorize(reduce_geocentric)
+        theta, phi = vreduce(theta, phi)
+
+    else:
+        theta, phi = reduce_geocentric(theta, phi)
 
     # converts geocentric to geographic colatitude
     # note: for example, the moho/topography/3D-model information is given in geographic latitude/longitude

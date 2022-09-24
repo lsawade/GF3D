@@ -4,8 +4,7 @@ from lwsspy.GF.constants_solver import NGNOD, NDIM
 
 
 def recompute_jacobian(
-        xelm, yelm, zelm, xi, eta, gamma, x, y, z,
-        xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz):
+        xelm, yelm, zelm, xi, eta, gamma):
     """
     use constants, only: NGNOD,NDIM,ZERO,HALF,ONE,TWO
 
@@ -40,7 +39,7 @@ def recompute_jacobian(
     """
 
     # check that the parameter file is correct
-    if (NGNOD /= 27):
+    if (NGNOD != 27):
         raise ValueError('elements should have 27 control nodes')
 
     l1xi = HALF*xi*(xi-ONE)
@@ -68,7 +67,7 @@ def recompute_jacobian(
     l3pgamma = gamma+HALF
 
     shape3D = np.zeros(NGNOD)
-    dershape3D = np.zeros(NDIM, NGNOD)
+    dershape3D = np.zeros((NDIM, NGNOD))
 
     # corner nodes
     shape3D[0] = l1xi*l1eta*l1gamma
@@ -217,15 +216,15 @@ def recompute_jacobian(
         y = y+shape3D[ia]*yelm[ia]
         z = z+shape3D[ia]*zelm[ia]
 
-        xxi = xxi+dershape3D[1, ia]*xelm[ia]
-        xeta = xeta+dershape3D[2, ia]*xelm[ia]
-        xgamma = xgamma+dershape3D[3, ia]*xelm[ia]
-        yxi = yxi+dershape3D[1, ia]*yelm[ia]
-        yeta = yeta+dershape3D[2, ia]*yelm[ia]
-        ygamma = ygamma+dershape3D[3, ia]*yelm[ia]
-        zxi = zxi+dershape3D[1, ia]*zelm[ia]
-        zeta = zeta+dershape3D[2, ia]*zelm[ia]
-        zgamma = zgamma+dershape3D[3, ia]*zelm[ia]
+        xxi = xxi+dershape3D[0, ia]*xelm[ia]
+        xeta = xeta+dershape3D[1, ia]*xelm[ia]
+        xgamma = xgamma+dershape3D[2, ia]*xelm[ia]
+        yxi = yxi+dershape3D[0, ia]*yelm[ia]
+        yeta = yeta+dershape3D[1, ia]*yelm[ia]
+        ygamma = ygamma+dershape3D[2, ia]*yelm[ia]
+        zxi = zxi+dershape3D[0, ia]*zelm[ia]
+        zeta = zeta+dershape3D[1, ia]*zelm[ia]
+        zgamma = zgamma+dershape3D[2, ia]*zelm[ia]
 
     jacobian = \
         xxi*(yeta*zgamma-ygamma*zeta) \
@@ -233,7 +232,7 @@ def recompute_jacobian(
         + xgamma*(yxi*zeta-yeta*zxi)
 
     if (jacobian <= ZERO):
-        raise ValueError('3D Jacobian undefined')
+        raise ValueError(f'3D Jacobian undefined: {jacobian}')
 
     # invert the relation (Fletcher p. 50 vol. 2)
     xix = (yeta*zgamma-ygamma*zeta)/jacobian
@@ -246,4 +245,4 @@ def recompute_jacobian(
     gammay = (xeta*zxi-xxi*zeta)/jacobian
     gammaz = (xxi*yeta-xeta*yxi)/jacobian
 
-    return xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz
+    return x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz

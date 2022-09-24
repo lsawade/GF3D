@@ -153,7 +153,7 @@ def hex_nodes_anchor_ijk():
 
     # preset the achors
     anchor_iax, anchor_iay, anchor_iaz = np.zeros(
-        NGNOD), np.zeros(NGNOD), np.zeros(NGNOD)
+        NGNOD, dtype=int), np.zeros(NGNOD, dtype=int), np.zeros(NGNOD, dtype=int)
 
     # define topology of the control element
     iaddx, iaddy, iaddr = hex_nodes()
@@ -163,11 +163,11 @@ def hex_nodes_anchor_ijk():
         # control point index
         iax = 0
         if (iaddx[ia] == 0):
-            iax = 1
+            iax = 0
         elif (iaddx[ia] == 1):
             iax = MIDX
         elif (iaddx[ia] == 2):
-            iax = NGLLX
+            iax = NGLLX-1
         else:
             raise ValueError('incorrect value of iaddx')
 
@@ -175,11 +175,11 @@ def hex_nodes_anchor_ijk():
 
         iay = 0
         if (iaddy[ia] == 0):
-            iay = 1
+            iay = 0
         elif (iaddy[ia] == 1):
             iay = MIDY
         elif (iaddy[ia] == 2):
-            iay = NGLLY
+            iay = NGLLY-1
         else:
             raise ValueError('incorrect value of iaddy')
 
@@ -187,11 +187,11 @@ def hex_nodes_anchor_ijk():
 
         iaz = 0
         if (iaddr[ia] == 0):
-            iaz = 1
+            iaz = 0
         elif (iaddr[ia] == 1):
             iaz = MIDZ
         elif (iaddr[ia] == 2):
-            iaz = NGLLZ
+            iaz = NGLLZ - 1
         else:
             raise ValueError('incorrect value of iaddz')
 

@@ -1,5 +1,4 @@
 # %%
-from glob import iglob
 from lwsspy.GF.get_topo_bathy import get_topo_bathy
 from pprint import pprint
 import os
@@ -10,6 +9,8 @@ import matplotlib.pyplot as plt
 from lwsspy.GF.source2xyz import source2xyz
 from lwsspy.GF.source import CMTSOLUTION
 from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ, NGLL3, MIDX, MIDY, MIDZ
+from lwsspy.GF.locate_point import locate_point
+from lwsspy.GF.transformations.rthetaphi_xyz import xyz_2_rthetaphi
 
 # Only import the KDTree after setting the LD_LIBRARY PATH, e.g.
 # $ export LD_LIBRARY_PATH='/home/lsawade/.conda/envs/gf/lib'
@@ -173,10 +174,10 @@ with adios2.open(reciprocal_file, "r", comm) as rh:
             local_dim = rh.read('ibool_GF/local_dim')[i]
             offset = rh.read('ibool_GF/offset')[i]
             ibool_sub = rh.read(
-                'x/array', start=[offset], count=[NGLL3*NGF_UNQIUE_LOCAL[i], ],
+                'ibool_GF/array', start=[offset], count=[NGLL3*NGF_UNQIUE_LOCAL[i], ],
                 block_id=0)
             ibool.append(
-                ibool_sub.reshape(NGLLX, NGLLY, NGLLZ, NGF_UNQIUE_LOCAL[i]))
+                ibool_sub.reshape(NGLLX, NGLLY, NGLLZ, NGF_UNQIUE_LOCAL[i], order='F')-1)
 
             # Getting the epsilon
             epsilon_sub = dict()
@@ -206,6 +207,15 @@ slc = 4
 midpoints = np.zeros((3, NGF_UNQIUE_LOCAL[slc]))
 
 # All iglobs
-iglob = ibool[slc][MIDX, MIDY, MIDZ, :].astype(int)
+iglobs = ibool[slc][MIDX, MIDY, MIDZ, :].astype(int)
 midpoints = np.vstack(
-    (xyz[slc]['x'][iglob], xyz[slc]['y'][iglob], xyz[slc]['z'][iglob])).T
+    (xyz[slc]['x'][iglobs], xyz[slc]['y'][iglobs], xyz[slc]['z'][iglobs])).T
+kdtree = KDTree(midpoints)
+
+# %%
+
+# Locate the point
+ispec_selected, xi, eta, gamma, x, y, z, distmin_not_squared = locate_point(
+    x_target, y_target, z_target, cmt.latitude, cmt.longitude,
+    midpoints, xyz[slc]['x'], xyz[slc]['y'], xyz[slc]['z'], ibool[slc],
+    POINT_CAN_BE_BURIED=True, kdtree=kdtree)

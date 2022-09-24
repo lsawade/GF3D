@@ -1,21 +1,21 @@
 import numpy as np
 from scipy.spatial import KDTree
 from .constants import R_PLANET_KM, HUGEVAL
-from .constants_solver import NGLLX, NGLLY, NGLLZ, MIDX, MIDY, MIDZ, DO_ADJACENT_SEARCH
+from .constants_solver import NGLLX, NGLLY, NGLLZ, MIDX, MIDY, MIDZ, \
+    DO_ADJACENT_SEARCH, NGNOD, NUM_ITER
 from .transformations.rthetaphi_xyz import xyz_2_latlon_minmax
 from .lagrange import gll_nodes
 from .hex_nodes import hex_nodes_anchor_ijk
-from .recompute_jacobian
+from .transformations.recompute_jacobian import recompute_jacobian
 
 
 def locate_point(
         x_target, y_target, z_target, lat_target, lon_target,
         midpoints, x_store, y_store, z_store, ibool,
-        POINT_CAN_BE_BURIED, NSPEC,
-        USE_DISTANCE_CRITERION: bool = False,
-        kdtree: KDTree | None):
+        USE_DISTANCE_CRITERION: bool = False, POINT_CAN_BE_BURIED: bool = True,
+        kdtree: KDTree | None = None):
     """
-      use constants_solver, only: &
+    use constants_solver, only: &
         NGLLX, NGLLY, NGLLZ, MIDX, MIDY, MIDZ, HUGEVAL, &
         USE_DISTANCE_CRITERION
 
@@ -97,7 +97,9 @@ def locate_point(
     lon = lon + 360.0 if (lon < 0.0) else lon
     lon = lon - 360.0 if (lon > 360.0) else lon
 
-    lat_min, lat_max, lon_min, lon_max = xyz_2_latlon_minmax(x, y, z)
+    # Get bounds
+    lat_min, lat_max, lon_min, lon_max = xyz_2_latlon_minmax(
+        x_store, y_store, z_store)
 
     # checks if receiver in this slice
     if (lat >= lat_min and lat <= lat_max and
@@ -116,16 +118,17 @@ def locate_point(
 
         # finds closest point(inside GLL points) in this chunk
         point_target = np.array([x_target, y_target, z_target])
-        (dist, ispec_selected) = kdtree.query(point_target, k=1)
+        dist, ispec_selected = kdtree.query(point_target, k=1)
 
         # debug
         # print *, 'kd-tree found location :', inode_min
 
         # loops over GLL points in this element to get(i, j, k) for initial guess
-        for k in range(1, NGLLZ-2):
-            for j in range(1, NGLLY-2):
-                for i in range(1, NGLLX-2):
-                    iglob = ibool(i, j, k, ispec_selected)
+        for k in range(NGLLZ):
+            for j in range(NGLLY):
+                for i in range(NGLLX):
+                    iglob = ibool[i, j, k, ispec_selected]
+
                     dist_squared = (
                         (x_target - x_store[iglob])**2 +
                         (y_target - y_store[iglob])**2 +
@@ -175,7 +178,7 @@ def locate_point(
         xi, eta, gamma, x, y, z = find_local_coordinates(
             x_target, y_target, z_target, ispec_selected,
             ix_initial_guess, iy_initial_guess, iz_initial_guess,
-            POINT_CAN_BE_BURIED)
+            x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED)
 
         # loops over neighbors and try to find better location
         if (DO_ADJACENT_SEARCH):
@@ -184,9 +187,9 @@ def locate_point(
                 # searches for better position in neighboring elements
                 # find_best_neighbor(x_target, y_target, z_target, xi, eta, gamma,
                 #                    x, y, z, ispec_selected, distmin_squared, POINT_CAN_BE_BURIED)
-
-                raise ValueError('Point found is outside element. and adjacent search is
-                                 'not yet implmenented.')
+                raise ValueError(
+                    'Point found is outside element. and adjacent search is'
+                    'not yet implmenented.')
 
     else:
         # point not found in this slice
@@ -222,7 +225,7 @@ def find_local_coordinates(
         x_target, y_target, z_target, ispec_selected,
         ix_initial_guess: int, iy_initial_guess: int, iz_initial_guess: int,
         x_store, y_store, z_store, ibool,
-        POINT_CAN_BE_BURIED):
+        POINT_CAN_BE_BURIED: bool = False):
     """
     use constants_solver, only: &
         NGNOD, HUGEVAL, NUM_ITER
@@ -262,39 +265,56 @@ def find_local_coordinates(
     # Get anchors
     anchor_iax, anchor_iay, anchor_iaz = hex_nodes_anchor_ijk()
 
+    print("Anchors")
+    # print(anchor_iax)
+    print(anchor_iay)
+
+    # Get anchors
+    xelm, yelm, zelm = np.zeros(NGNOD), np.zeros(NGNOD), np.zeros(NGNOD)
     # define coordinates of the control points of the element
     for ia in range(NGNOD):
-        iglob = ibool(anchor_iax[ia], anchor_iay[ia],
-                     anchor_iaz[ia], ispec_selected)
+        iglob = ibool[anchor_iax[ia], anchor_iay[ia],
+                      anchor_iaz[ia], ispec_selected]
         xelm[ia] = x_store[iglob]
         yelm[ia] = y_store[iglob]
         zelm[ia] = z_store[iglob]
 
+    print("Element coordinates")
+    # print(xelm)
+    print(yelm)
+    # print(zelm)
+
     # GLL points and weights (degree)
-    xigll, wxi, _ = gll_nodes(NGLLX-1)
-    etagll, weta, _ = gll_nodes(NGLLY-1)
-    gammagll, wgamma, _ = gll_nodes(NGLL-1)
+    xigll, _, _ = gll_nodes(NGLLX-1)
+    etagll, _, _ = gll_nodes(NGLLY-1)
+    gammagll, _, _ = gll_nodes(NGLLZ-1)
 
     # use initial guess in xi and eta
     xi = xigll[ix_initial_guess]
     eta = etagll[iy_initial_guess]
     gamma = gammagll[iz_initial_guess]
 
+    print(xi, eta, gamma)
+
     # impose receiver exactly at the surface
-    if (.not. POINT_CAN_BE_BURIED) gamma = 1.0
+    if (not POINT_CAN_BE_BURIED):
+        gamma = 1.0
 
     d_min_sq = HUGEVAL
-    dx_min = HUGEVAL
-    dy_min = HUGEVAL
-    dz_min = HUGEVAL
 
     # iterate to solve the non linear system
+    print("START", x_target, y_target, z_target)
+    print("     ", xi, eta, gamma)
+
     for iter_loop in range(NUM_ITER):
 
         # recompute Jacobian for the new point
-        recompute_jacobian(xelm, yelm, zelm, xi, eta,gamma,x,y,z, &
-                                xix, xiy, xiz, etax, etay,etaz,gammax,gammay,gammaz)
+        x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = \
+            recompute_jacobian(xelm, yelm, zelm, xi, eta, gamma)
 
+        # print(f"                            ", xelm)
+        # print(f"                            ", yelm)
+        # print(f"                            ", zelm)
         # compute distance to target location
         dx = - (x - x_target)
         dy = - (y - y_target)
@@ -304,28 +324,24 @@ def find_local_coordinates(
         # print *,'  iter ',iter_loop,'dx',sngl(dx),sngl(dx_min),'dy',sngl(dy),sngl(dy_min),'dz',sngl(dz),sngl(dz_min),d_min_sq
 
         # compute increments
-        if ((dx**2 + dy**2 + dz**2) < d_min_sq) then
-          d_min_sq = dx**2 + dy**2 + dz**2
-              dx_min = dx
-                  dy_min = dy
-                   dz_min = dz
+        if ((dx**2 + dy**2 + dz**2) < d_min_sq):
+            d_min_sq = dx**2 + dy**2 + dz**2
 
-                    dxi = xix*dx + xiy*dy + xiz*dz
-                    deta = etax*dx + etay*dy + etaz*dz
-                    dgamma = gammax*dx + gammay*dy + gammaz*dz
-        else
-          # new position is worse than old one, no change necessary
-          dxi = 0.0
-              deta = 0.0
-                  dgamma = 0.0
-        endif
+            dxi = xix*dx + xiy*dy + xiz*dz
+            deta = etax*dx + etay*dy + etaz*dz
+            dgamma = gammax*dx + gammay*dy + gammaz*dz
+        else:
+            # new position is worse than old one, no change necessary
+            dxi = 0.0
+            deta = 0.0
+            dgamma = 0.0
 
         # decreases step length if step is large
-        if ((dxi**2 + deta**2 + dgamma**2) > 1.00) then
-          dxi = dxi * 0.333333333330
-              deta = deta * 0.333333333330
-                  dgamma = dgamma * 0.333333333330
-        endif
+        if ((dxi**2 + deta**2 + dgamma**2) > 1.00):
+            dxi = dxi * 0.333333333330
+            deta = deta * 0.333333333330
+            dgamma = dgamma * 0.333333333330
+
         # alternative: impose limit on increments (seems to result in slightly less accurate locations)
         # if (np.abs(dxi) > 0.30 ) dxi = sign(1.00,dxi)*0.30
         # if (np.abs(deta) > 0.30 ) deta = sign(1.00,deta)*0.30
@@ -339,26 +355,33 @@ def find_local_coordinates(
         eta = eta + deta
         gamma = gamma + dgamma
 
+        print(f"    iter {iter_loop}", x, y, z)
+        print(f"                        ", xi, eta, gamma)
+
         # impose that we stay in that element
         # (useful if user gives a receiver outside the mesh for instance)
         # we can go slightly outside the [1,1] segment since with finite elements
         # the polynomial solution is defined everywhere
         # can be useful for convergence of iterative scheme with distorted elements
-        if (xi > 1.100) xi = 1.100
-        if (xi < -1.100) xi = -1.100
-        if (eta > 1.100) eta = 1.100
-        if (eta < -1.100) eta = -1.100
-        if (gamma > 1.100) gamma = 1.100
-        if (gamma < -1.100) gamma = -1.100
-
-    # end of non linear iterations
-    enddo
+        if (xi > 1.100):
+            xi = 1.100
+        if (xi < -1.100):
+            xi = -1.100
+        if (eta > 1.100):
+            eta = 1.100
+        if (eta < -1.100):
+            eta = -1.100
+        if (gamma > 1.100):
+            gamma = 1.100
+        if (gamma < -1.100):
+            gamma = -1.100
 
     # impose receiver exactly at the surface
-    if (.not. POINT_CAN_BE_BURIED) gamma = 1.0
+    if (not POINT_CAN_BE_BURIED):
+        gamma = 1.0
 
     # compute final coordinates of point found
-    call recompute_jacobian(xelm, yelm, zelm, xi, eta,gamma,x,y,z, &
-                            xix, xiy, xiz, etax, etay,etaz,gammax,gammay,gammaz)
+    x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = \
+        recompute_jacobian(xelm, yelm, zelm, xi, eta, gamma)
 
-    return xi, eta, gamma, x,y,z
+    return xi, eta, gamma, x, y, z

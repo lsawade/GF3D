@@ -170,6 +170,8 @@ def source2xyz(
     # stores surface radius for info output
     r0_source = r0
 
+    print("rsource", r0_source)
+
     # subtracts source depth(given in m)
     r_target = r0 - depth/R_PLANET
 

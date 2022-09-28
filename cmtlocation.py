@@ -1,4 +1,9 @@
 # %%
+# LOAD THE KDTREE FIRST!!!!!!!!!!!!!
+# If other packages are loaded, the wrong libstdc++ is picked up and
+# doesn't contain the right GLIBCXX version
+
+from scipy.spatial import KDTree
 from lwsspy.GF.get_topo_bathy import get_topo_bathy
 from pprint import pprint
 import os
@@ -14,7 +19,6 @@ from lwsspy.GF.transformations.rthetaphi_xyz import xyz_2_rthetaphi
 
 # Only import the KDTree after setting the LD_LIBRARY PATH, e.g.
 # $ export LD_LIBRARY_PATH='/home/lsawade/.conda/envs/gf/lib'
-from scipy.spatial import KDTree
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()

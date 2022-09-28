@@ -3,6 +3,7 @@ from multiprocessing.sharedctypes import Value
 import os
 import subprocess
 import typing as tp
+from unittest.mock import NonCallableMagicMock
 from lwsspy.GF.stf import create_stf
 import numpy as np
 from copy import deepcopy
@@ -29,9 +30,10 @@ class Simulation:
             station_burial: float,
             network: str,
             station: str,
-            target_latitude: float | np.ndarray | tp.Iterable,
-            target_longitude: float | np.ndarray | tp.Iterable,
-            target_depth: float | np.ndarray | tp.Iterable,
+            target_file: str | None = None,
+            target_latitude: float | np.ndarray | tp.Iterable | None = None,
+            target_longitude: float | np.ndarray | tp.Iterable | None = None,
+            target_depth: float | np.ndarray | tp.Iterable | None = None,
             force_factor: float = 1e14,
             t0: float = 0.0,
             tc: float = 0.0,
@@ -89,6 +91,7 @@ class Simulation:
         self.target_latitude = target_latitude     # degree
         self.target_longitude = target_longitude   # degree
         self.target_depth = target_depth           # km
+        self.target_file = target_file
 
         # Simulation parameters
         self.force_factor = force_factor
@@ -117,6 +120,9 @@ class Simulation:
         self.logger = logger
 
         # Run setup
+        if self.target_file is not None:
+            self.read_GF_LOCATIONS()
+
         self.check_inputs()
         self.setup()
 
@@ -449,6 +455,28 @@ class Simulation:
             np.savetxt(stf_forward_file, self.stf, fmt='%30.15f',
                        header=header, comments=' #')
 
+    def read_GF_LOCATIONS(self):
+        """GF LOCATIONS must have the format """
+        # Open GF locations file for each compenent
+        # with open(self.target_file, 'w') as f:
+
+        locmat = np.loadtxt(self.target_file)
+
+        # Assign latitude
+        self.target_latitude = locmat[:, 0]
+        self.target_longitude = locmat[:, 1]
+        self.target_depth = locmat[:, 2]
+
+        # print(f"{'Lat':<20}{'Lon':<20}{'Dep':<20}")
+        # print(60 * "-")
+        # for i in range(len(self.target_latitude)):
+        #     print(
+        #         f"{self.target_latitude[i]:<20f}"
+        #         f"{self.target_longitude[i]:<20f}"
+        #         f"{self.target_depth[i]:<20f}"
+        #     )
+        # print(60 * "-")
+
     def write_GF_LOCATIONS(self):
 
         self.logger.debug('Writing GF_LOCATIONS ...')
@@ -479,7 +507,7 @@ class Simulation:
                         self.target_latitude,
                         self.target_longitude,
                         self.target_depth):
-                    f.write(f'{_lat:7.4f}   {_lon:7.4f}   {_dep:7.4f}')
+                    f.write(f'{_lat:9.4f}   {_lon:9.4f}   {_dep:9.4f}\n')
 
         if self.forward_test:
 

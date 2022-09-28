@@ -1,11 +1,11 @@
-
+# %%
 import os
 import sys
 from mpi4py import MPI
 import numpy as np
 import adios2
 import matplotlib.pyplot as plt
-from .lagrange import lagrange_any, gll_nodes
+from lwsspy.GF.lagrange import lagrange_any, gll_nodes
 from obspy import read
 # from lwsspy.plot import plot_label
 comm = MPI.COMM_WORLD
@@ -21,6 +21,7 @@ def plot_label(ax, label: str, fontdict=None, **kwargs):
             fontdict=fontdict, **kwargs)
 
 
+# %%
 # From constants.h.in
 # gravitational constant in m3 kg-1 s-2, or equivalently in N.(m/kg)^2
 GRAV = 6.67384e-11
@@ -130,6 +131,8 @@ if rank == 0:
 
     NGLLX, NGLLY, NGLLZ = 5, 5, 5
 
+
+# %%
 with adios2.open(forward_file, "r", comm) as fh:
 
     # Get number of steps in the file
@@ -248,6 +251,8 @@ if rank == 0:
     fig = plt.figure(figsize=(10, 11))
 
 counter = 0
+
+# %%
 for _comp, _simdir in comp_dir.items():
 
     # Get file name
@@ -342,18 +347,23 @@ for _comp, _simdir in comp_dir.items():
                         sepsilon[5,
                                  :] += np.squeeze(epsilon_yz[i, j, k, :, :]) * hlagrange
 
-            sgt = np.zeros((3, 3, nsteps))
-            sgt[0, 0, :], sgt[0, 1, :], sgt[0, 2, :] = sepsilon[0, :],  \
-                sepsilon[3, :], sepsilon[4, :]
-            sgt[1, 0, :], sgt[1, 1, :], sgt[1, 2, :] =  \
-                sepsilon[3, :],   sepsilon[1, :], sepsilon[5, :]
-            sgt[2, 0, :], sgt[2, 1, :], sgt[2, 2, :] =  \
-                sepsilon[4, :], sepsilon[5, :],   sepsilon[2, :]
+            # sgt = np.zeros((3, 3, nsteps))
+            # sgt[0, 0, :], sgt[0, 1, :], sgt[0, 2, :] = sepsilon[0, :],  \
+            #     sepsilon[3, :], sepsilon[4, :]
+            # sgt[1, 0, :], sgt[1, 1, :], sgt[1, 2, :] =  \
+            #     sepsilon[3, :],   sepsilon[1, :], sepsilon[5, :]
+            # sgt[2, 0, :], sgt[2, 1, :], sgt[2, 2, :] =  \
+            #     sepsilon[4, :], sepsilon[5, :],   sepsilon[2, :]
 
-            sgt = sgt.transpose(1, 0, 2)
+            # sgt = sgt.transpose(1, 0, 2)
             # dot product
-            z = np.einsum('ji,ijk->k', M.T, sgt)
-            print("scale disp rh", scale_displ)
+            # z = np.einsum('ji,ijk->k', M.T, sgt)
+            Mv = np.array([M[0, 0], M[1, 1], M[2, 2],
+                          M[0, 1], M[0, 2], M[1, 2]])
+            sgt = np.array([1., 1., 1., 2., 2., 2.])[:, None] * sepsilon
+            z = np.sum(Mv[:, None] * sgt, axis=0)
+
+            # print("scale disp rh", scale_displ)
             plt.figure()
             plt.plot(z)
             plt.savefig('sgt_displacement.png', dpi=300)

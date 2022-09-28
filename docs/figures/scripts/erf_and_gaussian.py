@@ -16,7 +16,7 @@ nt = 1001
 
 hdur = 1.5
 
-t = arange(t0, t0+nt*dt, dt)
+jfs
 
 # In specfem the hdur is used like standard deviation for the force.
 g = exp(-(t-tc)**2/hdur**2) / (sqrt(pi) * hdur)

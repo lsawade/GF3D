@@ -94,7 +94,7 @@ class Simulation:
         self.target_file = target_file
 
         # Simulation parameters
-        self.force_factor = force_factor
+        self.force_factor = float(force_factor)
         self.t0 = t0
         self.tc = tc
         self.duration_in_min = duration_in_min
@@ -364,6 +364,8 @@ class Simulation:
             f"Number of timesteps for simulation: {self.nstep:6d}")
         self.logger.debug(
             f"Number of timesteps subsampled:     {int(self.nstep//self.xth_sample):6d}")
+        self.logger.debug(
+            f"Saving every x-th sample:           {self.xth_sample:6d}")
 
         # Show True sampling rate:
         self.ndt = self.dt * self.xth_sample
@@ -380,7 +382,7 @@ class Simulation:
         # very short 5*DT, where DT is the subsampled sampling time ``self.ndt``
         # For all filters to work fine, we just need to choose a half duration
         # that is 2.0 the length outgoing smapling interval.
-        self.hdur = 1.0*self.ndt
+        self.hdur = 2.0*self.ndt
         self.logger.debug(f"hdur of step:         {self.hdur:.4f} s")
 
         # The distance between t0 and tc should be larger than the

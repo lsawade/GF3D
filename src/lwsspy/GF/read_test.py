@@ -284,6 +284,7 @@ for _comp, _simdir in comp_dir.items():
                 f'epsilon_xx/array',
                 start=start, count=count,
                 step_start=0, step_count=nsteps, block_id=block_id).T
+            print(epsilon_xx)
             epsilon_yy = rh.read(
                 f'epsilon_yy/array',
                 start=start, count=count,
@@ -376,7 +377,7 @@ for _comp, _simdir in comp_dir.items():
             ax = fig.add_subplot(311 + counter)
 
             idx = [0, 1, 2]
-            dt = 6.8400
+            dt = 6.9000
 
             # z = np.hstack((np.array([0.0]), z))
             # t = tr.times()[::36]  # np.arange(0.0, (6316//36) * dt, dt)
@@ -393,7 +394,7 @@ for _comp, _simdir in comp_dir.items():
             ax.plot(t, z[:], 'b:', lw=0.75, label='Reciprocal')
             ax.plot(t, 10*(s[counter, :] - z[:]/z.max() *
                     s[counter, :].max()), 'b', lw=0.5, label='error')
-            ax.set_xlim(200, 600)
+            # ax.set_xlim(200, 600)
             absmax = np.max(
                 np.abs(np.hstack((tr.data, z/z.max() * s[counter, :].max()))))
             ax.set_ylim(-absmax, absmax)

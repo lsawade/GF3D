@@ -20,6 +20,8 @@ from lwsspy.GF.locate_point import locate_point
 from lwsspy.GF.transformations.rthetaphi_xyz import xyz_2_rthetaphi
 from lwsspy.GF.lagrange import lagrange_any, gll_nodes
 from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ, NGLL3, MIDX, MIDY, MIDZ
+from lwsspy.GF.postprocess import ProcessAdios
+from lwsspy.GF.lagrange import lagrange_any, gll_nodes
 # Only import the KDTree after setting the LD_LIBRARY PATH, e.g.
 # $ export LD_LIBRARY_PATH='/home/lsawade/.conda/envs/gf/lib'
 
@@ -207,8 +209,8 @@ with adios2.open(reciprocal_file, "r", comm) as rh:
                 epsilon_sub[key] = rh.read(
                     f'{key}/array', start=[offset],
                     count=[NGLL3*NGF_UNQIUE_LOCAL[i], ],
-                    step_start=0, step_count=nsteps, block_id=0).reshape(
-                        NGLLX, NGLLY, NGLLZ, NGF_UNQIUE_LOCAL[i], nsteps)
+                    step_start=0, step_count=nsteps, block_id=0).transpose().reshape(
+                        NGLLX, NGLLY, NGLLZ, NGF_UNQIUE_LOCAL[i], -1, order='F')
 
             epsilon.append(epsilon_sub)
 
@@ -227,19 +229,124 @@ midpoints = np.zeros((3, NGF_UNQIUE_LOCAL[slc]))
 iglobs = ibool[slc][MIDX, MIDY, MIDZ, :].astype(int)
 midpoints = np.vstack(
     (xyz[slc]['x'][iglobs], xyz[slc]['y'][iglobs], xyz[slc]['z'][iglobs])).T
-kdtree = KDTree(midpoints)
+
+
+# %% Define file location
+
+specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
+specfem = os.path.join(specfemmagic, 'specfem3d_globe')
+Nfile = os.path.join(specfem, 'run0001', "OUTPUT_FILES",
+                     "save_forward_arrays_GF.bp")
+Efile = os.path.join(specfem, 'run0002', "OUTPUT_FILES",
+                     "save_forward_arrays_GF.bp")
+Zfile = os.path.join(specfem, 'run0003', "OUTPUT_FILES",
+                     "save_forward_arrays_GF.bp")
+
+# Process one file
+# %% Get the main content of the adios file
+
+with ProcessAdios(Nfile) as P:
+    # Load both large and small
+    P.load_large_vars()
+    db = P.vars
+
+# %% Assign values
+
+topography = db['TOPOGRAPHY']
+ellipticity = db['ELLIPTICITY']
+ibathy_topo = db['BATHY']
+NX_BATHY = db['NX_BATHY']
+NY_BATHY = db['NY_BATHY']
+RESOLUTION_TOPO_FILE = db['RESOLUTION_TOPO_FILE']
+rspl = db['rspl']
+ellipticity_spline = db['ellipticity_spline']
+ellipticity_spline2 = db['ellipticity_spline2']
+ibool = db['ibool']
+xyz = db['xyz']
+
+# %% Get a source
+
+cmt = CMTSOLUTION.read('CMTSOLUTION')
+
+# %% Transform the CMTSOLUTION to mesh coordinates
+
+x_target, y_target, z_target, Mx = source2xyz(
+    cmt.latitude,
+    cmt.longitude,
+    cmt.depth,
+    cmt.tensor,
+    topography=topography,
+    ellipticity=ellipticity,
+    ibathy_topo=ibathy_topo,
+    NX_BATHY=NX_BATHY,
+    NY_BATHY=NY_BATHY,
+    RESOLUTION_TOPO_FILE=RESOLUTION_TOPO_FILE,
+    rspl=rspl,
+    ellipicity_spline=ellipticity_spline,
+    ellipicity_spline2=ellipticity_spline2,
+)
+
+
+# %% Make a kdtree for the location of events
+kdtree = KDTree(xyz[ibool[2, 2, 2, :], :])
 
 # %%
+
+# %% Here One could use the kdtree to subselect elements
+
+# Get the closest N elements including their strains, this will require ibool
+# to be reconfigured (again) to go from 0 to NGLOB_sub, and
+# xyz[ordered_ibool for subselection, :].
+
+# %% Other wise just locate the single point in the full mesh
 
 # Locate the point
 ispec_selected, xi, eta, gamma, x, y, z, distmin_not_squared = locate_point(
     x_target, y_target, z_target, cmt.latitude, cmt.longitude,
-    midpoints, xyz[slc]['x'], xyz[slc]['y'], xyz[slc]['z'], ibool[slc],
+    xyz[ibool[2, 2, 2, :], :], xyz[:, 0], xyz[:, 1], xyz[:, 2], ibool,
     POINT_CAN_BE_BURIED=True, kdtree=kdtree)
+
+# %% Grab the elements strain
+epsilon = db['epsilon'][:, :, :, :, ispec_selected, :]
+
+# %% Get the interpolation values
+
+# GLL points and weights (degree)
+npol = 4
+xigll, wxi, _ = gll_nodes(npol)
+etagll, weta, _ = gll_nodes(npol)
+gammagll, wgamma, _ = gll_nodes(npol)
+
+
+# Get lagrange values at specific GLL poins
+shxi, shpxi = lagrange_any(xi, xigll, npol)
+sheta, shpeta = lagrange_any(eta, xigll, npol)
+shgamma, shpgamma = lagrange_any(gamma, xigll, npol)
+
+# %%
+sepsilon = np.zeros((6, epsilon.shape[-1]))
+
+for k in range(NGLLZ):
+    for j in range(NGLLY):
+        for i in range(NGLLX):
+            hlagrange = shxi[i] * sheta[j] * shgamma[k]
+            sepsilon += hlagrange * epsilon[:, i, j, k, :] / 1e21
+
+
+sgt = np.array([1., 1., 1., 2., 2., 2.])[:, None] * sepsilon
+z = np.sum(Mx[:, None] * sgt, axis=0)
+
+# %%
+dt = 0.1150*60
+t = np.arange(0, len(z)*dt, dt)
+plt.figure(figsize=(12, 4))
+plt.plot(t, z)
+plt.xlabel('Time [s]')
+plt.ylabel('Amplitude')
+plt.savefig('testz.png', dpi=300)
 
 
 # %%
-
 with h5py.File('testdb.h5', 'r') as db:
     NSPEC = db['NSPEC'][()]
     topography = db['TOPOGRAPHY'][()]

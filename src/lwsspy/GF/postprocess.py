@@ -1,13 +1,16 @@
 import logging
+import toml
 from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ
 import numpy as np
-from numpy.typing import ArrayLike
 import adios2
-import typing as tp
 import traceback
 import matplotlib.pyplot as plt
 from mpi4py import MPI
+import h5py
 from lwsspy.math.cart2geo import cart2geo
+from lwsspy.GF.simulation import Simulation
+
+
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
@@ -41,6 +44,10 @@ class ProcessAdios(object):
         self.vars["NSPEC"] = int(np.sum(self.vars["NSPEC_LOCAL"]))
         self.vars["ELLIPTICITY"] = bool(self.F.read("ELLIPTICITY")[0])
         self.vars["TOPOGRAPHY"] = bool(self.F.read("TOPOGRAPHY")[0])
+
+        # We also need to save every X-TH frame so that NSTEP_BETWEEN_FRAMES
+        # we can thoroughly show the subsampling rate
+        self.vars["DT"] = float(self.F.read("DT")[0])
 
         if self.vars["ELLIPTICITY"]:
 
@@ -86,11 +93,9 @@ class ProcessAdios(object):
         xyz = np.zeros((self.vars["NGLOB"], 3), dtype=np.float32)
 
         # Define strain size convention xx,yy,zz,xy,xz,yz
-        epsilon = np.zeros((
-            6,
-            self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
-            self.vars["NSPEC"], self.vars["NSTEPS"]),
-            dtype=np.float32)
+        epsilon = np.zeros((6,
+                            self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
+                            self.vars["NSPEC"], self.vars["NSTEPS"]))
 
         # Define ibool size
         ibool = np.zeros((
@@ -167,7 +172,11 @@ class ProcessAdios(object):
                     count=[NGLL3*self.vars['NSPEC_LOCAL'][i], ],
                     block_id=0).reshape(
                         NGLLX, NGLLY, NGLLZ,
-                        self.vars['NSPEC_LOCAL'][i], order='F') + CNGLOB[i]  # OFFSET
+                        self.vars['NSPEC_LOCAL'][i], order='F') \
+                    + CNGLOB[i] \
+                    - 1
+                # CNGLOB[i] gives the global values a subset of values
+                # - 1 is to transfrom fortran to python indexing
 
                 # Getting the epsilon
                 for _i, _l in enumerate(['xx', 'yy', 'zz', 'xy', 'xz', 'yz']):
@@ -178,11 +187,10 @@ class ProcessAdios(object):
 
                     epsilon[_i, :, :, :, CNSPEC[i]:CNSPEC[i+1], :] = self.F.read(
                         f'{key}/array', start=[offset],
-                        count=[NGLL3*self.vars['NSPEC_LOCAL'][i], ],
+                        count=[NGLL3*self.vars['NSPEC_LOCAL'][i]],
                         step_start=0, step_count=self.vars['NSTEPS'],
-                        block_id=0).reshape(
-                            NGLLX, NGLLY, NGLLZ,
-                            self.vars['NSPEC_LOCAL'][i], self.vars['NSTEPS'], order='F')
+                        block_id=0).transpose().reshape(
+                        NGLLX, NGLLY, NGLLZ, self.vars['NSPEC_LOCAL'][i], self.vars['NSTEPS'], order='F')
 
             else:
                 logger.debug(f"Proc {i:d} does not have elements.")
@@ -235,54 +243,155 @@ class ProcessAdios(object):
         else:
             plt.show()
 
+# Read input file dict
 
-class ProcessAdios3(object):
 
-    P: tp.Dict[str, ProcessAdios]
+def read_toml(file: str):
+    return toml.load(file)
 
-    def __init__(self,  Nfile: str, Efile: str, Zfile: str, only: str | None = None) -> None:
 
-        # Define files to work on
-        if only is not None:
-            if only in ['', '', '']:
-                self.filenames = dict()
-            else:
-                raise ValueError('N')
-        else:
-            self.filenames = dict(N=Nfile, E=Efile, Z=Zfile)
+class Adios2HDF5(object):
 
-            self.vars = dict(N=dict(), E=dict(), Z=dict())
+    DB: h5py.File
+    consistent: bool = False
 
-    def load_basic_vars(self):
+    def __init__(self,
+                 h5file: str,
+                 Nfile: str, Efile: str, Zfile: str,
+                 config_file: str) -> None:
 
-        for _, P in self.P.items():
-            P.load_base_vars()
+        # Output filename
+        self.h5file = h5file
+
+        # Component filenames
+        self.filenames = dict(N=Nfile, E=Efile, Z=Zfile)
+
+        # Get important infor for the conversion
+        self.config = read_toml(config_file)
+        self.get_timing()
+
+        # Check consistency between components
+        self.check_consistency()
+
+    def get_timing(self):
+        # Get the timining from the mesh file
+        S = Simulation(**self.config)
+        S.get_timestep_period()
+        self.dt = S.ndt
+        self.t0 = S.t0
+
+        # STF midpoint! Note that due to the actual dt used this may not be hit by a
+        # sample!
+        self.tc = S.tc
 
     def check_consistency(self):
-        """Check consistency in sizes across the different Process instances."""
-        # Check topogrpahy NX and NY for topo if topo true
+        """
+        First we run a simple check to see whether all the variable parameters
+        across all components are correct. This parameters have to be all the same
+        since they depend on tagged elements. Tagged elements have to be the same
+        across components
 
-        # Check ellipticity splines if ellipticity True
+        We don't save the variables of the consisteny check simply because
+        the consistency-check, and reading of the shape/size arrays takes no
+        time.
+        """
 
-        # Check NPROCS
+        vardict = dict()
 
-        # If NPROCS consistent, check
+        # For each component load the correct variables
+        for _comp, _afile in self.filenames.items():
 
-        # CHECK
-        # - NGLOB
-        # - NSPEC_UNIQUE_LOCAL
-        # -
+            with ProcessAdios(_afile) as P:
+                P.load_base_vars()
+                vardict[_comp] = P.vars
 
-        pass
+        # Get components
+        ckeys = list(self.filenames.keys())
+
+        # Get list of keys in the files
+        keys = list(vardict[ckeys[0]].keys())
+
+        # Check whether arrays agree in shapes and values
+        try:
+            for _key in keys:
+                np.testing.assert_almost_equal(
+                    vardict[ckeys[0]][_key], vardict[ckeys[1]][_key])
+                np.testing.assert_almost_equal(
+                    vardict[ckeys[0]][_key], vardict[ckeys[2]][_key])
+        except Exception as e:
+            print(e)
+            raise ValueError(
+                'The error was raised in the consistency check.\n'
+                'Somehow it seems like the ADIOS files and their array sizes\n'
+                'are inconsistent.')
+
+        # Tell the class that the files are consistent.
+        self.consistent = True
+
+    def write(self):
+
+        if self.consistent is False:
+            raise ValueError('Component files are inconsistent.')
+
+        # Grab the things that were identified by simulation class:
+        self.DB.create_dataset("DT", data=self.dt)
+        self.DB.create_dataset("TC", data=self.tc)
+        self.DB.create_dataset("T0", data=self.t0)
+        self.DB.create_dataset("Network", data=self.config['network'])
+        self.DB.create_dataset("Station", data=self.config['station'])
+
+        # This factor combines both removin the initial force + conversion to dyn
+        self.DB.create_dataset(
+            "FACTOR", data=1e7*float(self.config['force_factor']))
+
+        for _i, (_comp, _afile) in enumerate(self.filenames.items()):
+
+            logger.debug(72*"=")
+            logger.debug(28*"=" + f" EPSILON FOR: {_comp} " + 28*"=")
+            logger.debug(72*"=")
+
+            with ProcessAdios(_afile) as P:
+
+                # We checked whether all components have the same type of
+                # We
+                if _i == 0:
+                    P.load_base_vars()
+                    for _key in list(P.vars.keys()):
+                        if _key == "DT":
+                            continue
+                        self.DB.create_dataset(_key, data=P.vars[_key])
+
+                # Once the small variables are written write the large ones
+                P.load_large_vars()
+
+                # Write ibool and coordinates only once
+                if _i == 0:
+                    self.DB.create_dataset('ibool', data=P.vars['ibool'])
+                    self.DB.create_dataset('xyz', data=P.vars['xyz'])
+
+                # NOTE Here we can put code for compression!!!!
+                # I tried a little but it failed completely...
+                # For now let's just save the data
+                # Write component-wise epsilon
+                # offset = np.min(P.vars['epsilon'])
+                # norm = np.max(P.vars['epsilon'] - offset)
+
+                # db.create_dataset(
+                #     f'epsilon/{_comp}/array',
+                #     data=((P.vars['epsilon']-offset)/norm).astype(np.float16))
+
+                # db.create_dataset(f'epsilon/{_comp}/offset', data=offset)
+                # db.create_dataset(f'epsilon/{_comp}/norm', data=norm)
+
+                self.DB.create_dataset(
+                    f'epsilon/{_comp}/array', data=P.vars['epsilon'].astype(np.float32))
 
     def open(self):
-        for key, filename in self.filenames.items():
-            self.P[key] = ProcessAdios(filename)
-            self.P[key].open()
+        self.DB = h5py.File(self.h5file, 'w')
+        # self.DB.open()
 
     def close(self):
-        for _, P in self.P.items():
-            P.close()
+        self.DB.close()
 
     def __enter__(self):
         self.open()

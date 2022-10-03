@@ -10,7 +10,7 @@ from .transformations.rthetaphi_xyz import lat_2_geocentric_colat, reduce_geocen
 
 
 def source2xyz(
-        lat: float, lon: float, depth_in_km: float, M: np.ndarray,
+        lat: float, lon: float, depth_in_km: float, M: None | np.ndarray = None,
         topography: bool = False, ellipticity: bool = False,
         ibathy_topo: np.ndarray | None = None,
         NX_BATHY: int | None = None,
@@ -39,32 +39,33 @@ def source2xyz(
     sinp = np.sin(phi)
     cosp = np.cos(phi)
 
-    # get the moment tensor
-    Mrr = M[0]
-    Mtt = M[1]
-    Mpp = M[2]
-    Mrt = M[3]
-    Mrp = M[4]
-    Mtp = M[5]
+    if M is not None:
+        # get the moment tensor
+        Mrr = M[0]
+        Mtt = M[1]
+        Mpp = M[2]
+        Mrt = M[3]
+        Mrp = M[4]
+        Mtp = M[5]
 
-    # convert from a spherical to a Cartesian representation of the moment tensor
-    Mxx = sint*sint*cosp*cosp*Mrr + cost*cost*cosp*cosp*Mtt + sinp*sinp*Mpp \
-        + 2.0*sint*cost*cosp*cosp*Mrt - 2.0*sint*sinp*cosp*Mrp - 2.0*cost*sinp*cosp*Mtp
+        # convert from a spherical to a Cartesian representation of the moment tensor
+        Mxx = sint*sint*cosp*cosp*Mrr + cost*cost*cosp*cosp*Mtt + sinp*sinp*Mpp \
+            + 2.0*sint*cost*cosp*cosp*Mrt - 2.0*sint*sinp*cosp*Mrp - 2.0*cost*sinp*cosp*Mtp
 
-    Myy = sint*sint*sinp*sinp*Mrr + cost*cost*sinp*sinp*Mtt + cosp*cosp*Mpp \
-        + 2.0*sint*cost*sinp*sinp*Mrt + 2.0*sint*sinp*cosp*Mrp + 2.0*cost*sinp*cosp*Mtp
+        Myy = sint*sint*sinp*sinp*Mrr + cost*cost*sinp*sinp*Mtt + cosp*cosp*Mpp \
+            + 2.0*sint*cost*sinp*sinp*Mrt + 2.0*sint*sinp*cosp*Mrp + 2.0*cost*sinp*cosp*Mtp
 
-    Mzz = cost*cost*Mrr + sint*sint*Mtt - 2.0*sint*cost*Mrt
+        Mzz = cost*cost*Mrr + sint*sint*Mtt - 2.0*sint*cost*Mrt
 
-    Mxy = sint*sint*sinp*cosp*Mrr + cost*cost*sinp*cosp*Mtt - sinp*cosp*Mpp \
-        + 2.0*sint*cost*sinp*cosp*Mrt + sint * \
-        (cosp*cosp-sinp*sinp)*Mrp + cost*(cosp*cosp-sinp*sinp)*Mtp
+        Mxy = sint*sint*sinp*cosp*Mrr + cost*cost*sinp*cosp*Mtt - sinp*cosp*Mpp \
+            + 2.0*sint*cost*sinp*cosp*Mrt + sint * \
+            (cosp*cosp-sinp*sinp)*Mrp + cost*(cosp*cosp-sinp*sinp)*Mtp
 
-    Mxz = sint*cost*cosp*Mrr - sint*cost*cosp*Mtt \
-        + (cost*cost-sint*sint)*cosp*Mrt - cost*sinp*Mrp + sint*sinp*Mtp
+        Mxz = sint*cost*cosp*Mrr - sint*cost*cosp*Mtt \
+            + (cost*cost-sint*sint)*cosp*Mrt - cost*sinp*Mrp + sint*sinp*Mtp
 
-    Myz = sint*cost*sinp*Mrr - sint*cost*sinp*Mtt \
-        + (cost*cost-sint*sint)*sinp*Mrt + cost*cosp*Mrp - sint*cosp*Mtp
+        Myz = sint*cost*sinp*Mrr - sint*cost*sinp*Mtt \
+            + (cost*cost-sint*sint)*sinp*Mrt + cost*cosp*Mrp - sint*cosp*Mtp
 
     nu_source = np.zeros((3, 3))
 
@@ -180,7 +181,11 @@ def source2xyz(
     y = r_target*sint*sinp
     z = r_target*cost
 
-    # Collect M_cartesian
-    M_cartesian = np.array([Mxx, Myy, Mzz, Mxy, Mxz, Myz])
+    if M is not None:
+        # Collect M_cartesian
+        M_cartesian = np.array([Mxx, Myy, Mzz, Mxy, Mxz, Myz])
 
-    return x, y, z, M_cartesian
+        return x, y, z, M_cartesian
+
+    else:
+        return x, y, z

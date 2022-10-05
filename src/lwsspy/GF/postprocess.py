@@ -103,16 +103,6 @@ class ProcessAdios(object):
             self.vars["NSPEC"]),
             dtype=int)
 
-        def plot_coords_slice(i, x, y, z):
-            _, lat, lon = cart2geo(x, y, z)
-            fig = plt.figure()
-            ax = plt.axes()
-            ax.scatter(lon, lat, s=2, marker='o')
-            ax.set_xlim(-180, 180)
-            ax.set_ylim(-90, 90)
-            plt.savefig(f'slicecoords{i:02d}.png', dpi=300)
-            plt.close(fig)
-
         # cumulative offset indeces.
         CNSPEC = np.hstack(
             (np.array([0]), np.cumsum(self.vars["NSPEC_LOCAL"])))
@@ -130,7 +120,7 @@ class ProcessAdios(object):
 
             # Only store things if there are points
             if self.vars['NGLOB_LOCAL'][i] > 0:
-                logger.debug(self.vars['NGLOB_LOCAL'][i], rankname)
+                logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
                 # Getting coordinates
                 x = dict()
                 for _i, _l in enumerate(['x', 'y', 'z']):

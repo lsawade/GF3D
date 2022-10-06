@@ -2,7 +2,7 @@ from multiprocessing.sharedctypes import Value
 import numpy as np
 import typing as tp
 from . import utils
-from .signal import filter
+from .filter import filter
 from scipy import special
 
 

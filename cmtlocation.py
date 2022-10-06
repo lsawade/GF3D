@@ -18,7 +18,8 @@ from lwsspy.GF.source import CMTSOLUTION
 from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ, NGLL3, MIDX, MIDY, MIDZ
 from lwsspy.GF.locate_point import locate_point
 from lwsspy.GF.transformations.rthetaphi_xyz import xyz_2_rthetaphi
-
+from lwsspy.GF.lagrange import lagrange_any, gll_nodes
+from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ, NGLL3, MIDX, MIDY, MIDZ
 # Only import the KDTree after setting the LD_LIBRARY PATH, e.g.
 # $ export LD_LIBRARY_PATH='/home/lsawade/.conda/envs/gf/lib'
 
@@ -122,8 +123,8 @@ with h5py.File('testdb.h5', 'r') as db:
     NY_BATHY = db['NY_BATHY']
     RESOLUTION_TOPO_FILE = db['RESOLUTION_TOPO_FILE']
     rspl = db['rspl']
-    ellipicity_spline = ['ellipticity_spline']
-    ellipicity_spline2 = ['ellipticity_spline2']
+    ellipticity_spline = ['ellipticity_spline']
+    ellipticity_spline2 = ['ellipticity_spline2']
 
 # %%
 x_target, y_target, z_target, Mx = source2xyz(
@@ -240,71 +241,158 @@ ispec_selected, xi, eta, gamma, x, y, z, distmin_not_squared = locate_point(
 # %%
 
 with h5py.File('testdb.h5', 'r') as db:
-    topography = db['TOPOGRAPHY']
-    ellipticity = db['ELLIPTICITY']
-    ibathy_topo = db['BATHY']
-    NX_BATHY = db['NX_BATHY']
-    NY_BATHY = db['NY_BATHY']
-    RESOLUTION_TOPO_FILE = db['RESOLUTION_TOPO_FILE']
-    rspl = db['rspl']
-    ellipicit_spline = ['ellipticity_spline']
-    ellipicity_spline2 = ['ellipticity_spline2']
-    ibool = db['ibool']
-    xyz = db['xyz']
+    NSPEC = db['NSPEC'][()]
+    topography = db['TOPOGRAPHY'][()]
+    ellipticity = db['ELLIPTICITY'][()]
+    ibathy_topo = db['BATHY'][:]
+    NX_BATHY = db['NX_BATHY'][()]
+    NY_BATHY = db['NY_BATHY'][()]
+    RESOLUTION_TOPO_FILE = db['RESOLUTION_TOPO_FILE'][()]
+    rspl = db['rspl'][:]
+    ellipticity_spline = db['ellipticity_spline'][:]
+    ellipticity_spline2 = db['ellipticity_spline2'][:]
+    ibool = db['ibool'][:]-1
+    xyz = db['xyz'][:]
 
 
 # %%
-NSPEC = ibool.shape()[-1]
 
-x = np.zeros(12*3*NSPEC)
-y = np.zeros(12*3*NSPEC)
-z = np.zeros(12*3*NSPEC)
+ellipticity
+# %%
+
+cmt = CMTSOLUTION.read('CMTSOLUTION')
+
+
+x_target, y_target, z_target, Mx = source2xyz(
+    cmt.latitude,
+    cmt.longitude,
+    cmt.depth,
+    cmt.tensor,
+    topography=topography,
+    ellipticity=ellipticity,
+    ibathy_topo=ibathy_topo,
+    NX_BATHY=NX_BATHY,
+    NY_BATHY=NY_BATHY,
+    RESOLUTION_TOPO_FILE=RESOLUTION_TOPO_FILE,
+    rspl=rspl,
+    ellipicity_spline=ellipticity_spline,
+    ellipicity_spline2=ellipticity_spline2,
+)
+
+# %%
+topography
+
+
+# %%
+kdtree = KDTree(xyz[ibool[2, 2, 2, :], :])
+
+# %%
+# Locate the point
+ispec_selected, xi, eta, gamma, x, y, z, distmin_not_squared = locate_point(
+    x_target, y_target, z_target, cmt.latitude, cmt.longitude,
+    xyz[ibool[2, 2, 2, :], :], xyz[:, 0], xyz[:, 1], xyz[:, 2], ibool,
+    POINT_CAN_BE_BURIED=True, kdtree=kdtree)
+
+# %%
+# GLL points and weights (degree)
+npol = 4
+xigll, wxi, _ = gll_nodes(npol)
+etagll, weta, _ = gll_nodes(npol)
+gammagll, wgamma, _ = gll_nodes(npol)
+
+
+# Get lagrange values at specific GLL poins
+shxi, shpxi = lagrange_any(xi, xigll, npol)
+sheta, shpeta = lagrange_any(eta, xigll, npol)
+shgamma, shpgamma = lagrange_any(gamma, xigll, npol)
+
+
+# %%
+with h5py.File('testdb.h5', 'r') as db:
+    print(db['epsilon'].shape)
+    epsilon = db['epsilon'][:, :, :, :, ispec_selected, :] / (1e14*1e7)
+
+# %%
+sepsilon = np.zeros((6, epsilon.shape[-1]))
+
+for k in range(NGLLZ):
+    for j in range(NGLLY):
+        for i in range(NGLLX):
+            hlagrange = shxi[i] * sheta[j] * shgamma[k]
+            sepsilon += hlagrange * epsilon[:, i, j, k, :]
+
+
+# %%
+# gravitational constant in m3 kg-1 s-2, or equivalently in N.(m/kg)^2
+GRAV = 6.67384e-11
+R_PLANET = 6371000.0    # radius of the Earth in m
+RHOAV = 5514.3          # Avergage density of the Earth
+scaleM = 1e7 * RHOAV * (R_PLANET ** 5) * np.pi * GRAV * RHOAV
+
+M = Mx
+sgt = np.array([1., 1., 1., 2., 2., 2.])[:, None] * sepsilon
+z = np.sum(Mx[:, None] * sgt, axis=0)
+
+# %%
+
+plt.figure()
+plt.plot(z)
+plt.show()
+# %%
+NSPEC = ibool.shape[-1]
+
+# %%
+x = []
+y = []
+z = []
+
 for i in range(NSPEC):
 
-    x[i:i+36] = np.array([
-        xyz[ibool[0, 0, 0, i], 0], xyz[ibool[4, 0, 0, i], 0], np.nan,
-        xyz[ibool[0, 0, 0, i], 0], xyz[ibool[0, 4, 0, i], 0], np.nan,
-        xyz[ibool[0, 0, 0, i], 0], xyz[ibool[0, 0, 4, i], 0], np.nan,
-        xyz[ibool[4, 0, 0, i], 0], xyz[ibool[4, 0, 4, i], 0], np.nan,
-        xyz[ibool[4, 0, 0, i], 0], xyz[ibool[4, 4, 0, i], 0], np.nan,
-        xyz[ibool[0, 4, 0, i], 0], xyz[ibool[4, 4, 0, i], 0], np.nan,
-        xyz[ibool[0, 4, 0, i], 0], xyz[ibool[0, 4, 4, i], 0], np.nan,
-        xyz[ibool[0, 0, 4, i], 0], xyz[ibool[0, 4, 4, i], 0], np.nan,
-        xyz[ibool[0, 0, 4, i], 0], xyz[ibool[4, 0, 4, i], 0], np.nan,
-        xyz[ibool[4, 4, 4, i], 0], xyz[ibool[4, 4, 0, i], 0], np.nan,
-        xyz[ibool[4, 4, 4, i], 0], xyz[ibool[0, 4, 4, i], 0], np.nan,
-        xyz[ibool[4, 4, 4, i], 0], xyz[ibool[4, 0, 4, i], 0], np.nan,
+    x.extend([
+        xyz[ibool[0, 0, 0, i], 0], xyz[ibool[4, 0, 0, i], 0], None,
+        xyz[ibool[0, 0, 0, i], 0], xyz[ibool[0, 4, 0, i], 0], None,
+        xyz[ibool[0, 0, 0, i], 0], xyz[ibool[0, 0, 4, i], 0], None,
+        xyz[ibool[4, 0, 0, i], 0], xyz[ibool[4, 0, 4, i], 0], None,
+        xyz[ibool[4, 0, 0, i], 0], xyz[ibool[4, 4, 0, i], 0], None,
+        xyz[ibool[0, 4, 0, i], 0], xyz[ibool[4, 4, 0, i], 0], None,
+        xyz[ibool[0, 4, 0, i], 0], xyz[ibool[0, 4, 4, i], 0], None,
+        xyz[ibool[0, 0, 4, i], 0], xyz[ibool[0, 4, 4, i], 0], None,
+        xyz[ibool[0, 0, 4, i], 0], xyz[ibool[4, 0, 4, i], 0], None,
+        xyz[ibool[4, 4, 4, i], 0], xyz[ibool[4, 4, 0, i], 0], None,
+        xyz[ibool[4, 4, 4, i], 0], xyz[ibool[0, 4, 4, i], 0], None,
+        xyz[ibool[4, 4, 4, i], 0], xyz[ibool[4, 0, 4, i], 0], None,
     ])
 
-    y[i:i+36] = np.array([
-        xyz[ibool[0, 0, 0, i], 1], xyz[ibool[4, 0, 0, i], 1], np.nan,
-        xyz[ibool[0, 0, 0, i], 1], xyz[ibool[0, 4, 0, i], 1], np.nan,
-        xyz[ibool[0, 0, 0, i], 1], xyz[ibool[0, 0, 4, i], 1], np.nan,
-        xyz[ibool[4, 0, 0, i], 1], xyz[ibool[4, 0, 4, i], 1], np.nan,
-        xyz[ibool[4, 0, 0, i], 1], xyz[ibool[4, 4, 0, i], 1], np.nan,
-        xyz[ibool[0, 4, 0, i], 1], xyz[ibool[4, 4, 0, i], 1], np.nan,
-        xyz[ibool[0, 4, 0, i], 1], xyz[ibool[0, 4, 4, i], 1], np.nan,
-        xyz[ibool[0, 0, 4, i], 1], xyz[ibool[0, 4, 4, i], 1], np.nan,
-        xyz[ibool[0, 0, 4, i], 1], xyz[ibool[4, 0, 4, i], 1], np.nan,
-        xyz[ibool[4, 4, 4, i], 1], xyz[ibool[4, 4, 0, i], 1], np.nan,
-        xyz[ibool[4, 4, 4, i], 1], xyz[ibool[0, 4, 4, i], 1], np.nan,
-        xyz[ibool[4, 4, 4, i], 1], xyz[ibool[4, 0, 4, i], 1], np.nan,
+    y.extend([
+        xyz[ibool[0, 0, 0, i], 1], xyz[ibool[4, 0, 0, i], 1], None,
+        xyz[ibool[0, 0, 0, i], 1], xyz[ibool[0, 4, 0, i], 1], None,
+        xyz[ibool[0, 0, 0, i], 1], xyz[ibool[0, 0, 4, i], 1], None,
+        xyz[ibool[4, 0, 0, i], 1], xyz[ibool[4, 0, 4, i], 1], None,
+        xyz[ibool[4, 0, 0, i], 1], xyz[ibool[4, 4, 0, i], 1], None,
+        xyz[ibool[0, 4, 0, i], 1], xyz[ibool[4, 4, 0, i], 1], None,
+        xyz[ibool[0, 4, 0, i], 1], xyz[ibool[0, 4, 4, i], 1], None,
+        xyz[ibool[0, 0, 4, i], 1], xyz[ibool[0, 4, 4, i], 1], None,
+        xyz[ibool[0, 0, 4, i], 1], xyz[ibool[4, 0, 4, i], 1], None,
+        xyz[ibool[4, 4, 4, i], 1], xyz[ibool[4, 4, 0, i], 1], None,
+        xyz[ibool[4, 4, 4, i], 1], xyz[ibool[0, 4, 4, i], 1], None,
+        xyz[ibool[4, 4, 4, i], 1], xyz[ibool[4, 0, 4, i], 1], None,
     ])
 
-    z[i:i+36] = np.array([
-        xyz[ibool[0, 0, 0, i], 2], xyz[ibool[4, 0, 0, i], 2], np.nan,
-        xyz[ibool[0, 0, 0, i], 2], xyz[ibool[0, 4, 0, i], 2], np.nan,
-        xyz[ibool[0, 0, 0, i], 2], xyz[ibool[0, 0, 4, i], 2], np.nan,
-        xyz[ibool[4, 0, 0, i], 2], xyz[ibool[4, 0, 4, i], 2], np.nan,
-        xyz[ibool[4, 0, 0, i], 2], xyz[ibool[4, 4, 0, i], 2], np.nan,
-        xyz[ibool[0, 4, 0, i], 2], xyz[ibool[4, 4, 0, i], 2], np.nan,
-        xyz[ibool[0, 4, 0, i], 2], xyz[ibool[0, 4, 4, i], 2], np.nan,
-        xyz[ibool[0, 0, 4, i], 2], xyz[ibool[0, 4, 4, i], 2], np.nan,
-        xyz[ibool[0, 0, 4, i], 2], xyz[ibool[4, 0, 4, i], 2], np.nan,
-        xyz[ibool[4, 4, 4, i], 2], xyz[ibool[4, 4, 0, i], 2], np.nan,
-        xyz[ibool[4, 4, 4, i], 2], xyz[ibool[0, 4, 4, i], 2], np.nan,
-        xyz[ibool[4, 4, 4, i], 2], xyz[ibool[4, 0, 4, i], 2], np.nan,
+    z.extend([
+        xyz[ibool[0, 0, 0, i], 2], xyz[ibool[4, 0, 0, i], 2], None,
+        xyz[ibool[0, 0, 0, i], 2], xyz[ibool[0, 4, 0, i], 2], None,
+        xyz[ibool[0, 0, 0, i], 2], xyz[ibool[0, 0, 4, i], 2], None,
+        xyz[ibool[4, 0, 0, i], 2], xyz[ibool[4, 0, 4, i], 2], None,
+        xyz[ibool[4, 0, 0, i], 2], xyz[ibool[4, 4, 0, i], 2], None,
+        xyz[ibool[0, 4, 0, i], 2], xyz[ibool[4, 4, 0, i], 2], None,
+        xyz[ibool[0, 4, 0, i], 2], xyz[ibool[0, 4, 4, i], 2], None,
+        xyz[ibool[0, 0, 4, i], 2], xyz[ibool[0, 4, 4, i], 2], None,
+        xyz[ibool[0, 0, 4, i], 2], xyz[ibool[4, 0, 4, i], 2], None,
+        xyz[ibool[4, 4, 4, i], 2], xyz[ibool[4, 4, 0, i], 2], None,
+        xyz[ibool[4, 4, 4, i], 2], xyz[ibool[0, 4, 4, i], 2], None,
+        xyz[ibool[4, 4, 4, i], 2], xyz[ibool[4, 0, 4, i], 2], None,
     ])
 
+# %%
 fig = go.Figure(data=go.Scatter3d(x=x, y=y, z=z, mode='lines'))
 fig.show()

@@ -1,3 +1,4 @@
+import logging
 import h5py
 import contextlib
 from obspy import Trace, Stream
@@ -37,6 +38,8 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
 
         station = db['Station'][()].decode("utf-8")
         network = db['Network'][()].decode("utf-8")
+        latitude = db['latitude'][()]
+        longitude = db['longitude'][()]
         topography = db['TOPOGRAPHY'][()]
         ellipticity = db['ELLIPTICITY'][()]
         ibathy_topo = db['BATHY'][:]
@@ -88,9 +91,13 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         factor = db['FACTOR'][()]
         epsilond = dict()
         for comp in ['N', 'E', 'Z']:
+            # offset = db[f'epsilon/{comp}/offset'][()]
+            norm = db[f'epsilon/{comp}/norm'][()]
             epsilond[comp] = \
-                db[f'epsilon/{comp}/array'][
-                    :, :, :, :, ispec_selected, :].astype(np.float64) / factor
+                db[f'epsilon/{comp}/array'][:, :, :, :,
+                                            ispec_selected, :].astype(np.float64) * norm / factor
+
+            print("Min/Max", epsilond[comp].min(), epsilond[comp].min())
 
     # GLL points and weights (degree)
     npol = 4
@@ -124,6 +131,141 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         stats.delta = dt
         stats.network = network
         stats.station = station
+        stats.latitude = latitude
+        stats.longitude = longitude
+        stats.location = ''
+        stats.channel = f'MX{comp}'
+        stats.starttime = cmt.cmt_time - tc
+        stats.npts = len(data)
+        tr = Trace(data=data, header=stats)
+
+        traces.append(tr)
+
+    return Stream(traces)
+
+
+def get_seismograms_sub(stationfile: str, cmt: CMTSOLUTION):
+    """
+
+    This function takes in the path to a station file and a CMTSOLUTION and
+    subsequently returns an obspy Stream with the relevant seismograms.
+    The function performs the following steps:
+
+    * read the stationfiles header info (TOPO, ELLIP, etc.)
+    * convert cmtsolution to mesh coordinates, rotate moment tensor
+    * get the element from a kdtree that uses all the element midpoints
+    * locate source location in the element
+    * grabs element strains
+    * interpolates the strain to the source point
+    * dots the moment tensor with the strains of all 3 components
+    * returns Stream() containing all three components
+
+    Use this function ONLY if your goal is retrieveing a single seismogram for
+    a single station. Otherwise, please use the SGTManager. It makes more sense
+    if your goal is to perform source inversion using a set of stations, and/or
+    a single station, but the location may change.
+
+    """
+
+    with h5py.File(stationfile, 'r') as db:
+
+        station = db['Station'][()].decode("utf-8")
+        network = db['Network'][()].decode("utf-8")
+        latitude = db['latitude'][()]
+        longitude = db['longitude'][()]
+        topography = db['TOPOGRAPHY'][()]
+        ellipticity = db['ELLIPTICITY'][()]
+        ibathy_topo = db['BATHY'][:]
+        NX_BATHY = db['NX_BATHY'][()]
+        NY_BATHY = db['NY_BATHY'][()]
+        RESOLUTION_TOPO_FILE = db['RESOLUTION_TOPO_FILE'][()]
+        rspl = db['rspl'][:]
+        ellipticity_spline = db['ellipticity_spline'][:]
+        ellipticity_spline2 = db['ellipticity_spline2'][:]
+        NGLLX = db['NGLLX'][()]-2
+        NGLLY = db['NGLLY'][()]-2
+        NGLLZ = db['NGLLZ'][()]-2
+        ibool = db['ibool'][:]
+        xyz = db['xyz'][:]
+        dt = db['DT'][()]
+        tc = db['TC'][()]
+        # t0 = db['TC'][()]
+        FACTOR = db['FACTOR'][()]
+
+    # Create KDTree
+    kdtree = KDTree(xyz[ibool[2, 2, 2, :], :])
+
+    # Get location in mesh
+    x_target, y_target, z_target, Mx = source2xyz(
+        cmt.latitude,
+        cmt.longitude,
+        cmt.depth,
+        M=cmt.tensor,
+        topography=topography,
+        ellipticity=ellipticity,
+        ibathy_topo=ibathy_topo,
+        NX_BATHY=NX_BATHY,
+        NY_BATHY=NY_BATHY,
+        RESOLUTION_TOPO_FILE=RESOLUTION_TOPO_FILE,
+        rspl=rspl,
+        ellipicity_spline=ellipticity_spline,
+        ellipicity_spline2=ellipticity_spline2,
+    )
+
+    # Locate the point in mesh
+    ispec_selected, xi, eta, gamma, _, _, _, _ = locate_point(
+        x_target, y_target, z_target, cmt.latitude, cmt.longitude,
+        xyz[ibool[2, 2, 2, :], :], xyz[:, 0], xyz[:, 1], xyz[:, 2], ibool,
+        POINT_CAN_BE_BURIED=True, kdtree=kdtree)
+
+    # Read strains from the file
+    with h5py.File(stationfile, 'r') as db:
+
+        factor = db['FACTOR'][()]
+        epsilond = dict()
+        for comp in ['N', 'E', 'Z']:
+            # offset = db[f'epsilon/{comp}/offset'][()]
+            norm = db[f'epsilon/{comp}/norm'][()]
+            epsilond[comp] = \
+                db[f'epsilon/{comp}/array'][:, ::2, ::2, ::2,
+                                            ispec_selected, :].astype(np.float64) * norm / factor
+
+            print("Min/Max", epsilond[comp].min(), epsilond[comp].min())
+
+    # GLL points and weights (degree)
+    npol = 2
+    xigll, _, _ = gll_nodes(npol)
+
+    # Get lagrange values at specific GLL poins
+    shxi, _ = lagrange_any(xi, xigll, npol)
+    sheta, _ = lagrange_any(eta, xigll, npol)
+    shgamma, _ = lagrange_any(gamma, xigll, npol)
+
+    # Initialize epsilon array
+    sepsilon = np.zeros((3, 6, epsilond['N'].shape[-1]))
+
+    for k in range(NGLLZ):
+        for j in range(NGLLY):
+            for i in range(NGLLX):
+                hlagrange = shxi[i] * sheta[j] * shgamma[k]
+
+                for _i, comp in enumerate(['N', 'E', 'Z']):
+
+                    sepsilon[_i, :, :] += hlagrange * \
+                        epsilond[comp][:, i, j, k, :]
+
+    # Add traces to the
+    traces = []
+
+    for _i, comp in enumerate(['N', 'E', 'Z']):
+        data = np.sum(np.array([1., 1., 1., 2., 2., 2.])[:, None]
+                      * Mx[:, None] * np.squeeze(sepsilon[_i, :, :]), axis=0)
+        stats = Stats()
+        stats.delta = dt
+        stats.network = network
+        stats.station = station
+        stats.latitude = latitude
+        stats.longitude = longitude
         stats.location = ''
         stats.channel = f'MX{comp}'
         stats.starttime = cmt.cmt_time - tc
@@ -155,13 +297,13 @@ class SGTManager(object):
     """
 
     # Main variables
+    db: list[str] | str   # list of station data base files.
+
     lat: float                # in degrees
 
     lon: float                # in degrees
 
     depth: float              # in km
-
-    dblist: list[str]         # list of station data base files.
 
     headerfile: str           # path to first file in dblist
 
@@ -169,7 +311,7 @@ class SGTManager(object):
 
     midpoints: np.ndarray     # all midpoints
 
-    fullkdtree: KDTree    # KDTree to get elements
+    fullkdtree: KDTree        # KDTree to get elements
 
     ispec: np.ndarray         # subset of elements
 
@@ -181,13 +323,17 @@ class SGTManager(object):
 
     components: list[str] = ['N', 'E', 'Z']  # components
 
-    def __init__(self, dblist: list[str]) -> None:
+    def __init__(self, db: list[str] | str) -> None:
         """Initializes the SGT manager"""
 
         # List of station files
-        self.dblist = dblist
-        self.headerfile = self.dblist[0]
-        self.Ndb = len(self.dblist)
+        self.db = db
+        if isinstance(self.db, str):
+            self.subset = True
+            self.headerfile = self.db
+        else:
+            self.subset = False
+            self.headerfile = self.db[0]
 
     def get_mesh_location(self):
         pass
@@ -232,10 +378,30 @@ class SGTManager(object):
             # t0 = db['TC'][()]
             self.header['factor'] = db['FACTOR'][()]
 
-        # Create KDTree
-        self.fullkdtree = KDTree(self.header['midpoints'])
+            # Create KDTree
+            self.fullkdtree = KDTree(self.header['midpoints'])
+
+            # Now if this is a subset, we can already define the needed arrays
+            # for source location, that are usually defined using the
+            # .get_elements method
+            if self.subset:
+                self.ibool = db['ibool'][:]
+                self.epsilon = db['epsilon'][:]
+                self.stations = db['stations'][:]
+                self.xyz = db['xyz']
+                self.kdtree = self.fullkdtree
+
+            # Component-wise norm
+            self.header['norm'] = dict()
+            for comp in self.components:
+                self.header['norm'][f'{comp}'] = db[f'epsilon/{comp}/norm'][()]
 
     def get_elements(self, lat, lon, depth, k=10):
+
+        if self.subset:
+            logging.warning(
+                'Note that you already loaded a subset of elements from file, '
+                'so this may have 0 effect.')
 
         # source location to query
         self.lat = lat
@@ -263,30 +429,24 @@ class SGTManager(object):
         point_target = np.array([x_target, y_target, z_target])
         _, self.ispec_subset = self.fullkdtree.query(point_target, k=k)
 
-        # Sort for reading HDF%
+        # Sort for reading HDF5
         self.ispec_subset = np.sort(self.ispec_subset)
 
-        # Get number of files
-        with contextlib.ExitStack() as stack:
+        if self.subset:
 
-            # open stack of files.
-            dbs = [stack.enter_context(h5py.File(fname, 'r'))
-                   for fname in self.dblist]
-
-            # Read ibool, xyz
-            ibool = dbs[0]['ibool'][:, :, :, self.ispec_subset]
+            self.ibool = self.ibool[:, :, :, self.ispec_subset]
 
             # Get unique elements
-            uni, inv = np.unique(ibool, return_inverse=True)
+            uni, inv = np.unique(self.ibool, return_inverse=True)
 
             # Get new index array of length of the unique values
             indeces = np.arange(len(uni))
 
             # Get fixed ibool array for the interpolation and source location
-            self.ibool = indeces[inv].reshape(ibool.shape)
+            self.ibool = indeces[inv].reshape(self.ibool.shape)
 
             # Then finally get sub set of coordinates
-            self.xyz = dbs[0]['xyz'][uni, :]
+            self.xyz = self.xyz[uni, :]
 
             # Mini kdtree
             self.kdtree = KDTree(
@@ -299,31 +459,73 @@ class SGTManager(object):
                 ]
             )
 
-            # Read strains into big array
-            self.stations = []
+            # Finally redefine epsilon
+            self.epsilon = self.epsilon[:, :, :, :, :, :, self.ispec_subset, :]
 
-            # Initialize big array for aaaalll the strains at aaall
-            # the stations
-            self.epsilon = np.zeros((
-                self.Ndb,
-                len(self.components),
-                6,
-                self.header['NGLLX'],
-                self.header['NGLLY'],
-                self.header['NGLLZ'],
-                len(self.ispec_subset),
-                self.header['nsteps']
-            ))
+        else:
 
-            for _i, db in enumerate(dbs):
+            # Get number of files
+            with contextlib.ExitStack() as stack:
 
-                # Get force factor specific to file
-                factor = db['FACTOR'][()]
+                # open stack of files.
+                dbs = [stack.enter_context(h5py.File(fname, 'r'))
+                       for fname in self.db]
 
-                for _j, comp in enumerate(self.components):
-                    self.epsilon[_i, _j, :, :, :, :, :, :] = \
-                        db[f'epsilon/{comp}/array'][
-                            :, :, :, :, self.ispec_subset, :].astype(np.float64) / factor
+                # Number of database files
+                self.Ndb = len(self.db)
+
+                # Read ibool, xyz
+                ibool = dbs[0]['ibool'][:, :, :, self.ispec_subset]
+
+                # Get unique elements
+                uni, inv = np.unique(ibool, return_inverse=True)
+
+                # Get new index array of length of the unique values
+                indeces = np.arange(len(uni))
+
+                # Get fixed ibool array for the interpolation and source location
+                self.ibool = indeces[inv].reshape(ibool.shape)
+
+                # Then finally get sub set of coordinates
+                self.xyz = dbs[0]['xyz'][uni, :]
+
+                # Mini kdtree
+                self.kdtree = KDTree(
+                    self.xyz[
+                        self.ibool[
+                            self.header['NGLLX']//2,
+                            self.header['NGLLY']//2,
+                            self.header['NGLLZ']//2,
+                            :]
+                    ]
+                )
+
+                # Read strains into big array
+                self.stations = []
+
+                # Initialize big array for aaaalll the strains at aaall
+                # the stations
+                self.epsilon = np.zeros((
+                    self.Ndb,
+                    len(self.components),
+                    6,
+                    self.header['NGLLX'],
+                    self.header['NGLLY'],
+                    self.header['NGLLZ'],
+                    len(self.ispec_subset),
+                    self.header['nsteps']
+                ))
+
+                for _i, db in enumerate(dbs):
+
+                    # Get force factor specific to file
+                    factor = db['FACTOR'][()]
+
+                    for _j, comp in enumerate(self.components):
+                        norm = db[f'epsilon/{comp}/norm'][()]
+                        self.epsilon[_i, _j, :, :, :, :, :, :] = \
+                            db[f'epsilon/{comp}/array'][
+                                :, :, :, :, self.ispec_subset, :].astype(np.float64) * norm / factor
 
     def get_seismogram(self, cmt: CMTSOLUTION):
 
@@ -372,6 +574,7 @@ class SGTManager(object):
         print('et', sheta.shape)
         print('ga', shgamma.shape)
 
+        # Since the database is the same for all
         seismograms = np.einsum(
             'hijklmo,j,k,l,m->hio',
             self.epsilon[:, :, :, :, :, :, ispec_selected, :], M, shxi, sheta, shgamma)
@@ -379,12 +582,23 @@ class SGTManager(object):
         print(seismograms.shape)
 
         return seismograms
-        # for k in range(NGLLZ):
-        #     for j in range(NGLLY):
-        #         for i in range(NGLLX):
-        #             hlagrange=shxi[i] * sheta[j] * shgamma[k]
+        # for h in stations:
+        #     for i in components:
+        #         for j in range(6):
+        #             for k in range(NGLLX):
+        #                 for l in range(NGLLY):
+        #                     for m in range(NGLLZ):
+        #                         seismograms[h, i, :] += \
+        #                             self.epsilon[h, i, j, k, l, m, ispec_selected, :] \
+        #                             * M[j]
+        #                         * xis[k]
+        #                         * etas[l]
+        #                         * gammas[m]
 
-        #             for _i, comp in enumerate(['N', 'E', 'Z']):
-
-        #                 sepsilon[_i, :, :] += hlagrange * \
-        #                     epsilond[comp][:, i, j, k, :]
+    def get_hdf5_subset(self, outfile):
+        """Given the files in the database, get a set of strains and write it
+        into to a single file in a single epsilon array.
+        Also write a list of stations and normal header info required for
+        source location. This very same SGTManager would be used to read the.
+        Where """
+        pass

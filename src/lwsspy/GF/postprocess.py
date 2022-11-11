@@ -1,4 +1,6 @@
+import time
 import logging
+from multiprocessing.sharedctypes import Value
 import toml
 from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ
 import numpy as np
@@ -244,11 +246,22 @@ class Adios2HDF5(object):
 
     DB: h5py.File
     consistent: bool = False
+    subspace: bool = False     # Only saving the corners and center points if True
+    precision: type = np.float32
+    # LZF faster, but less compression,
+    # GZIP slower but better compression
+    # going with gzip as a default for now.
+    compression: str | None = None
+    compression_opts: int | None = None  # Only used for the strain
 
     def __init__(self,
                  h5file: str,
                  Nfile: str, Efile: str, Zfile: str,
-                 config_file: str) -> None:
+                 config_file: str,
+                 subspace: bool = False,
+                 precision: str | None = None,
+                 compression: str | None = None,
+                 compression_opts: int | None = None) -> None:
 
         # Output filename
         self.h5file = h5file
@@ -258,7 +271,31 @@ class Adios2HDF5(object):
 
         # Get important infor for the conversion
         self.config = read_toml(config_file)
+        self.subspace = subspace
         self.get_timing()
+
+        # Precision decision
+        if precision is not None:
+            if precision == 'single':
+                self.precision = np.float32
+            elif precision == 'double':
+                self.precision = np.float64
+            elif precision == 'half':
+                self.precision = np.float16
+            else:
+                raise ValueError(
+                    f'Precision Value {precision} not implemented')
+
+        # Compression
+        if compression is not None:
+            if compression in ['lzf', 'gzip', 'szip']:
+                self.compression = compression
+            else:
+                raise ValueError(f'Compression {compression} not implemented')
+
+        # Check default
+        if compression is not None:
+            self.compression_opts = compression_opts
 
         # Check consistency between components
         self.check_consistency()
@@ -310,6 +347,7 @@ class Adios2HDF5(object):
                     vardict[ckeys[0]][_key], vardict[ckeys[2]][_key])
         except Exception as e:
             print(e)
+            print(f'Sizes of {_key} did not match!')
             raise ValueError(
                 'The error was raised in the consistency check.\n'
                 'Somehow it seems like the ADIOS files and their array sizes\n'
@@ -329,6 +367,11 @@ class Adios2HDF5(object):
         self.DB.create_dataset("T0", data=self.t0)
         self.DB.create_dataset("Network", data=self.config['network'])
         self.DB.create_dataset("Station", data=self.config['station'])
+        self.DB.create_dataset(
+            "latitude", data=self.config['station_latitude'])
+        self.DB.create_dataset(
+            "longitude", data=self.config['station_longitude'])
+        self.DB.create_dataset("burial", data=self.config['station_burial'])
 
         # This factor combines both removin the initial force + conversion to dyn
         self.DB.create_dataset(
@@ -349,32 +392,89 @@ class Adios2HDF5(object):
                     for _key in list(P.vars.keys()):
                         if _key == "DT":
                             continue
-                        self.DB.create_dataset(_key, data=P.vars[_key])
+
+                        if (self.subspace) \
+                                and (_key in ["NGLLX", "NGLLY", "NGLLZ"]):
+                            self.DB.create_dataset(_key, data=self.subspace)
+                        else:
+                            self.DB.create_dataset(_key, data=P.vars[_key])
 
                 # Once the small variables are written write the large ones
                 P.load_large_vars()
 
                 # Write ibool and coordinates only once
                 if _i == 0:
-                    self.DB.create_dataset('ibool', data=P.vars['ibool'])
-                    self.DB.create_dataset('xyz', data=P.vars['xyz'])
+                    if self.subspace:
+
+                        ibool_sub = P.vars['ibool'][::2, ::2, ::2, :]
+
+                        # Get unique elements
+                        uni, inv = np.unique(
+                            ibool_sub, return_inverse=True)
+
+                        # Get new index array of length of the unique values
+                        indeces = np.arange(len(uni))
+
+                        # Get fixed ibool array for the interpolation and source location
+                        ibool = indeces[inv].reshape(ibool_sub.shape)
+
+                        # Then finally get sub set of coordinates
+                        xyz = dbs[0]['xyz'][uni, :]
+
+                        self.DB.create_dataset('ibool', data=ibool)
+                        self.DB.create_dataset('xyz', data=xyz)
+                    else:
+                        self.DB.create_dataset('ibool', data=P.vars['ibool'])
+                        self.DB.create_dataset('xyz', data=P.vars['xyz'])
 
                 # NOTE Here we can put code for compression!!!!
                 # I tried a little but it failed completely...
                 # For now let's just save the data
                 # Write component-wise epsilon
-                # offset = np.min(P.vars['epsilon'])
-                # norm = np.max(P.vars['epsilon'] - offset)
 
-                # db.create_dataset(
-                #     f'epsilon/{_comp}/array',
-                #     data=((P.vars['epsilon']-offset)/norm).astype(np.float16))
+                epsilon = P.vars['epsilon']
+                norm = np.abs(P.vars['epsilon']).max()
+                # minoffset = P.vars['epsilon'].min()
+                # maxoffset = P.vars['epsilon'].max()
+                # norm = maxoffset-minoffset
 
-                # db.create_dataset(f'epsilon/{_comp}/offset', data=offset)
-                # db.create_dataset(f'epsilon/{_comp}/norm', data=norm)
+                logger.debug(
+                    f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
 
+                # epsilon = (epsilon - minoffset)/norm
+                epsilon = epsilon/norm
+
+                logger.debug(
+                    f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+                epsilon = epsilon.astype(self.precision)
+
+                logger.debug(
+                    f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+                # self.DB.create_dataset(
+                # f'epsilon/{_comp}/offset', data=minoffset)
+                self.DB.create_dataset(f'epsilon/{_comp}/norm', data=norm)
+                # logger.debug(
+                #     f'Offset/Norm: {minoffset:g}/{norm:g}')
+                logger.debug(
+                    f'Norm: {norm:g}/{norm:g}')
+
+                # if
+                # if self.subspace:
+                t0 = time.time()
                 self.DB.create_dataset(
-                    f'epsilon/{_comp}/array', data=P.vars['epsilon'].astype(np.float32))
+                    f'epsilon/{_comp}/array', epsilon.shape,
+                    chunks=(6, 5, 5, 5, 1, epsilon.shape[-1]),
+                    data=epsilon.astype(self.precision),
+                    compression=self.compression,
+                    compression_opts=self.compression_opts,
+                    shuffle=True)
+                t1 = time.time()
+                print(72*'+')
+                print(
+                    f'+ --> Writing epsilon for component {_comp} took {t1-t0:.1f} seconds')
+                print(72*'+')
 
     def open(self):
         self.DB = h5py.File(self.h5file, 'w')

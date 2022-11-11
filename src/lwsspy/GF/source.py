@@ -6,6 +6,7 @@ Readers and writers for FORCESOLUTION and CMTSOLUTION for specfem.
 import warnings
 import numpy as np
 from obspy import UTCDateTime
+from copy import deepcopy
 
 
 class FORCESOLUTION:
@@ -373,6 +374,14 @@ class CMTSOLUTION:
         self.Mtp *= factor
 
         self.update_hdur()
+
+    def pert(self, param: str, pert: float):
+
+        outcmt = deepcopy(self)
+
+        setattr(outcmt, param, getattr(outcmt, param) + pert)
+
+        return outcmt
 
     def update_hdur(self):
         # Updates the half duration

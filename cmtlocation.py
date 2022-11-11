@@ -3,6 +3,7 @@
 # If other packages are loaded, the wrong libstdc++ is picked up and
 # doesn't contain the right GLIBCXX version
 
+import pickle
 from scipy.spatial import KDTree
 import h5py
 import plotly.graph_objs as go
@@ -235,6 +236,8 @@ midpoints = np.vstack(
 
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
 specfem = os.path.join(specfemmagic, 'specfem3d_globe')
+OUTF = os.path.join(specfem, "OUTPUT_FILES",
+                    "save_forward_arrays_GF.bp")
 Nfile = os.path.join(specfem, 'run0001', "OUTPUT_FILES",
                      "save_forward_arrays_GF.bp")
 Efile = os.path.join(specfem, 'run0002', "OUTPUT_FILES",
@@ -347,8 +350,13 @@ plt.savefig('testz.png', dpi=300)
 
 
 # %%
+<<<<<<< HEAD
 with h5py.File('testdb.h5', 'r') as db:
     NSPEC = db['NSPEC'][()]
+=======
+h5file = f'/scratch/gpfs/lsawade/permanentnew.h5'
+with h5py.File(h5file, 'r') as db:
+>>>>>>> 835d50f (Added and edited some things)
     topography = db['TOPOGRAPHY'][()]
     ellipticity = db['ELLIPTICITY'][()]
     ibathy_topo = db['BATHY'][:]
@@ -356,13 +364,33 @@ with h5py.File('testdb.h5', 'r') as db:
     NY_BATHY = db['NY_BATHY'][()]
     RESOLUTION_TOPO_FILE = db['RESOLUTION_TOPO_FILE'][()]
     rspl = db['rspl'][:]
+<<<<<<< HEAD
     ellipticity_spline = db['ellipticity_spline'][:]
     ellipticity_spline2 = db['ellipticity_spline2'][:]
     ibool = db['ibool'][:]-1
     xyz = db['xyz'][:]
+=======
+    ellipicit_spline = db['ellipticity_spline'][:]
+    ellipicity_spline2 = db['ellipticity_spline2'][:]
+    ibool = db['ibool'][:]
+    xyz = db['xyz'][:]
 
 
 # %%
+
+>>>>>>> 835d50f (Added and edited some things)
+
+with ProcessAdios(Nfile) as P:
+    # Load both large and small
+    P.load_large_vars()
+    db = P.vars
+    db.pop('epsilon', None)
+
+ibool = db['ibool']
+xyz = db['xyz']
+
+# %%
+<<<<<<< HEAD
 
 ellipticity
 # %%
@@ -453,6 +481,14 @@ x = []
 y = []
 z = []
 
+=======
+#
+NSPEC = ibool.shape[-1]
+x = []
+y = []
+z = []
+
+>>>>>>> 835d50f (Added and edited some things)
 for i in range(NSPEC):
 
     x.extend([
@@ -500,6 +536,14 @@ for i in range(NSPEC):
         xyz[ibool[4, 4, 4, i], 2], xyz[ibool[4, 0, 4, i], 2], None,
     ])
 
+<<<<<<< HEAD
 # %%
 fig = go.Figure(data=go.Scatter3d(x=x, y=y, z=z, mode='lines'))
 fig.show()
+=======
+xyzout = dict(x=x, y=y, z=z)
+
+# %%
+with open("coords.pkl", "wb") as f:
+    pickle.dump(xyzout, f, protocol=pickle.HIGHEST_PROTOCOL)
+>>>>>>> 835d50f (Added and edited some things)

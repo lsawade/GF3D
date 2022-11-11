@@ -46,7 +46,8 @@ class Simulation:
             broadcast_mesh_model: bool = False,
             simultaneous_runs: bool = False,
             cmtsolutionfile: str | None = None,
-            par_file: str | None = None) -> None:
+            par_file: str | None = None,
+            element_buffer: int | None = None) -> None:
         """Makes specfem directory into SGT database simulator.
 
         Note that the specfem Par_file should be written in the same way you
@@ -103,8 +104,14 @@ class Simulation:
         self.ndt_requested = ndt
         self.ndt = ndt
         self.dt = None
+        self.xth_sample = None
         self.lpfilter = lpfilter
-
+        if element_buffer is not None and element_buffer > 0:
+            self.use_element_buffer = True
+            self.element_buffer = element_buffer
+        else:
+            self.use_element_buffer = False
+            self.element_buffer = 0
         # Parameters for a forward backward test
         self.forward_test = forward_test
         self.cmtsolutionfile = cmtsolutionfile
@@ -616,11 +623,8 @@ class Simulation:
         pardict['SAVE_GREEN_FUNCTIONS'] = True
         pardict['USE_FORCE_POINT_SOURCE'] = True
 
-        # Force STF print
-        if self.subsample:
-            pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
-        else:
-            pardict['PRINT_SOURCE_TIME_FUNCTION'] = True
+        pardict['USE_BUFFER_ELEMENTS'] = self.use_element_buffer
+        pardict['NUMBER_OF_BUFFER_ELEMENTS'] = self.element_buffer
 
         # IF runs have to be parallel
         if self.simultaneous_runs:
@@ -631,11 +635,13 @@ class Simulation:
             pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
 
         if self.subsample:
+            pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
             if self.ndt_requested is not None:
                 pardict['NSTEP'] = self.nstep
                 pardict['T0'] = self.t0
                 pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
         else:
+            pardict['PRINT_SOURCE_TIME_FUNCTION'] = True
             pardict['NTSTEP_BETWEEN_FRAMES'] = 1
             pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
 
@@ -660,6 +666,9 @@ class Simulation:
             pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
             pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
 
+            pardict['USE_BUFFER_ELEMENTS'] = False
+            pardict['NUMBER_OF_BUFFER_ELEMENTS'] = 0
+
             # Force STF print
             if self.subsample:
                 pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
@@ -679,6 +688,7 @@ class Simulation:
             utils.write_par_file(pardict, self.par_file_forward)
 
     def __str__(self) -> str:
+
         rstr = "\n"
         rstr += "Reciprocal Simulation Setup:\n"
         rstr += "-----------------------------\n"
@@ -694,10 +704,14 @@ class Simulation:
             rstr += f"DT:{self.dt:.>69.4f}\n"
 
         if self.subsample:
+
             if self.ndt_requested is not None:
                 rstr += f"NDT requested:{self.ndt_requested:.>58.4f}\n"
+
             if self.ndt is not None:
                 rstr += f"NDT:{self.ndt:.>68.4f}\n"
+
+            if self.xth_sample is not None:
                 rstr += f"X_TH_SAMPLE:{self.xth_sample:.>60d}\n"
 
         if self.nstep is not None:

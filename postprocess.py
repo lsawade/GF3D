@@ -3,6 +3,7 @@
 # If other packages are loaded, the wrong libstdc++ is picked up and
 # doesn't contain the right GLIBCXX version
 
+import time
 from lwsspy.GF.seismograms import SGTManager
 from obspy import read, Stream
 from copy import deepcopy
@@ -16,9 +17,10 @@ import matplotlib.pyplot as plt
 from lwsspy.plot import plot_label
 from lwsspy.GF.source import CMTSOLUTION
 from lwsspy.GF.postprocess import Adios2HDF5
-from lwsspy.GF.seismograms import get_seismograms
+from lwsspy.GF.seismograms import get_seismograms, get_seismograms_sub
 import matplotlib.dates as mdates
 
+# %%
 # Only import the KDTree after setting the LD_LIBRARY PATH, e.g.
 # $ export LD_LIBRARY_PATH='/home/lsawade/.conda/envs/gf/lib'
 
@@ -41,22 +43,44 @@ for _i, comp in enumerate(['N', 'E', 'Z']):
 
 # %%
 # Write H5py Database file
-h5file = '/scratch/gpfs/lsawade/testdb.h5'
+h5file = '/scratch/gpfs/lsawade/testdb_compression.h5'
 
 # %%
+
+# compressors = [None, 'lzf', 'gzip']
+# compressors = ['gzip']
+# compressor_opts = dict()
+# compressor_opts[None] = [None]
+# compressor_opts['gzip'] = [5, 9]
+# compressor_opts['lzf'] = [None]
+
+
+# for _compressor in compressors:
+#     for _opt in compressor_opts[_compressor]:
+
+# h5file = f'/scratch/gpfs/lsawade/testdb_compression_{_compressor}'
+# if _compressor == 'gzip':
+#     h5file += f'{_opt:d}'
+# h5file += '.h5'
+
+h5file = f'/scratch/gpfs/lsawade/testdb.h5'
 with Adios2HDF5(
         h5file, compdict['N'], compdict['E'], compdict['Z'],
-        config_file) as A2H:
+        config_file, subspace=False,
+        precision='half',
+        compression='lzf',
+        compression_opts=None) as A2H:
 
     A2H.write()
 
-# %%
-with h5py.File(h5file, 'r') as db:
-    ibool = db['ibool'][:]
-    xyz = db['xyz'][:]
+ # %%
+h5file = f'/scratch/gpfs/lsawade/permanentnew.h5'
+# with h5py.File(h5file, 'r') as db:
+#     ibool = db['ibool'][:]
+#     xyz = db['xyz'][:]
 
-    # save_coordinates = np.savez('coords.npz', xyz=xyz, ibool=ibool)
-    del ibool, xyz
+#     # save_coordinates = np.savez('coords.npz', xyz=xyz, ibool=ibool)
+#     del ibool, xyz
 
 
 # %% Get CMT solution to convert
@@ -65,7 +89,9 @@ cmt = CMTSOLUTION.read('CMTSOLUTION')
 # %% Get seismograms
 rp = get_seismograms(h5file, cmt)
 
+
 # %%
+
 fw = read(os.path.join(specfemmagic,
           'specfem3d_globe_forward', 'OUTPUT_FILES', '*.sac'))
 for tr in fw:
@@ -88,7 +114,7 @@ limits = (starttime.datetime, endtime.datetime)
 
 plt.close('all')
 fig = plt.figure(figsize=(10, 6))
-lw = 1
+lw = 0.25
 for _i, comp in enumerate(['N', 'E', 'Z']):
 
     forward = fw.select(component=comp)[0]
@@ -118,7 +144,7 @@ for _i, comp in enumerate(['N', 'E', 'Z']):
     ax.spines.left.set_visible(False)
     ax.spines.top.set_visible(False)
 
-    # ax.set_xlim(limits)
+    ax.set_xlim(limits)
 
     if _i == 2:
         plt.xlabel('Time')
@@ -141,93 +167,161 @@ plt.savefig('proof.pdf', dpi=300)
 
 
 # %%
-
-# %% Get CMT solution to convert
-cmt = CMTSOLUTION.read('CMTSOLUTION')
+# %% Get seismograms
 
 
-lst = []
-depth_range = list(range(-10, 11, 2))
-for dd in depth_range:
-    tcmt = deepcopy(cmt)
-    tcmt.depth = tcmt.depth + dd
+rp = get_seismograms(h5file, cmt)
+rpsub = get_seismograms_sub(h5file, cmt)
 
-    lst.append(get_seismograms(h5file, tcmt))
+fw = read(os.path.join(specfemmagic,
+          'specfem3d_globe_forward', 'OUTPUT_FILES', '*.sac'))
 
-# %%
-starttime = lst[0][0].stats.starttime + 250
+for tr in fw:
+    tr.stats.starttime -= 60
+
+
+starttime = fw[0].stats.starttime + 300
 endtime = starttime + 500
 limits = (starttime.datetime, endtime.datetime)
 
-# %%
+
+# This test proves that spatial subsampling is indeed possible, at the cost of
+# period.
+
+def process_trace(tr, period=40.0):
+    tr.taper(0.25, type='cosine', side='both')
+    fdict = dict(freq=1.0/period, zerophase=True)
+    tr.filter("lowpass", **fdict)
+
+
 plt.close('all')
-fig = plt.figure(figsize=(10, 3))
-ax = plt.axes()
-alpha = np.linspace(-0.95, 0.95, 11)
+fig = plt.figure(figsize=(10, 6))
+lw = 0.25
+for _i, comp in enumerate(['N', 'E', 'Z']):
 
-for _al, _reci, _dd in zip(alpha, lst, list(depth_range)):
+    forward = fw.select(component=comp)[0]
+    recipro = rp.select(component=comp)[0]
+    reciprosub = rpsub.select(component=comp)[0]
 
-    recipro = _reci.select(component='Z')[0]
+    period = 20.0
+    process_trace(forward, period=period)
+    process_trace(recipro, period=period)
+    process_trace(reciprosub, period=period)
+
+    ax = plt.subplot(3, 1, _i+1)
+    plt.plot(forward.times("matplotlib")[
+             ::28], forward.data[::28], 'r--', lw=lw, label='Fw. subsampled')
     plt.plot(recipro.times("matplotlib"), recipro.data,
-             c=(0.1, 0.1, 0.8), lw=0.25, label=f'{_dd:>3d} km', alpha=1-np.abs(_al))
+             'k', lw=lw, label='125 Nodes')
+    plt.plot(reciprosub.times("matplotlib"), reciprosub.data,
+             'b', lw=lw, label='27 Nodes')
+    # plt.plot(forward.times("matplotlib"), forward.data,
+    #          'r-', lw=lw, label='Forward')
+    plt.ylabel(f'{comp}  ', rotation=0)
 
-recipro = lst[5].select(component='Z')[0]
-plt.plot(recipro.times("matplotlib"), recipro.data,
-         'k', lw=1.0, alpha=1)
-plt.ylabel(f'Z  ', rotation=0)
-absmax = np.max(np.abs(recipro.data))
-ax.set_ylim(-1.2*absmax, 1.2*absmax)
-plot_label(
-    ax, f'max|u|: {absmax:.5g} m',
-    fontsize='x-small', box=False)
-ax.xaxis_date()
-ax.xaxis.set_major_formatter(
-    mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
-ax.tick_params(labelleft=False, left=False)
-ax.spines.right.set_visible(False)
-ax.spines.left.set_visible(False)
-ax.spines.top.set_visible(False)
+    trn = recipro.copy()
+    trn.trim(starttime=starttime, endtime=endtime)
+    absmax = np.max(np.abs(trn.data))
+    ax.set_ylim(-1.375*absmax, 1.375*absmax)
+    plot_label(
+        ax, f'max|u|: {absmax:.5g} m',
+        fontsize='x-small', box=False)
+    ax.xaxis_date()
+    ax.xaxis.set_major_formatter(
+        mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
+    ax.tick_params(labelleft=False, left=False)
+    ax.spines.right.set_visible(False)
+    ax.spines.left.set_visible(False)
+    ax.spines.top.set_visible(False)
 
-ax.set_xlim(limits)
+    ax.set_xlim(limits)
 
-plt.xlabel('Time')
+    if _i == 2:
+        plt.xlabel('Time')
 
-# Add title with event info
-network = _reci[0].stats.network
-station = _reci[0].stats.station
-plt.title(
-    f"{network}.{station} -- {cmt.cmt_time} Loc: {cmt.latitude}dg, {cmt.longitude}dg, {cmt.depth}km")
+    if _i == 0:
+        # Add title with event info
+        network = rp[0].stats.network
+        station = rp[0].stats.station
+        plt.title(
+            f"LP {period:.0f} s -- {network}.{station} -- {cmt.cmt_time} Loc: {cmt.latitude}dg, {cmt.longitude}dg, {cmt.depth}km")
 
-# Add legend
-plt.legend(frameon=False, loc='center left', bbox_to_anchor=(1, 0.5))
+        # Add legend
+        plt.legend(frameon=False, loc='lower right',
+                   ncol=3, fontsize='x-small')
 
 fig.autofmt_xdate()
 plt.subplots_adjust(
-    left=0.125, right=0.875, bottom=0.2, top=0.875)
-plt.savefig('testz.pdf', dpi=300)
+    left=0.05, right=0.95, bottom=0.1, top=0.95)
+plt.savefig(f'proof_spatial_subsampling.pdf', dpi=300)
 
 
 # %%
 
+rp = get_seismograms(h5file, cmt)
+rpsub = get_seismograms_sub(h5file, cmt)
 
-# Write H5py Database file
-h5file = '/scratch/gpfs/lsawade/testdb.h5'
+fw = read(os.path.join(specfemmagic,
+          'specfem3d_globe_forward', 'OUTPUT_FILES', '*.sac'))
+for tr in fw:
+    tr.stats.starttime -= 60
 
-dbfiles = [h5file]
+plt.close('all')
+fig = plt.figure(figsize=(10, 6))
+lw = 0.25
+for _i, comp in enumerate(['N', 'E', 'Z']):
 
-SGTM = SGTManager(dbfiles)
+    forward = fw.select(component=comp)[0]
+    recipro = rp.select(component=comp)[0]
+    reciprosub = rpsub.select(component=comp)[0]
+    period = 55
+    process_trace(forward, period=period)
+    process_trace(recipro, period=period)
+    process_trace(reciprosub, period=period)
 
-# Get base
-cmt = CMTSOLUTION.read('CMTSOLUTION')
-lat, lon, dep = cmt.latitude, cmt.longitude, cmt.depth
+    ax = plt.subplot(3, 1, _i+1)
+    plt.plot(forward.times("matplotlib")[
+             ::28], forward.data[::28], 'r--', lw=lw, label='Fw. subsampled')
+    plt.plot(recipro.times("matplotlib"), recipro.data,
+             'k', lw=lw, label='125 Nodes')
+    plt.plot(reciprosub.times("matplotlib"), reciprosub.data,
+             'b', lw=lw, label='27 Nodes')
+    # plt.plot(forward.times("matplotlib"), forward.data,
+    #          'r-', lw=lw, label='Forward')
+    plt.ylabel(f'{comp}  ', rotation=0)
 
-SGTM.load_header_variables()
+    trn = recipro.copy()
+    trn.trim(starttime=starttime, endtime=endtime)
+    absmax = np.max(np.abs(trn.data))
+    ax.set_ylim(-1.375*absmax, 1.375*absmax)
+    plot_label(
+        ax, f'max|u|: {absmax:.5g} m',
+        fontsize='x-small', box=False)
+    ax.xaxis_date()
+    ax.xaxis.set_major_formatter(
+        mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
+    ax.tick_params(labelleft=False, left=False)
+    ax.spines.right.set_visible(False)
+    ax.spines.left.set_visible(False)
+    ax.spines.top.set_visible(False)
 
-# %%
+    ax.set_xlim(limits)
 
-SGTM.header['res_topo']
-SGTM.header['topography']
-SGTM.header['ellipticity']
+    if _i == 2:
+        plt.xlabel('Time')
 
-# %%
-SGTM.get_elements(lat, lon, dep, k=10)
+    if _i == 0:
+        # Add title with event info
+        network = rp[0].stats.network
+        station = rp[0].stats.station
+        plt.title(
+            f"LP {period:.0f} s -- {network}.{station} -- {cmt.cmt_time} Loc: {cmt.latitude}dg, {cmt.longitude}dg, {cmt.depth}km")
+
+        # Add legend
+        plt.legend(frameon=False, loc='lower right',
+                   ncol=3, fontsize='x-small')
+
+fig.autofmt_xdate()
+plt.subplots_adjust(
+    left=0.05, right=0.95, bottom=0.1, top=0.95)
+plt.savefig(f'proof_spatial_subsampling_low_pass_{period:.0f}.pdf', dpi=300)

@@ -92,8 +92,7 @@ rp = get_seismograms(h5file, cmt)
 
 # %%
 
-fw = read(os.path.join(specfemmagic,
-          'specfem3d_globe_forward', 'OUTPUT_FILES', '*.sac'))
+
 for tr in fw:
     tr.stats.starttime -= 60
 

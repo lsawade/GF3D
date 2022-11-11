@@ -1,3 +1,4 @@
+
 import numpy as np
 from scipy.spatial import KDTree
 from .constants import R_PLANET_KM, HUGEVAL
@@ -97,17 +98,23 @@ def locate_point(
     lon = lon + 360.0 if (lon < 0.0) else lon
     lon = lon - 360.0 if (lon > 360.0) else lon
 
+    # ######################################################################
+    # Don't need this block, the traget should always be located since we
+    # don't split in slices!
+    # ######################################################################
     # Get bounds
-    lat_min, lat_max, lon_min, lon_max = xyz_2_latlon_minmax(
-        x_store, y_store, z_store)
-
-    # checks if receiver in this slice
-    if (lat >= lat_min and lat <= lat_max and
-            lon >= lon_min and lon <= lon_max):
-        target_located = True
-    else:
-        target_located = False
-
+    # print('    Get bounds...', flush=True)
+    # lat_min, lat_max, lon_min, lon_max = xyz_2_latlon_minmax(
+    #     x_store, y_store, z_store)
+    # print('    ...Done', flush=True)
+    # # checks if source in this slice?
+    # if (lat >= lat_min and lat <= lat_max and
+    #         lon >= lon_min and lon <= lon_max):
+    #     target_located = True
+    # else:
+    #     target_located = False
+    # ######################################################################
+    target_located = True
     # debug
     # print *, 'target located:', target_located, 'lat', sngl(lat), sngl(lat_min), sngl(lat_max), 'lon', sngl(lon), sngl(lon_min), sngl(lon_max)
 
@@ -118,8 +125,10 @@ def locate_point(
 
         # finds closest point(inside GLL points) in this chunk
         point_target = np.array([x_target, y_target, z_target])
-        dist, ispec_selected = kdtree.query(point_target, k=1)
 
+        print('    Querying KDTree...')
+        dist, ispec_selected = kdtree.query(point_target, k=1)
+        print('    ...Done')
         # debug
         # print *, 'kd-tree found location :', inode_min
 
@@ -175,11 +184,12 @@ def locate_point(
         #      endif
 
         # gets xi/eta/gamma and corresponding x/y/z coordinates
+        print('    Finding local coordinates...', flush=True)
         xi, eta, gamma, x, y, z = find_local_coordinates(
             x_target, y_target, z_target, ispec_selected,
             ix_initial_guess, iy_initial_guess, iz_initial_guess,
             x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED)
-
+        print('    ...Done', flush=True)
         # loops over neighbors and try to find better location
         if (DO_ADJACENT_SEARCH):
             # checks if position lies on an element boundary

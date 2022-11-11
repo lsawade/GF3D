@@ -16,7 +16,7 @@ from lwsspy.plot import axes_from_axes, get_aspect
 # %%
 
 # Write H5py Database file
-h5file = '/scratch/gpfs/lsawade/testdb.h5'
+h5file = '/scratch/gpfs/lsawade/db/II/BFO.h5'
 
 dbfiles = [h5file]
 
@@ -35,7 +35,9 @@ SGTM.header['topography']
 SGTM.header['ellipticity']
 
 # %%
-SGTM.get_elements(lat, lon, dep, k=10)
+
+SGTM.get_elements(lat, lon, dep, k=26)
+
 
 # %%
 

@@ -1,6 +1,7 @@
 import logging
 import h5py
 import contextlib
+from copy import deepcopy
 from obspy import Trace, Stream
 from obspy.core.trace import Stats
 from scipy.spatial import KDTree
@@ -9,6 +10,79 @@ from .lagrange import gll_nodes, lagrange_any
 from .source2xyz import source2xyz
 from .locate_point import locate_point
 from .source import CMTSOLUTION
+
+
+def get_frechet(cmt, stationfile):
+    """Computes centered finite difference using 10m perturbations"""
+
+    mtpar = ['Mrr', 'Mtt', 'Mpp', 'Mrt', 'Mrp', 'Mtp']
+    pertdict = dict(
+        Mrr=1e23,
+        Mtt=1e23,
+        Mpp=1e23,
+        Mrt=1e23,
+        Mrp=1e23,
+        Mtp=1e23,
+        latitude=0.0001,
+        longitude=0.0001,
+        depth=0.01,
+        time_shift=-1.0,
+    )
+
+    frechets = dict()
+
+    for par, pert in pertdict.items():
+
+        if par in mtpar:
+
+            dcmt = deepcopy(cmt)
+
+            # Set all M... to zero
+            for mpar in mtpar:
+                setattr(dcmt, mpar, 0.0)
+
+            # Set one to none-zero
+            setattr(dcmt, par, pert)
+
+            # Get reciprocal synthetics
+            drp = get_seismograms(stationfile, dcmt)
+
+            for tr in drp:
+                tr.data /= pert
+
+        elif par == 'time_shift':
+
+            drp = get_seismograms(stationfile, cmt)
+            drp.differentiate()
+            for tr in drp:
+                tr.data *= -1
+
+        else:
+            # create cmt copies
+            pcmt = deepcopy(cmt)
+            mcmt = deepcopy(cmt)
+
+            # Get model values
+            m = getattr(cmt, par)
+
+            # Set vals
+            setattr(pcmt, par, m + pert)
+            setattr(mcmt, par, m - pert)
+
+            # Get reciprocal synthetics
+            prp = get_seismograms(stationfile, pcmt)
+            mrp = get_seismograms(stationfile, mcmt)
+
+            for ptr, mpr in zip(prp, mrp):
+                ptr.data -= mpr.data
+                ptr.data /= 2 * pert
+
+            # Reassign to match
+            drp = prp
+
+        frechets[par] = drp
+
+    return frechets
 
 
 def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
@@ -60,9 +134,12 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         FACTOR = db['FACTOR'][()]
 
     # Create KDTree
+    print('Building KDTree ...')
     kdtree = KDTree(xyz[ibool[2, 2, 2, :], :])
+    print('... Done')
 
     # Get location in mesh
+    print('Conversion geo -> xyz', flush=True)
     x_target, y_target, z_target, Mx = source2xyz(
         cmt.latitude,
         cmt.longitude,
@@ -78,14 +155,18 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         ellipicity_spline=ellipticity_spline,
         ellipicity_spline2=ellipticity_spline2,
     )
+    print('... Done', flush=True)
 
     # Locate the point in mesh
+    print('Locating the point ...', flush=True)
     ispec_selected, xi, eta, gamma, _, _, _, _ = locate_point(
         x_target, y_target, z_target, cmt.latitude, cmt.longitude,
         xyz[ibool[2, 2, 2, :], :], xyz[:, 0], xyz[:, 1], xyz[:, 2], ibool,
         POINT_CAN_BE_BURIED=True, kdtree=kdtree)
+    print('...Done', flush=True)
 
     # Read strains from the file
+    print('Loading strains ...', flush=True)
     with h5py.File(stationfile, 'r') as db:
 
         factor = db['FACTOR'][()]
@@ -98,6 +179,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
                                             ispec_selected, :].astype(np.float64) * norm / factor
 
             print("Min/Max", epsilond[comp].min(), epsilond[comp].min())
+    print('... Done', flush=True)
 
     # GLL points and weights (degree)
     npol = 4
@@ -501,7 +583,10 @@ class SGTManager(object):
                 )
 
                 # Read strains into big array
+                self.networks = []
                 self.stations = []
+                self.latitudes = []
+                self.longitudes = []
 
                 # Initialize big array for aaaalll the strains at aaall
                 # the stations
@@ -518,14 +603,18 @@ class SGTManager(object):
 
                 for _i, db in enumerate(dbs):
 
+                    self.networks.append(db['Network'][()].decode("utf-8"))
+                    self.stations.append(db['Station'][()].decode("utf-8"))
+                    self.latitudes.append(db['latitude'][()])
+                    self.longitudes.append(db['longitude'][()])
+
                     # Get force factor specific to file
                     factor = db['FACTOR'][()]
 
                     for _j, comp in enumerate(self.components):
                         norm = db[f'epsilon/{comp}/norm'][()]
-                        self.epsilon[_i, _j, :, :, :, :, :, :] = \
-                            db[f'epsilon/{comp}/array'][
-                                :, :, :, :, self.ispec_subset, :].astype(np.float64) * norm / factor
+                        self.epsilon[_i, _j, :, :, :, :, :, :] = db[f'epsilon/{comp}/array'][
+                            :, :, :, :, self.ispec_subset, :].astype(np.float64) * norm / factor
 
     def get_seismogram(self, cmt: CMTSOLUTION):
 
@@ -568,18 +657,32 @@ class SGTManager(object):
         # h is stations, i is compenent, j is strain element (0-5),
         # klm are gll points, n are is element, o is time
         # print('eps', self.epsilon.sape)
-        print('eps', self.epsilon[:, :, :, :, :, :, ispec_selected, :].shape)
-        print('M', M.shape)
-        print('xi', shxi.shape)
-        print('et', sheta.shape)
-        print('ga', shgamma.shape)
 
         # Since the database is the same for all
         seismograms = np.einsum(
             'hijklmo,j,k,l,m->hio',
             self.epsilon[:, :, :, :, :, :, ispec_selected, :], M, shxi, sheta, shgamma)
 
-        print(seismograms.shape)
+        # Add traces to the
+        traces = []
+        for _h in range(len(self.db)):
+            for _i, comp in enumerate(['N', 'E', 'Z']):
+
+                stats = Stats()
+                stats.delta = self.header['dt']
+                stats.network = self.networks[_h]
+                stats.station = self.stations[_h]
+                stats.latitude = self.latitudes[_h]
+                stats.longitude = self.longitudes[_h]
+                stats.location = ''
+                stats.channel = f'MX{comp}'
+                stats.starttime = cmt.cmt_time - self.header['tc']
+                stats.npts = self.header['nsteps']
+                tr = Trace(data=seismograms[_h, _i, :], header=stats)
+
+                traces.append(tr)
+
+            return Stream(traces)
 
         return seismograms
         # for h in stations:

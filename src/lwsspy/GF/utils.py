@@ -4,6 +4,7 @@ from itertools import chain
 from sys import getsizeof, stderr
 from collections import OrderedDict
 import os
+import sys
 import numpy as np
 import typing as tp
 
@@ -12,6 +13,14 @@ try:
 except ImportError:
     pass
 
+
+# Disable
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore
+def enablePrint():
+    sys.stdout = sys.__stdout__
 
 def next_power_of_2(x):
     return int(1) if x == 0 else int(2**np.ceil(np.log2(x)))

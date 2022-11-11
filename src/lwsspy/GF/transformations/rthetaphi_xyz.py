@@ -224,16 +224,23 @@ def xyz_2_rlatlon(x, y, z):
     """
 
     # converts location to radius/colatitude/longitude
+    print('            xyz_2_rthetaphi...', flush=True)
     r, theta, phi = xyz_2_rthetaphi(x, y, z)
+    print('            ...Done', flush=True)
 
+    print('            reduce...', flush=True)
     # reduces range for colatitude to 0 and PI, for longitude to 0 and 2*PI
     if isinstance(theta, Iterable):
+        print('            vectorize...', flush=True)
         vreduce = np.vectorize(reduce_geocentric)
+        print('            ...done', flush=True)
+        print('            vreduce...', flush=True)
         theta, phi = vreduce(theta, phi)
+        print('            ...done', flush=True)
 
     else:
         theta, phi = reduce_geocentric(theta, phi)
-
+    print('            ...Done', flush=True)
     # converts geocentric to geographic colatitude
     # note: for example, the moho/topography/3D-model information is given in geographic latitude/longitude
     #       (lat/lon given with respect to a reference ellipsoid).
@@ -270,7 +277,9 @@ def xyz_2_latlon_minmax(x, y, z):
     # latitude in degree between[-90, 90], longitude in degree between[0, 360]
 
     # loops only over corners
+    print('        xyz_2_rlatlon...', flush=True)
     r, lat, lon = xyz_2_rlatlon(x, y, z)
+    print('        ...Done', flush=True)
 
     # Compute mins and maxes
     lat_min = np.min(lat)

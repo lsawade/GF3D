@@ -22,7 +22,7 @@ print(cmt)
 # %%
 db = '/scratch/gpfs/lsawade/db'
 stationfile = os.path.join(db, 'II', 'BFO.h5')
-
+# %%
 # Get reciprocal synthetics
 blockPrint()
 rp = get_seismograms(stationfile, cmt)

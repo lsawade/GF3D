@@ -51,6 +51,27 @@ class ProcessAdios(object):
         # we can thoroughly show the subsampling rate
         self.vars["DT"] = float(self.F.read("DT")[0])
 
+        # cumulative offset indeces.
+        self.vars['CNSPEC'] = np.hstack(
+            (np.array([0]), np.cumsum(self.vars["NSPEC_LOCAL"])))
+        self.vars['CNGLOB'] = np.hstack(
+            (np.array([0]), np.cumsum(self.vars["NGLOB_LOCAL"])))
+
+        # Full shapes for the HDF5 file
+        # -----------------------------
+        # ibool
+        self.vars['ibool_shape'] = (
+            self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
+            self.vars["NSPEC"])
+
+        # epsilon/compononent
+        self.vars['epsilon_shape'] = (
+            6, self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
+            self.vars["NSPEC"], self.vars["NSTEPS"])
+
+        # xyz
+        self.vars['xyz_shape'] = (self.vars['NGLOB'], 3)
+
         if self.vars["ELLIPTICITY"]:
 
             Nrspl = self.F.read('rspl/local_dim')[0]
@@ -81,6 +102,188 @@ class ProcessAdios(object):
                 block_id=0).reshape(
                     self.vars["NX_BATHY"], self.vars["NY_BATHY"], order='F')
 
+    def get_xyz(self, i):
+        """Gets ``xyz`` for a single slice ``i``."""
+
+        # GLOBAL ARRAY DIMENSIONS
+        if "NGLOB" not in self.vars:
+            self.load_base_vars()
+
+        # To access rank specific variables
+        rankname = f'{i:d}'.zfill(5)
+
+        # Only store things if there are points
+        if self.vars['NGLOB_LOCAL'][i] > 0:
+            logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
+
+            # Make arrays
+            xyz = np.zeros((self.vars["NGLOB_LOCAL"][i], 3), dtype=np.float32)
+
+            # Getting coordinates
+            for _i, _l in enumerate(['x', 'y', 'z']):
+
+                # Offset
+                local_dim = self.F.read(f'{_l}/local_dim')[i]
+                global_dim = self.F.read(f'{_l}/global_dim')[i]
+                offset = self.F.read(f'{_l}/offset')[i]
+                if _i == 0:
+                    logger.debug(
+                        f"{i:>5d} | {offset:>10}{global_dim:>10}{local_dim:>10}{self.vars['NGLOB_LOCAL'][i]:>10}{self.vars['NGLOB']:>10}")
+
+                # Assign to global array
+                xyz[:, _i] = self.F.read(f'{_l}/array', start=[offset], count=[
+                    self.vars["NGLOB_LOCAL"][i], ], block_id=0)
+                # x[_l]
+
+                logger.debug(
+                    f'{i}--{_l} min/max: {np.min(xyz[:, _i])}/{np.max(xyz[:, _i])}')
+
+            return xyz
+        else:
+            logger.debug(f"Proc {i:d} does not have elements.")
+
+            return None
+
+    def get_epsilon_minmax(self):
+        '''This gets the overall minimum and maximum for all epsilon arrays.'''
+        mins = []
+        maxs = []
+
+        for _, _l in enumerate(['xx', 'yy', 'zz', 'xy', 'xz', 'yz']):
+            key = f'epsilon_{_l}'
+            maxs.append(np.float64(
+                self.F.available_variables()[f'{key}/array']['Max']))
+            mins.append(np.float64(
+                self.F.available_variables()[f'{key}/array']['Min']))
+
+        return np.min(mins), np.max(maxs)
+
+    def get_epsilon(self, i):
+        """Gets ``epsilon`` for a single slice ``i``."""
+
+        # GLOBAL ARRAY DIMENSIONS
+        if "NGLOB" not in self.vars:
+            self.load_base_vars()
+
+        # To access rank specific variables
+        rankname = f'{i:d}'.zfill(5)
+
+        # Cube gll points
+        NGLL3 = self.vars['NGLLX'] * self.vars['NGLLY'] * self.vars['NGLLZ']
+
+        # Only store things if there are points
+        if self.vars['NGLOB_LOCAL'][i] > 0:
+            logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
+
+            epsilon = np.zeros(
+                (6, self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
+                 self.vars['NSPEC_LOCAL'][i], self.vars["NSTEPS"]))
+
+            # Getting the epsilon
+            for _i, _l in enumerate(['xx', 'yy', 'zz', 'xy', 'xz', 'yz']):
+                logger.debug(f'... Loading strain component {_l}')
+                key = f'epsilon_{_l}'
+                local_dim = self.F.read(f'{key}/local_dim')[i]
+                offset = self.F.read(f'{key}/offset')[i]
+
+                epsilon[_i, :, :, :, :, :] = self.F.read(
+                    f'{key}/array', start=[offset],
+                    count=[NGLL3*self.vars['NSPEC_LOCAL'][i]],
+                    step_start=0, step_count=self.vars['NSTEPS'],
+                    block_id=0).transpose().reshape(
+                    NGLLX, NGLLY, NGLLZ, self.vars['NSPEC_LOCAL'][i], self.vars['NSTEPS'], order='F')
+
+            return epsilon
+        else:
+            logger.debug(f"Proc {i:d} does not have elements.")
+            return None
+
+    def get_epsilon_comp(self, i, comp):
+        """Gets ``epsilon`` for a single slice ``i``."""
+
+        # GLOBAL ARRAY DIMENSIONS
+        if "NGLOB" not in self.vars:
+            self.load_base_vars()
+
+        # To access rank specific variables
+        rankname = f'{i:d}'.zfill(5)
+
+        # Cube gll points
+        NGLL3 = self.vars['NGLLX'] * self.vars['NGLLY'] * self.vars['NGLLZ']
+
+        # Only store things if there are points
+        if self.vars['NGLOB_LOCAL'][i] > 0:
+            logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
+
+            # Getting the epsilon
+            logger.debug(f'... Loading strain component {_l}')
+            key = f'epsilon_{_l}'
+            local_dim = self.F.read(f'{key}/local_dim')[i]
+            offset = self.F.read(f'{key}/offset')[i]
+
+            epsilon_comp = self.F.read(
+                f'{key}/array', start=[offset],
+                count=[NGLL3*self.vars['NSPEC_LOCAL'][i]],
+                step_start=0, step_count=self.vars['NSTEPS'],
+                block_id=0).transpose().reshape(
+                NGLLX, NGLLY, NGLLZ, self.vars['NSPEC_LOCAL'][i], self.vars['NSTEPS'], order='F')
+
+            return epsilon_comp
+        else:
+            logger.debug(f"Proc {i:d} does not have elements.")
+            return None
+
+    def get_ibool(self, i):
+        """Gets ibool for a single slice ``i``."""
+
+        # GLOBAL ARRAY DIMENSIONS
+        if "NGLOB" not in self.vars:
+            self.load_base_vars()
+
+        # To access rank specific variables
+        rankname = f'{i:d}'.zfill(5)
+
+        # Cube gll points
+        NGLL3 = self.vars['NGLLX'] * self.vars['NGLLY'] * self.vars['NGLLZ']
+
+        ibool = np.zeros(
+            (self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
+             self.vars['NSPEC_LOCAL'][i]), dtype=int)
+
+        # Only store things if there are points
+        if self.vars['NGLOB_LOCAL'][i] > 0:
+            logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
+
+            ibool = np.zeros(
+                (self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
+                 self.vars['NSPEC_LOCAL'][i]), dtype=int)
+
+            # Getting ibool dimension and offset
+            local_dim = self.F.read(f'ibool_GF/local_dim')[i]
+            global_dim = self.F.read(f'ibool_GF/global_dim')[i]
+            offset = self.F.read(f'ibool_GF/offset')[i]
+
+            logger.debug(
+                f"      | {local_dim*i:>10}{global_dim:>10}{local_dim:>10}{self.vars['NSPEC_LOCAL'][i]:>10}{self.vars['NSPEC']:>10}")
+
+            # Getting ibool
+            ibool[:, :, :, :] = self.F.read(
+                f'ibool_GF/array',
+                start=[offset],
+                count=[NGLL3*self.vars['NSPEC_LOCAL'][i], ],
+                block_id=0).reshape(
+                    NGLLX, NGLLY, NGLLZ,
+                    self.vars['NSPEC_LOCAL'][i], order='F') \
+                + self.vars['CNGLOB'][i] \
+                - 1
+            # CNGLOB[i] gives the global values a subset of values
+            # - 1 is to transfrom fortran to python indexing
+
+            return ibool
+        else:
+            logger.debug(f"Proc {i:d} does not have elements.")
+            return None
+
     def load_large_vars(self):
 
         # GLOBAL ARRAY DIMENSIONS
@@ -92,29 +295,20 @@ class ProcessAdios(object):
         NGLL3 = self.vars['NGLLX'] * self.vars['NGLLY'] * self.vars['NGLLZ']
 
         # Allocate arrays
-        xyz = np.zeros((self.vars["NGLOB"], 3), dtype=np.float32)
+        xyz = np.zeros(self.vars['xyz_shape'], dtype=np.float32)
 
         # Define strain size convention xx,yy,zz,xy,xz,yz
-        epsilon = np.zeros((6,
-                            self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
-                            self.vars["NSPEC"], self.vars["NSTEPS"]))
+        epsilon = np.zeros(self.vars['epsilon_shape'])
 
         # Define ibool size
-        ibool = np.zeros((
-            self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
-            self.vars["NSPEC"]),
-            dtype=int)
-
-        # cumulative offset indeces.
-        CNSPEC = np.hstack(
-            (np.array([0]), np.cumsum(self.vars["NSPEC_LOCAL"])))
-        CNGLOB = np.hstack(
-            (np.array([0]), np.cumsum(self.vars["NGLOB_LOCAL"])))
+        ibool = np.zeros((self.vars['ibool_shape']),
+                         dtype=int)
 
         # Loop over processors
         logger.debug(
             f"{'NPROC':>5} | {'Offset':>10}{'Global':>10}{'Local':>10}{'NGL_LOCAL':>10}{'NGL_Global':>10}")
         logger.debug("-" * 55)
+
         for i in range(self.vars['NPROC']):
 
             # To access rank specific variables
@@ -140,12 +334,12 @@ class ProcessAdios(object):
                     #     self.vars["NGLOB_LOCAL"][i], ], block_id=0)
 
                     # Assign to global array
-                    xyz[CNGLOB[i]:CNGLOB[i+1], _i] = self.F.read(f'{_l}/array', start=[offset], count=[
+                    xyz[self.vars['CNGLOB'][i]:self.vars['CNGLOB'][i+1], _i] = self.F.read(f'{_l}/array', start=[offset], count=[
                         self.vars["NGLOB_LOCAL"][i], ], block_id=0)
                     # x[_l]
 
                     logger.debug(
-                        f'{i}--{_l} min/max: {np.min(xyz[CNGLOB[i]:CNGLOB[i+1], _i])}/{np.max(xyz[CNGLOB[i]:CNGLOB[i+1], _i])}')
+                        f'{i}--{_l} min/max: {np.min(xyz[self.vars[{"CNGLOB"}][i]:self.vars[{"CNGLOB"}][i+1], _i])}/{np.max(xyz[self.vars[{"CNGLOB"}][i]:self.vars[{"CNGLOB"}][i+1], _i])}')
 
                 # plot_coords_slice(i, x['x'], x['y'], x['z'])
 
@@ -158,14 +352,14 @@ class ProcessAdios(object):
                     f"      | {local_dim*i:>10}{global_dim:>10}{local_dim:>10}{self.vars['NSPEC_LOCAL'][i]:>10}{self.vars['NSPEC']:>10}")
 
                 # Getting ibool
-                ibool[:, :, :, CNSPEC[i]:CNSPEC[i+1]] = self.F.read(
+                ibool[:, :, :, self.vars['CNGLOB'][i]:self.vars['CNGLOB'][i+1]] = self.F.read(
                     f'ibool_GF/array',
                     start=[offset],
                     count=[NGLL3*self.vars['NSPEC_LOCAL'][i], ],
                     block_id=0).reshape(
                         NGLLX, NGLLY, NGLLZ,
                         self.vars['NSPEC_LOCAL'][i], order='F') \
-                    + CNGLOB[i] \
+                    + self.vars['CNGLOB'][i] \
                     - 1
                 # CNGLOB[i] gives the global values a subset of values
                 # - 1 is to transfrom fortran to python indexing
@@ -177,7 +371,7 @@ class ProcessAdios(object):
                     local_dim = self.F.read(f'{key}/local_dim')[i]
                     offset = self.F.read(f'{key}/offset')[i]
 
-                    epsilon[_i, :, :, :, CNSPEC[i]:CNSPEC[i+1], :] = self.F.read(
+                    epsilon[_i, :, :, :, self.vars['CNSPEC'][i]:self.vars['CNSPEC'][i+1], :] = self.F.read(
                         f'{key}/array', start=[offset],
                         count=[NGLL3*self.vars['NSPEC_LOCAL'][i]],
                         step_start=0, step_count=self.vars['NSTEPS'],
@@ -377,6 +571,7 @@ class Adios2HDF5(object):
         self.DB.create_dataset(
             "FACTOR", data=1e7*float(self.config['force_factor']))
 
+        t0 = time.time()
         for _i, (_comp, _afile) in enumerate(self.filenames.items()):
 
             logger.debug(72*"=")
@@ -384,11 +579,11 @@ class Adios2HDF5(object):
             logger.debug(72*"=")
 
             with ProcessAdios(_afile) as P:
-
+                t00 = time.time()
+                P.load_base_vars()
                 # We checked whether all components have the same type of
                 # We
                 if _i == 0:
-                    P.load_base_vars()
                     for _key in list(P.vars.keys()):
                         if _key == "DT":
                             continue
@@ -399,82 +594,162 @@ class Adios2HDF5(object):
                         else:
                             self.DB.create_dataset(_key, data=P.vars[_key])
 
-                # Once the small variables are written write the large ones
-                P.load_large_vars()
-
-                # Write ibool and coordinates only once
+                # Create the three large variable datasets
+                # Only write the coordinates and ibool arrays once.
                 if _i == 0:
-                    if self.subspace:
 
-                        ibool_sub = P.vars['ibool'][::2, ::2, ::2, :]
+                    print('Shape   XYZ', P.vars['xyz_shape'])
 
-                        # Get unique elements
-                        uni, inv = np.unique(
-                            ibool_sub, return_inverse=True)
+                    self.DB.create_dataset(
+                        'xyz', P.vars['xyz_shape'], dtype=np.float32)
 
-                        # Get new index array of length of the unique values
-                        indeces = np.arange(len(uni))
+                    print('Shape IBOOL', P.vars['ibool_shape'])
 
-                        # Get fixed ibool array for the interpolation and source location
-                        ibool = indeces[inv].reshape(ibool_sub.shape)
+                    self.DB.create_dataset(
+                        'ibool', P.vars['ibool_shape'], dtype=int)
 
-                        # Then finally get sub set of coordinates
-                        xyz = dbs[0]['xyz'][uni, :]
-
-                        self.DB.create_dataset('ibool', data=ibool)
-                        self.DB.create_dataset('xyz', data=xyz)
-                    else:
-                        self.DB.create_dataset('ibool', data=P.vars['ibool'])
-                        self.DB.create_dataset('xyz', data=P.vars['xyz'])
-
-                # NOTE Here we can put code for compression!!!!
-                # I tried a little but it failed completely...
-                # For now let's just save the data
-                # Write component-wise epsilon
-
-                epsilon = P.vars['epsilon']
-                norm = np.abs(P.vars['epsilon']).max()
-                # minoffset = P.vars['epsilon'].min()
-                # maxoffset = P.vars['epsilon'].max()
-                # norm = maxoffset-minoffset
-
-                logger.debug(
-                    f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-                # epsilon = (epsilon - minoffset)/norm
-                epsilon = epsilon/norm
-
-                logger.debug(
-                    f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-                epsilon = epsilon.astype(self.precision)
-
-                logger.debug(
-                    f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-                # self.DB.create_dataset(
-                # f'epsilon/{_comp}/offset', data=minoffset)
+                norm = np.abs(P.get_epsilon_minmax()).max()
                 self.DB.create_dataset(f'epsilon/{_comp}/norm', data=norm)
-                # logger.debug(
-                #     f'Offset/Norm: {minoffset:g}/{norm:g}')
-                logger.debug(
-                    f'Norm: {norm:g}/{norm:g}')
 
-                # if
-                # if self.subspace:
-                t0 = time.time()
+                # Create epsilon for each components
                 self.DB.create_dataset(
-                    f'epsilon/{_comp}/array', epsilon.shape,
-                    chunks=(6, 5, 5, 5, 1, epsilon.shape[-1]),
-                    data=epsilon.astype(self.precision),
+                    f'epsilon/{_comp}/array', P.vars['epsilon_shape'],
+                    dtype=self.precision,
+                    chunks=(6, 5, 5, 5, 1, P.vars['epsilon_shape'][-1]),
                     compression=self.compression,
                     compression_opts=self.compression_opts,
                     shuffle=True)
-                t1 = time.time()
+
+                print(self.DB['xyz'])
+                for j in range(P.vars['NPROC']):
+
+                    t000 = time.time()
+
+                    if P.vars['NGLOB_LOCAL'][j] > 0:
+                        if _i == 0:
+
+                            # Getting the coordinates xyz
+                            xyz = P.get_xyz(j)
+
+                            self.DB['xyz'][
+                                P.vars['CNGLOB'][j]:P.vars['CNGLOB'][j+1], :] = xyz
+
+                            del xyz
+
+                            # Getting the addressing array ibool
+                            ibool = P.get_ibool(j)
+
+                            self.DB['ibool'][
+                                :, :, :,
+                                P.vars['CNSPEC'][j]:P.vars['CNSPEC'][j+1]] = \
+                                ibool
+
+                            del ibool
+
+                        # Get epsilon
+                        epsilon = P.get_epsilon(j)
+
+                        if epsilon is None:
+                            raise ValueError(
+                                'Epsilon is None, when it really shouldnt be.')
+
+                        logger.debug(
+                            f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+                        epsilon = epsilon/norm
+
+                        logger.debug(
+                            f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+                        epsilon = epsilon.astype(self.precision)
+
+                        logger.debug(
+                            f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+                        self.DB[f'epsilon/{_comp}/array'][
+                            :, :, :, :, P.vars['CNSPEC'][j]:P.vars['CNSPEC'][j+1], :
+                        ] = epsilon
+
+                        del epsilon
+
+                        t111 = time.time()
+                        print(72*'-')
+                        print(
+                            f'+ --> Writing arrays for slice {j} took {t111-t000:.1f} seconds')
+                        print(72*'-')
+                    else:
+                        print(
+                            f"No elements in slice {j:>5d}/{P.vars['NPROC']}.")
+                        continue
+
+                t11 = time.time()
                 print(72*'+')
                 print(
-                    f'+ --> Writing epsilon for component {_comp} took {t1-t0:.1f} seconds')
+                    f'+ --> Writing arrays for component {_comp} took {t11-t00:.1f} seconds')
                 print(72*'+')
+            t1 = time.time()
+            print(72*'=')
+            print(f'      All arrays took {t1-t0:.1f} seconds')
+            print(72*'=')
+
+            #     # Write ibool and coordinates only once
+            # if _i == 0:
+
+            # if self.subspace:
+
+            #     ibool_sub = P.vars['ibool'][::2, ::2, ::2, :]
+
+            #     # Get unique elements
+            #     uni, inv = np.unique(
+            #         ibool_sub, return_inverse=True)
+
+            #     # Get new index array of length of the unique values
+            #     indeces = np.arange(len(uni))
+
+            #     # Get fixed ibool array for the interpolation and source location
+            #     ibool = indeces[inv].reshape(ibool_sub.shape)
+
+            #     # Then finally get sub set of coordinates
+            #     xyz = dbs[0]['xyz'][uni, :]
+
+            #     self.DB.create_dataset('ibool', data=ibool)
+            #     self.DB.create_dataset('xyz', data=xyz)
+            # else:
+            #     self.DB.create_dataset('ibool', data=P.vars['ibool'])
+            #     self.DB.create_dataset('xyz', data=P.vars['xyz'])
+
+            # NOTE Here we can put code for compression!!!!
+            # I tried a little but it failed completely...
+            # For now let's just save the data
+            # Write component-wise epsilon
+
+            # epsilon = P.vars['epsilon']
+            # norm = np.abs(P.vars['epsilon']).max()
+            # minoffset = P.vars['epsilon'].min()
+            # maxoffset = P.vars['epsilon'].max()
+            # norm = maxoffset-minoffset
+
+            # logger.debug(
+            #     f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+            # # epsilon = (epsilon - minoffset)/norm
+            # epsilon = epsilon/norm
+
+            # logger.debug(
+            #     f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+            # epsilon = epsilon.astype(self.precision)
+
+            # logger.debug(
+            #     f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+            # # self.DB.create_dataset(
+            # # f'epsilon/{_comp}/offset', data=minoffset)
+            # self.DB.create_dataset(f'epsilon/{_comp}/norm', data=norm)
+            # # logger.debug(
+            # #     f'Offset/Norm: {minoffset:g}/{norm:g}')
+            # logger.debug(
+            #     f'Norm: {norm:g}/{norm:g}')
 
     def open(self):
         self.DB = h5py.File(self.h5file, 'w')

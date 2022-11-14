@@ -6,12 +6,7 @@
 import time
 from lwsspy.GF.seismograms import SGTManager
 from obspy import read, Stream
-from copy import deepcopy
-import datetime
-import logging
 import os
-import h5py
-from mpi4py import MPI
 import numpy as np
 import matplotlib.pyplot as plt
 from lwsspy.plot import plot_label
@@ -23,10 +18,6 @@ import matplotlib.dates as mdates
 # %%
 # Only import the KDTree after setting the LD_LIBRARY PATH, e.g.
 # $ export LD_LIBRARY_PATH='/home/lsawade/.conda/envs/gf/lib'
-
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-size = comm.Get_size()
 
 # %% Get CMT solution to convert
 cmt = CMTSOLUTION.read('CMTSOLUTION')
@@ -74,7 +65,7 @@ with Adios2HDF5(
     A2H.write()
 
  # %%
-h5file = f'/scratch/gpfs/lsawade/permanentnew.h5'
+# h5file = f'/scratch/gpfs/lsawade/permanentnew.h5'
 # with h5py.File(h5file, 'r') as db:
 #     ibool = db['ibool'][:]
 #     xyz = db['xyz'][:]
@@ -88,7 +79,6 @@ cmt = CMTSOLUTION.read('CMTSOLUTION')
 
 # %% Get seismograms
 rp = get_seismograms(h5file, cmt)
-
 
 # %%
 

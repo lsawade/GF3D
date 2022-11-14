@@ -1,0 +1,33 @@
+# Specfem directory
+specfemdir="/scratch/gpfs/lsawade/SpecfemMagicGF/specfem3d_globe"
+par_file='/scratch/gpfs/lsawade/SpecfemMagicGF/Par_file'
+
+# Station
+network="II"
+station="BFO"
+station_latitude=48.3319
+station_longitude=8.3311
+station_burial=0.0
+
+# GF locations
+target_file='GF_LOCATIONS'
+target_latitude=35.0300   #
+target_longitude=26.8500  # Not used if target_file is set.
+target_depth=24.0000      #
+element_buffer=1          # Should be a sensible choice, but there is technically no limit
+
+# STF parameters
+t0=0.0
+tc=120.0
+duration_in_min=240.0
+ndt = 4.0
+subsample=true
+force_factor = 1e14
+
+# Forward parameters
+forward_test=true
+cmtsolutionfile='CMTSOLUTION'
+
+# Simultaneous writing
+broadcast_mesh_model=false
+simultaneous_runs=false

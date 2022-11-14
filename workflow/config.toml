@@ -1,0 +1,13 @@
+[job]
+system = ["nnodes.job", "Traverse"]
+name = "gaussian"
+nnodes = 2
+account = "GEO111"
+walltime = 60.0
+gap = 2.0
+debug = true
+
+[root]
+task = ["workflow", "main"]
+simulation = true
+processing = false

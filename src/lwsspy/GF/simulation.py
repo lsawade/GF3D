@@ -351,7 +351,7 @@ class Simulation:
         self.dt, self.T = utils.get_dt_from_mesh_header(self.specfemdir)
 
         # Get number of timesteps
-        duration_in_s = self.duration_in_min * 60.0
+        duration_in_s = self.duration_in_min * 60.0 + self.tc
 
         # Compute new number of time
         if self.nstep is None:
@@ -645,11 +645,16 @@ class Simulation:
 
         # pardict['DT'] = self.dt
 
-        for _, _compdict in self.compdict.items():
+        for _comp, _compdict in self.compdict.items():
 
             # Don't write first Par_file since it is in the
             # Main directory
-            par_file = os.path.join(_compdict['dir'], 'DATA', 'Par_file')
+            if _comp == 'N':
+                par_file = os.path.join(
+                    os.path.dirname(_compdict['dir']),
+                    'DATA', 'Par_file')
+            else:
+                par_file = os.path.join(_compdict['dir'], 'DATA', 'Par_file')
 
             # Write Par file for each sub dir
             utils.write_par_file(pardict, par_file)

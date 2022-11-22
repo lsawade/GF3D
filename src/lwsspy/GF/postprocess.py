@@ -698,50 +698,28 @@ class Adios2HDF5(object):
 
                             del ibool
 
-                            # # Getting the adjacency vector
-                            # xadj, adjacency = P.get_adjacency(j)
+                            # Getting the adjacency vector
+                            xadj, adjacency = P.get_adjacency(j)
 
-                            # # Neighbor locations in neighbor array note that
-                            # # for slices
-                            # if j == 0:
-                            #     self.DB['xadj'][
-                            #         P.vars['CNSPEC'][j]:
-                            #             P.vars['CNSPEC'][j+1]+1] = xadj
-                            # else:
-                            #     self.DB['xadj'][
-                            #         P.vars['CNSPEC'][j] + 1:
-                            #             P.vars['CNSPEC'][j+1] + 1] = xadj[1:]
+                            # Neighbor locations in neighbor array note that
+                            # for slices
+                            if j == 0:
+                                self.DB['xadj'][
+                                    P.vars['CNSPEC'][j]:
+                                        P.vars['CNSPEC'][j+1]+1] = xadj
+                            else:
+                                self.DB['xadj'][
+                                    P.vars['CNSPEC'][j] + 1:
+                                        P.vars['CNSPEC'][j+1] + 1] = xadj[1:]
 
-                            # # Actual neighbors
-                            # self.DB['adjacency'][
-                            #     P.vars['CNEIGH'][j]:
-                            #     P.vars['CNEIGH'][j+1]] = adjacency
+                            # Actual neighbors
+                            self.DB['adjacency'][
+                                P.vars['CNEIGH'][j]:
+                                P.vars['CNEIGH'][j+1]] = adjacency
 
                         self.DB[f'epsilon/{_comp}/array'][
                             :, :, :, :, P.vars['CNSPEC'][j]:P.vars['CNSPEC'][j+1], :
                         ] = P.get_epsilon(j, norm, self.precision)
-
-                        # # Get epsilon
-                        # epsilon = P.get_epsilon_comp(j, _l)
-
-                        # if epsilon is None:
-                        #     raise ValueError(
-                        #         'Epsilon is None, when it really shouldnt be.')
-
-                        # logger.debug(
-                        #     f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-                        # epsilon = epsilon/norm
-
-                        # logger.debug(
-                        #     f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-                        # epsilon = epsilon.astype(self.precision)
-
-                        # logger.debug(
-                        #     f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-                        # del epsilon
 
                         t111 = time.time()
                         print(72*'-')
@@ -763,184 +741,125 @@ class Adios2HDF5(object):
             print(f'      All arrays took {t1-t0:.1f} seconds')
             print(72*'=')
 
-            #     # Write ibool and coordinates only once
-            # if _i == 0:
+    def write_complete_working(self):
 
-            # if self.subspace:
+        if self.consistent is False:
+            raise ValueError('Component files are inconsistent.')
 
-            #     ibool_sub = P.vars['ibool'][::2, ::2, ::2, :]
+        # Grab the things that were identified by simulation class:
+        self.DB.create_dataset("DT", data=self.dt)
+        self.DB.create_dataset("TC", data=self.tc)
+        self.DB.create_dataset("T0", data=self.t0)
+        self.DB.create_dataset("Network", data=self.config['network'])
+        self.DB.create_dataset("Station", data=self.config['station'])
+        self.DB.create_dataset(
+            "latitude", data=self.config['station_latitude'])
+        self.DB.create_dataset(
+            "longitude", data=self.config['station_longitude'])
+        self.DB.create_dataset("burial", data=self.config['station_burial'])
 
-            #     # Get unique elements
-            #     uni, inv = np.unique(
-            #         ibool_sub, return_inverse=True)
+        # This factor combines both removin the initial force + conversion to dyn
+        self.DB.create_dataset(
+            "FACTOR", data=1e7*float(self.config['force_factor']))
 
-            #     # Get new index array of length of the unique values
-            #     indeces = np.arange(len(uni))
+        for _i, (_comp, _afile) in enumerate(self.filenames.items()):
 
-            #     # Get fixed ibool array for the interpolation and source location
-            #     ibool = indeces[inv].reshape(ibool_sub.shape)
+            logger.debug(72*"=")
+            logger.debug(28*"=" + f" EPSILON FOR: {_comp} " + 28*"=")
+            logger.debug(72*"=")
 
-            #     # Then finally get sub set of coordinates
-            #     xyz = dbs[0]['xyz'][uni, :]
+            with ProcessAdios(_afile) as P:
 
-            #     self.DB.create_dataset('ibool', data=ibool)
-            #     self.DB.create_dataset('xyz', data=xyz)
-            # else:
-            #     self.DB.create_dataset('ibool', data=P.vars['ibool'])
-            #     self.DB.create_dataset('xyz', data=P.vars['xyz'])
+                # We checked whether all components have the same type of
+                # We
+                if _i == 0:
+                    P.load_base_vars()
+                    for _key in list(P.vars.keys()):
+                        if _key == "DT":
+                            continue
 
-            # NOTE Here we can put code for compression!!!!
-            # I tried a little but it failed completely...
-            # For now let's just save the data
-            # Write component-wise epsilon
+                        if (self.subspace) \
+                                and (_key in ["NGLLX", "NGLLY", "NGLLZ"]):
+                            self.DB.create_dataset(_key, data=self.subspace)
+                        else:
+                            self.DB.create_dataset(_key, data=P.vars[_key])
 
-            # epsilon = P.vars['epsilon']
-            # norm = np.abs(P.vars['epsilon']).max()
-            # minoffset = P.vars['epsilon'].min()
-            # maxoffset = P.vars['epsilon'].max()
-            # norm = maxoffset-minoffset
+                # Once the small variables are written write the large ones
+                P.load_large_vars()
 
-            # logger.debug(
-            #     f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+                # Write ibool and coordinates only once
+                if _i == 0:
+                    if self.subspace:
 
-            # # epsilon = (epsilon - minoffset)/norm
-            # epsilon = epsilon/norm
+                        ibool_sub = P.vars['ibool'][::2, ::2, ::2, :]
 
-            # logger.debug(
-            #     f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+                        # Get unique elements
+                        uni, inv = np.unique(
+                            ibool_sub, return_inverse=True)
 
-            # epsilon = epsilon.astype(self.precision)
+                        # Get new index array of length of the unique values
+                        indeces = np.arange(len(uni))
 
-            # logger.debug(
-            #     f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+                        # Get fixed ibool array for the interpolation and source location
+                        ibool = indeces[inv].reshape(ibool_sub.shape)
 
-            # # self.DB.create_dataset(
-            # # f'epsilon/{_comp}/offset', data=minoffset)
-            # self.DB.create_dataset(f'epsilon/{_comp}/norm', data=norm)
-            # # logger.debug(
-            # #     f'Offset/Norm: {minoffset:g}/{norm:g}')
-            # logger.debug(
-            #     f'Norm: {norm:g}/{norm:g}')
+                        # Then finally get sub set of coordinates
+                        xyz = dbs[0]['xyz'][uni, :]
 
-    # def write_complete_working(self):
+                        self.DB.create_dataset('ibool', data=ibool)
+                        self.DB.create_dataset('xyz', data=xyz)
+                    else:
+                        self.DB.create_dataset('ibool', data=P.vars['ibool'])
+                        self.DB.create_dataset('xyz', data=P.vars['xyz'])
 
-    #     if self.consistent is False:
-    #         raise ValueError('Component files are inconsistent.')
+                # NOTE Here we can put code for compression!!!!
+                # I tried a little but it failed completely...
+                # For now let's just save the data
+                # Write component-wise epsilon
 
-    #     # Grab the things that were identified by simulation class:
-    #     self.DB.create_dataset("DT", data=self.dt)
-    #     self.DB.create_dataset("TC", data=self.tc)
-    #     self.DB.create_dataset("T0", data=self.t0)
-    #     self.DB.create_dataset("Network", data=self.config['network'])
-    #     self.DB.create_dataset("Station", data=self.config['station'])
-    #     self.DB.create_dataset(
-    #         "latitude", data=self.config['station_latitude'])
-    #     self.DB.create_dataset(
-    #         "longitude", data=self.config['station_longitude'])
-    #     self.DB.create_dataset("burial", data=self.config['station_burial'])
+                epsilon = P.vars['epsilon']
+                norm = np.abs(P.vars['epsilon']).max()
+                # minoffset = P.vars['epsilon'].min()
+                # maxoffset = P.vars['epsilon'].max()
+                # norm = maxoffset-minoffset
 
-    #     # This factor combines both removin the initial force + conversion to dyn
-    #     self.DB.create_dataset(
-    #         "FACTOR", data=1e7*float(self.config['force_factor']))
+                logger.debug(
+                    f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
 
-    #     for _i, (_comp, _afile) in enumerate(self.filenames.items()):
+                # epsilon = (epsilon - minoffset)/norm
+                epsilon = epsilon/norm
 
-    #         logger.debug(72*"=")
-    #         logger.debug(28*"=" + f" EPSILON FOR: {_comp} " + 28*"=")
-    #         logger.debug(72*"=")
+                logger.debug(
+                    f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
 
-    #         with ProcessAdios(_afile) as P:
+                epsilon = epsilon.astype(self.precision)
 
-    #             # We checked whether all components have the same type of
-    #             # We
-    #             if _i == 0:
-    #                 P.load_base_vars()
-    #                 for _key in list(P.vars.keys()):
-    #                     if _key == "DT":
-    #                         continue
+                logger.debug(
+                    f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
 
-    #                     if (self.subspace) \
-    #                             and (_key in ["NGLLX", "NGLLY", "NGLLZ"]):
-    #                         self.DB.create_dataset(_key, data=self.subspace)
-    #                     else:
-    #                         self.DB.create_dataset(_key, data=P.vars[_key])
+                # self.DB.create_dataset(
+                # f'epsilon/{_comp}/offset', data=minoffset)
+                self.DB.create_dataset(f'epsilon/{_comp}/norm', data=norm)
+                # logger.debug(
+                #     f'Offset/Norm: {minoffset:g}/{norm:g}')
+                logger.debug(
+                    f'Norm: {norm:g}/{norm:g}')
 
-    #             # Once the small variables are written write the large ones
-    #             P.load_large_vars()
-
-    #             # Write ibool and coordinates only once
-    #             if _i == 0:
-    #                 if self.subspace:
-
-    #                     ibool_sub = P.vars['ibool'][::2, ::2, ::2, :]
-
-    #                     # Get unique elements
-    #                     uni, inv = np.unique(
-    #                         ibool_sub, return_inverse=True)
-
-    #                     # Get new index array of length of the unique values
-    #                     indeces = np.arange(len(uni))
-
-    #                     # Get fixed ibool array for the interpolation and source location
-    #                     ibool = indeces[inv].reshape(ibool_sub.shape)
-
-    #                     # Then finally get sub set of coordinates
-    #                     xyz = dbs[0]['xyz'][uni, :]
-
-    #                     self.DB.create_dataset('ibool', data=ibool)
-    #                     self.DB.create_dataset('xyz', data=xyz)
-    #                 else:
-    #                     self.DB.create_dataset('ibool', data=P.vars['ibool'])
-    #                     self.DB.create_dataset('xyz', data=P.vars['xyz'])
-
-    #             # NOTE Here we can put code for compression!!!!
-    #             # I tried a little but it failed completely...
-    #             # For now let's just save the data
-    #             # Write component-wise epsilon
-
-    #             epsilon = P.vars['epsilon']
-    #             norm = np.abs(P.vars['epsilon']).max()
-    #             # minoffset = P.vars['epsilon'].min()
-    #             # maxoffset = P.vars['epsilon'].max()
-    #             # norm = maxoffset-minoffset
-
-    #             logger.debug(
-    #                 f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-    #             # epsilon = (epsilon - minoffset)/norm
-    #             epsilon = epsilon/norm
-
-    #             logger.debug(
-    #                 f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-    #             epsilon = epsilon.astype(self.precision)
-
-    #             logger.debug(
-    #                 f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-    #             # self.DB.create_dataset(
-    #             # f'epsilon/{_comp}/offset', data=minoffset)
-    #             self.DB.create_dataset(f'epsilon/{_comp}/norm', data=norm)
-    #             # logger.debug(
-    #             #     f'Offset/Norm: {minoffset:g}/{norm:g}')
-    #             logger.debug(
-    #                 f'Norm: {norm:g}/{norm:g}')
-
-    #             # if
-    #             # if self.subspace:
-    #             t0 = time.time()
-    #             self.DB.create_dataset(
-    #                 f'epsilon/{_comp}/array', epsilon.shape,
-    #                 chunks=(6, 5, 5, 5, 1, epsilon.shape[-1]),
-    #                 data=epsilon.astype(self.precision),
-    #                 compression=self.compression,
-    #                 compression_opts=self.compression_opts,
-    #                 shuffle=True)
-    #             t1 = time.time()
-    #             print(72*'+')
-    #             print(
-    #                 f'+ --> Writing epsilon for component {_comp} took {t1-t0:.1f} seconds')
-    #             print(72*'+')
+                # if
+                # if self.subspace:
+                t0 = time.time()
+                self.DB.create_dataset(
+                    f'epsilon/{_comp}/array', epsilon.shape,
+                    chunks=(6, 5, 5, 5, 1, epsilon.shape[-1]),
+                    data=epsilon.astype(self.precision),
+                    compression=self.compression,
+                    compression_opts=self.compression_opts,
+                    shuffle=True)
+                t1 = time.time()
+                print(72*'+')
+                print(
+                    f'+ --> Writing epsilon for component {_comp} took {t1-t0:.1f} seconds')
+                print(72*'+')
 
     def open(self):
         self.DB = h5py.File(self.h5file, 'w')

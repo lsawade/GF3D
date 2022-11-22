@@ -64,7 +64,7 @@ with Adios2HDF5(
 
     A2H.write()
 
- # %%
+# %%
 # h5file = f'/scratch/gpfs/lsawade/permanentnew.h5'
 # with h5py.File(h5file, 'r') as db:
 #     ibool = db['ibool'][:]
@@ -97,7 +97,7 @@ limits = (starttime.datetime, endtime.datetime)
 
 
 def process_stream(st: Stream):
-    st.filter('bandpass', freqmin=1/300.0, freqmax=1/40.0, zerophase=True)
+    st.filter('bandpass', freqmin=1/300.0, freqmax=1/35.0, zerophase=True)
 
 
 process_stream(rp)

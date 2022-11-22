@@ -13,7 +13,7 @@ from .transformations.recompute_jacobian import recompute_jacobian
 def locate_point(
         x_target, y_target, z_target, lat_target, lon_target,
         midpoints, x_store, y_store, z_store, ibool,
-        xadj, adjacency,
+        # xadj, adjacency,
         USE_DISTANCE_CRITERION: bool = False, POINT_CAN_BE_BURIED: bool = True,
         kdtree: KDTree | None = None):
     """
@@ -198,14 +198,15 @@ def locate_point(
                 print('    Doing Adjacent Search...', flush=True)
                 # searches for better position in neighboring elements
 
-                xi, eta, gamma, x, y, z = find_best_neighbor(
-                    x_target, y_target, z_target, xi, eta, gamma, x, y, z,
-                    x_store, y_store, z_store, ibool, ispec_selected, distmin_squared,
-                    xadj, adjacency, POINT_CAN_BE_BURIED)
+                # xi, eta, gamma, x, y, z = find_best_neighbor(
+                #     x_target, y_target, z_target, xi, eta, gamma, x, y, z,
+                #     x_store, y_store, z_store, ibool, ispec_selected, distmin_squared,
+                #     # xadj, adjacency,
+                #     POINT_CAN_BE_BURIED)
 
-                # raise ValueError(
-                #     'Point found is outside element. and adjacent search is'
-                #     'not yet implmenented.')
+                raise ValueError(
+                    'Point found is outside element. and adjacent search is'
+                    'not yet implmenented.')
 
                 print('    ...Done', flush=True)
 

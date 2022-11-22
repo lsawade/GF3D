@@ -117,8 +117,8 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         topography = db['TOPOGRAPHY'][()]
         ellipticity = db['ELLIPTICITY'][()]
         ibathy_topo = db['BATHY'][:]
-        xadj = db['xadj'][:]
-        adjacency = db['adjacency'][:]
+        # xadj = db['xadj'][:]
+        # adjacency = db['adjacency'][:]
         NX_BATHY = db['NX_BATHY'][()]
         NY_BATHY = db['NY_BATHY'][()]
         RESOLUTION_TOPO_FILE = db['RESOLUTION_TOPO_FILE'][()]
@@ -167,7 +167,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     ispec_selected, xi, eta, gamma, _, _, _, _ = locate_point(
         x_target, y_target, z_target, cmt.latitude, cmt.longitude,
         xyz[ibool[2, 2, 2, :], :], xyz[:, 0], xyz[:, 1], xyz[:, 2], ibool,
-        xadj, adjacency,
+        # xadj, adjacency,
         POINT_CAN_BE_BURIED=True, kdtree=kdtree)
     print('...Done', flush=True)
 

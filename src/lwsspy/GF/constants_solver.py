@@ -15,7 +15,7 @@ NGNOD = 27
 NGNOD2D = 9
 
 # POINT LOCATION
-DO_ADJACENT_SEARCH = False
+DO_ADJACENT_SEARCH = True
 
 # Number of iteration to use to find a point
 NUM_ITER = 5

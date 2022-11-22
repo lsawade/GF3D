@@ -1,6 +1,7 @@
+from scipy.spatial import KDTree  # Only import to avoid a certain error message
 import time
 import logging
-from multiprocessing.sharedctypes import Value
+import sys
 import toml
 from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ
 import numpy as np
@@ -9,9 +10,8 @@ import traceback
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 import h5py
-from lwsspy.math.cart2geo import cart2geo
 from lwsspy.GF.simulation import Simulation
-
+from pprint import pprint
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -39,13 +39,17 @@ class ProcessAdios(object):
         self.vars["NGLLX"] = NGLLX  # self.F.read("NGLLX")[0]
         self.vars["NGLLY"] = NGLLY  # self.F.read("NGLLY")[0]
         self.vars["NGLLZ"] = NGLLZ  # self.F.read("NGLLZ")[0]
-        # self.vars["DT"] = self.F.read("DT")
+
         self.vars["NGLOB_LOCAL"] = self.F.read("NGLOB")
         self.vars["NGLOB"] = int(np.sum(self.vars["NGLOB_LOCAL"]))
         self.vars["NSPEC_LOCAL"] = self.F.read("NGF_UNIQUE_LOCAL")
         self.vars["NSPEC"] = int(np.sum(self.vars["NSPEC_LOCAL"]))
         self.vars["ELLIPTICITY"] = bool(self.F.read("ELLIPTICITY")[0])
         self.vars["TOPOGRAPHY"] = bool(self.F.read("TOPOGRAPHY")[0])
+
+        # Adjacency values
+        self.vars["NEIGHBORS_LOCAL"] = self.F.read("NUM_NEIGHBORS")
+        self.vars["NEIGHBORS"] = int(np.sum(self.vars["NEIGHBORS_LOCAL"]))
 
         # We also need to save every X-TH frame so that NSTEP_BETWEEN_FRAMES
         # we can thoroughly show the subsampling rate
@@ -56,6 +60,8 @@ class ProcessAdios(object):
             (np.array([0]), np.cumsum(self.vars["NSPEC_LOCAL"])))
         self.vars['CNGLOB'] = np.hstack(
             (np.array([0]), np.cumsum(self.vars["NGLOB_LOCAL"])))
+        self.vars['CNEIGH'] = np.hstack(
+            (np.array([0]), np.cumsum(self.vars["NEIGHBORS_LOCAL"])))
 
         # Full shapes for the HDF5 file
         # -----------------------------
@@ -71,6 +77,10 @@ class ProcessAdios(object):
 
         # xyz
         self.vars['xyz_shape'] = (self.vars['NGLOB'], 3)
+
+        # Adjacency shape
+        self.vars['xadj_shape'] = (self.vars["NSPEC"] + 1,)
+        self.vars['adj_shape'] = (self.vars["NEIGHBORS"],)
 
         if self.vars["ELLIPTICITY"]:
 
@@ -146,6 +156,7 @@ class ProcessAdios(object):
 
     def get_epsilon_minmax(self):
         '''This gets the overall minimum and maximum for all epsilon arrays.'''
+
         mins = []
         maxs = []
 
@@ -158,7 +169,7 @@ class ProcessAdios(object):
 
         return np.min(mins), np.max(maxs)
 
-    def get_epsilon(self, i):
+    def get_epsilon(self, i, norm, dtype):
         """Gets ``epsilon`` for a single slice ``i``."""
 
         # GLOBAL ARRAY DIMENSIONS
@@ -191,9 +202,10 @@ class ProcessAdios(object):
                     count=[NGLL3*self.vars['NSPEC_LOCAL'][i]],
                     step_start=0, step_count=self.vars['NSTEPS'],
                     block_id=0).transpose().reshape(
-                    NGLLX, NGLLY, NGLLZ, self.vars['NSPEC_LOCAL'][i], self.vars['NSTEPS'], order='F')
+                    NGLLX, NGLLY, NGLLZ, self.vars['NSPEC_LOCAL'][i],
+                    self.vars['NSTEPS'], order='F') / norm
 
-            return epsilon
+            return epsilon.astype(dtype)
         else:
             logger.debug(f"Proc {i:d} does not have elements.")
             return None
@@ -216,8 +228,8 @@ class ProcessAdios(object):
             logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
 
             # Getting the epsilon
-            logger.debug(f'... Loading strain component {_l}')
-            key = f'epsilon_{_l}'
+            logger.debug(f'... Loading strain component {comp}')
+            key = f'epsilon_{comp}'
             local_dim = self.F.read(f'{key}/local_dim')[i]
             offset = self.F.read(f'{key}/offset')[i]
 
@@ -232,6 +244,34 @@ class ProcessAdios(object):
         else:
             logger.debug(f"Proc {i:d} does not have elements.")
             return None
+
+    def get_adjacency(self, i):
+
+        local_dim = self.F.read(f'xadj_gf/local_dim')[i]
+        offset = self.F.read(f'xadj_gf/offset')[i]
+
+        xadj = self.F.read(
+            f'xadj_gf/array',
+            start=[offset],
+            count=[self.vars['NSPEC_LOCAL'][i] + 1],
+            block_id=0) \
+            + self.vars['CNEIGH'][i]
+
+        # count is always 1 more than number of elements
+
+        local_dim = self.F.read(f'adjncy_gf/local_dim')[i]
+        offset = self.F.read(f'adjncy_gf/offset')[i]
+        adjacency = self.F.read(
+            f'adjncy_gf/array',
+            start=[offset],
+            count=[self.vars['NEIGHBORS_LOCAL'][i]],
+            block_id=0) \
+            + self.vars['CNSPEC'][i] \
+            - 1
+        # + self.vars['CNSPEC'][i] --> Add number of elements from first slice
+        # - 1                      --> Remove index for Python indexing.
+
+        return xadj, adjacency
 
     def get_ibool(self, i):
         """Gets ibool for a single slice ``i``."""
@@ -608,7 +648,20 @@ class Adios2HDF5(object):
                     self.DB.create_dataset(
                         'ibool', P.vars['ibool_shape'], dtype=int)
 
+                    print('Shape x neighbors', P.vars['xadj_shape'])
+
+                    self.DB.create_dataset(
+                        'xadj', P.vars['xadj_shape'], dtype=int)
+
+                    print('Shape neighbors', P.vars['adj_shape'])
+
+                    self.DB.create_dataset(
+                        'adjacency', P.vars['adj_shape'], dtype=int)
+
                 norm = np.abs(P.get_epsilon_minmax()).max()
+
+                print(norm)
+
                 self.DB.create_dataset(f'epsilon/{_comp}/norm', data=norm)
 
                 # Create epsilon for each components
@@ -620,7 +673,6 @@ class Adios2HDF5(object):
                     compression_opts=self.compression_opts,
                     shuffle=True)
 
-                print(self.DB['xyz'])
                 for j in range(P.vars['NPROC']):
 
                     t000 = time.time()
@@ -646,31 +698,50 @@ class Adios2HDF5(object):
 
                             del ibool
 
-                        # Get epsilon
-                        epsilon = P.get_epsilon(j)
+                            # Getting the adjacency vector
+                            xadj, adjacency = P.get_adjacency(j)
 
-                        if epsilon is None:
-                            raise ValueError(
-                                'Epsilon is None, when it really shouldnt be.')
+                            # Neighbor locations in neighbor array note that
+                            # for slices
+                            if j == 0:
+                                self.DB['xadj'][
+                                    P.vars['CNSPEC'][j]:
+                                        P.vars['CNSPEC'][j+1]+1] = xadj
+                            else:
+                                self.DB['xadj'][
+                                    P.vars['CNSPEC'][j] + 1:
+                                        P.vars['CNSPEC'][j+1] + 1] = xadj[1:]
 
-                        logger.debug(
-                            f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-                        epsilon = epsilon/norm
-
-                        logger.debug(
-                            f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
-
-                        epsilon = epsilon.astype(self.precision)
-
-                        logger.debug(
-                            f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+                            # Actual neighbors
+                            self.DB['adjacency'][
+                                P.vars['CNEIGH'][j]:
+                                P.vars['CNEIGH'][j+1]] = adjacency
 
                         self.DB[f'epsilon/{_comp}/array'][
                             :, :, :, :, P.vars['CNSPEC'][j]:P.vars['CNSPEC'][j+1], :
-                        ] = epsilon
+                        ] = P.get_epsilon(j, norm, self.precision)
 
-                        del epsilon
+                        # # Get epsilon
+                        # epsilon = P.get_epsilon_comp(j, _l)
+
+                        # if epsilon is None:
+                        #     raise ValueError(
+                        #         'Epsilon is None, when it really shouldnt be.')
+
+                        # logger.debug(
+                        #     f'           Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+                        # epsilon = epsilon/norm
+
+                        # logger.debug(
+                        #     f'Normalized Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+                        # epsilon = epsilon.astype(self.precision)
+
+                        # logger.debug(
+                        #     f'Typechange Epsilon Min/Mean/Max: {epsilon.min():g}/{epsilon.mean():g}/{epsilon.max():g}')
+
+                        # del epsilon
 
                         t111 = time.time()
                         print(72*'-')

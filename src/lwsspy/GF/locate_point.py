@@ -1,6 +1,6 @@
 
-import numpy as np
 from scipy.spatial import KDTree
+import numpy as np
 from .constants import R_PLANET_KM, HUGEVAL
 from .constants_solver import NGLLX, NGLLY, NGLLZ, MIDX, MIDY, MIDZ, \
     DO_ADJACENT_SEARCH, NGNOD, NUM_ITER
@@ -13,6 +13,7 @@ from .transformations.recompute_jacobian import recompute_jacobian
 def locate_point(
         x_target, y_target, z_target, lat_target, lon_target,
         midpoints, x_store, y_store, z_store, ibool,
+        xadj, adjacency,
         USE_DISTANCE_CRITERION: bool = False, POINT_CAN_BE_BURIED: bool = True,
         kdtree: KDTree | None = None):
     """
@@ -194,12 +195,19 @@ def locate_point(
         if (DO_ADJACENT_SEARCH):
             # checks if position lies on an element boundary
             if (np.abs(xi) > 1.0990 or np.abs(eta) > 1.0990 or np.abs(gamma) > 1.0990):
+                print('    Doing Adjacent Search...', flush=True)
                 # searches for better position in neighboring elements
-                # find_best_neighbor(x_target, y_target, z_target, xi, eta, gamma,
-                #                    x, y, z, ispec_selected, distmin_squared, POINT_CAN_BE_BURIED)
-                raise ValueError(
-                    'Point found is outside element. and adjacent search is'
-                    'not yet implmenented.')
+
+                xi, eta, gamma, x, y, z = find_best_neighbor(
+                    x_target, y_target, z_target, xi, eta, gamma, x, y, z,
+                    x_store, y_store, z_store, ibool, ispec_selected, distmin_squared,
+                    xadj, adjacency, POINT_CAN_BE_BURIED)
+
+                # raise ValueError(
+                #     'Point found is outside element. and adjacent search is'
+                #     'not yet implmenented.')
+
+                print('    ...Done', flush=True)
 
     else:
         # point not found in this slice
@@ -289,10 +297,10 @@ def find_local_coordinates(
         yelm[ia] = y_store[iglob]
         zelm[ia] = z_store[iglob]
 
-    print("Element coordinates")
+    # print("Element coordinates")
     # print(xelm)
-    print(yelm)
-    # print(zelm)
+    # print(yelm)
+    # # print(zelm)
 
     # GLL points and weights (degree)
     xigll, _, _ = gll_nodes(NGLLX-1)
@@ -384,6 +392,7 @@ def find_local_coordinates(
         if (gamma > 1.100):
             gamma = 1.100
         if (gamma < -1.100):
+            print('hello')
             gamma = -1.100
 
     # impose receiver exactly at the surface
@@ -393,5 +402,187 @@ def find_local_coordinates(
     # compute final coordinates of point found
     x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = \
         recompute_jacobian(xelm, yelm, zelm, xi, eta, gamma)
+
+    return xi, eta, gamma, x, y, z
+
+
+def find_best_neighbor(
+        x_target: float, y_target: float, z_target: float,
+        xi: float, eta: float, gamma: float,
+        x: float, y: float, z: float,
+        x_store, y_store, z_store,
+        ibool, ispec_selected: int,
+        distmin_squared: float,
+        xadj, adjacency, POINT_CAN_BE_BURIED: bool = True):
+
+    print(ibool.shape)
+    nspec = ibool.shape[-1]
+    MAX_NEIGHBORS = 50
+    DEBUG = True
+
+    #   ! local parameters
+    #   integer : : ix_initial_guess,iy_initial_guess,iz_initial_guess
+    #   integer : : ispec,i,j,k,iglob
+
+    #   double precision : : dist_squared
+    #   double precision : : distmin_squared_guess
+
+    #   ! nodes search
+    #   double precision : : xi_n,eta_n,gamma_n,x_n,y_n,z_n ! neighbor position result
+
+    #   ! neighbor elements
+    #   integer, parameter ::    ! maximum number of neighbors (around 37 should be sufficient for crust/mantle)
+    #   integer : : index_neighbors(MAX_NEIGHBORS*MAX_NEIGHBORS) ! including neighbors of neighbors
+    #   integer : : num_neighbors
+
+    #   integer : : ii,jj,i_n,ientry,ispec_ref
+    #   logical : : do_neighbor
+
+    #   ! verbose output
+    #   logical, parameter :: DEBUG = .false.
+
+    #   ! best distance to target .. so far
+    #   distmin_squared = (x_target - x)*(x_target - x) &
+    #                  + (y_target - y)*(y_target - y) &
+    #                   + (z_target - z)*(z_target - z)
+
+    #   !debug
+    #   if (DEBUG) print *, 'neighbors: best guess ',ispec_selected,xi,eta,gamma,'distance',sngl(sqrt(distmin_squared)*R_PLANET_KM)
+
+    # fill neighbors arrays
+    #
+    # note: we add direct neighbors plus neighbors of neighbors.
+    # for very coarse meshes, the initial location guesses especially around doubling layers can be poor such that we need
+    #       to enlarge the search of neighboring elements.
+
+    index_neighbors = np.zeros(MAX_NEIGHBORS*MAX_NEIGHBORS, dtype=int)
+    num_neighbors = 0
+
+    for ii in range(xadj[ispec_selected+1]-xadj[ispec_selected]):
+        # get neighbor
+        ientry = xadj[ispec_selected] + ii
+        ispec_ref = adjacency[ientry]
+
+        if DEBUG:
+            print('ispec_ref', ispec_ref)
+        # checks
+        if (ispec_ref < 0 or ispec_ref > nspec-1):
+            raise ValueError(
+                'Invalid ispec index in locate point search -- ii loop')
+
+        # checks if exists already in list
+        do_neighbor = True
+        for i_n in range(num_neighbors):
+
+            if (index_neighbors[i_n] == ispec_ref):
+                do_neighbor = False
+                break
+
+        # adds to search elements
+        if do_neighbor:
+            num_neighbors = num_neighbors + 1
+            index_neighbors[num_neighbors] = ispec_ref
+
+        # adds neighbors of neighbor
+        for jj in range(xadj[ispec_ref+1]-xadj[ispec_ref]):
+            # get neighbor
+            ientry = xadj[ispec_ref] + jj
+            ispec = adjacency[ientry]
+
+            # checks
+            if (ispec < 0 or ispec > nspec-1):
+                raise ValueError(
+                    'Invalid ispec index in locate point search -- jj loop')
+
+            # checks if exists already in list
+            do_neighbor = True
+            for i_n in range(num_neighbors):
+                if (index_neighbors[i_n] == ispec):
+                    do_neighbor = False
+                    break
+
+            # adds to search elements
+            if (do_neighbor):
+                num_neighbors = num_neighbors + 1
+                index_neighbors[num_neighbors] = ispec
+
+    # loops over neighboring elements
+    for i_n in range(num_neighbors):
+
+        # Get neighbor
+        ispec = index_neighbors[i_n]
+
+        # note: the final position location can be still off if we start too far away.
+        #       here we guess the best "inner" GLL point inside this search neighbor element
+        #       to be the starting initial guess for finding the local coordinates.
+
+        # gets first guess as starting point
+        ix_initial_guess = MIDX
+        iy_initial_guess = MIDY
+        iz_initial_guess = MIDZ
+
+        iglob = ibool[MIDX, MIDY, MIDZ, ispec]
+
+        distmin_squared_guess = (x_target - x_store[iglob])**2 \
+            + (y_target - y_store[iglob])**2 \
+            + (z_target - z_store[iglob])**2
+
+        # loop only on points inside the element
+        # exclude edges to ensure this point is not shared with other elements
+        for k in range(1, NGLLZ-1):
+            for j in range(1, NGLLY-1):
+                for i in range(1, NGLLX-1):
+                    iglob = ibool[i, j, k, ispec]
+                    dist_squared = (x_target - x_store[iglob])**2 \
+                        + (y_target - y_store[iglob])**2 \
+                        + (z_target - z_store[iglob])**2
+
+                    #  keep this point if it is closer to the receiver
+                    #  we compare squared distances instead of distances themselves to significantly speed up calculations
+                    if (dist_squared < distmin_squared_guess):
+                        distmin_squared_guess = dist_squared
+                        ix_initial_guess = i
+                        iy_initial_guess = j
+                        iz_initial_guess = k
+
+        # gets xi/eta/gamma and corresponding x/y/z coordinates
+        xi_n, eta_n, gamma_n, x_n, y_n, z_n = find_local_coordinates(
+            x_target, y_target, z_target, ispec_selected,
+            ix_initial_guess, iy_initial_guess, iz_initial_guess,
+            x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED)
+
+        # final distance to target
+        dist_squared = (x_target - x_n)*(x_target - x_n) \
+            + (y_target - y_n)*(y_target - y_n) \
+            + (z_target - z_n)*(z_target - z_n)
+
+        # debug
+        if DEBUG:
+            print(
+                '  neighbor ', ispec, i_n, ientry, 'ispec = ', ispec_selected,
+                xi_n, eta_n, gamma_n, 'distance',
+                np.sqrt(dist_squared) * R_PLANET_KM,
+                np.sqrt(distmin_squared)*R_PLANET_KM)
+
+        # takes this point if it is closer to the receiver
+        # (we compare squared distances instead of distances themselves to significantly speed up calculations)
+        if (dist_squared < distmin_squared):
+            distmin_squared = dist_squared
+            # uses this as new location
+            ispec_selected = ispec
+            xi = xi_n
+            eta = eta_n
+            gamma = gamma_n
+            x = x_n
+            y = y_n
+            z = z_n
+
+        # checks if position lies inside element(which usually means that located position is accurate)
+        if (np.abs(xi) < 1.099 and np.abs(eta) < 1.099 and np.abs(gamma) < 1.099):
+            break
+
+    if (DEBUG):
+        print('neighbors: final ', ispec_selected, xi, eta, gamma,
+              'distance', np.sqrt(distmin_squared)*R_PLANET_KM)
 
     return xi, eta, gamma, x, y, z

@@ -23,6 +23,8 @@ def compare_fw_reci(cmt, rp, fw, limits, outdir):
             ::28], forward.data[::28], 'r--', lw=lw, label='Fw. subsampled')
         plt.ylabel(f'{comp}  ', rotation=0)
 
+        # trn=recipro.copy()
+        # trn.trim(starttime=limits[0], endtime=limits[1])
         absmax = np.max(np.abs(recipro.data))
         ax.set_ylim(-1.375*absmax, 1.375*absmax)
         plot_label(

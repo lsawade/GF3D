@@ -398,7 +398,7 @@ class Simulation:
 
         # Determine low pass filter dependent on ndt and corresponding nyquist
         # frequency fny or fcutoff = 1/(2*dt)
-        self.cutoff = (1.0/self.ndt)/2.0
+        self.cutoff = 1.0/(self.ndt*4.0)
 
         # Create new STF using the
         self.t, self.stf = create_stf(

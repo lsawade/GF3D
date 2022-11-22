@@ -73,8 +73,10 @@ with Adios2HDF5(
 #     # save_coordinates = np.savez('coords.npz', xyz=xyz, ibool=ibool)
 #     del ibool, xyz
 
+# h5file = f'/scratch/gpfs/lsawade/SA_subset/II/BFO.h5'
 
 # %% Get CMT solution to convert
+h5file = f'/scratch/gpfs/lsawade/testdb.h5'
 cmt = CMTSOLUTION.read('CMTSOLUTION')
 
 # %% Get seismograms
@@ -82,22 +84,24 @@ rp = get_seismograms(h5file, cmt)
 
 # %%
 
+fw = read(os.path.join(specfemmagic,
+          'specfem3d_globe_forward', 'OUTPUT_FILES', '*.sac'))
 
 for tr in fw:
-    tr.stats.starttime -= 60
+    tr.stats.starttime -= 120
 
 
 starttime = fw[0].stats.starttime + 300
-endtime = starttime + 500
+endtime = starttime + 7200
 limits = (starttime.datetime, endtime.datetime)
 
 
-# def process_stream(st: Stream):
-#     st.filter('lowpass', freq=1/35.0,zerophase=True)
+def process_stream(st: Stream):
+    st.filter('bandpass', freqmin=1/300.0, freqmax=1/40.0, zerophase=True)
 
 
-# process_stream(rp)
-# process_stream(fw)
+process_stream(rp)
+process_stream(fw)
 
 # %%
 
@@ -115,12 +119,12 @@ for _i, comp in enumerate(['N', 'E', 'Z']):
     plt.plot(forward.times("matplotlib"), forward.data,
              'r-', lw=lw, label='Forward')
     plt.plot(forward.times("matplotlib")[
-             ::28], forward.data[::28], 'r--', lw=lw, label='Fw. subsampled')
+             ::32], forward.data[::32], 'r--', lw=lw, label='Fw. subsampled')
     plt.ylabel(f'{comp}  ', rotation=0)
 
     trn = recipro.copy()
     trn.trim(starttime=starttime, endtime=endtime)
-    absmax = np.max(np.abs(trn.data))
+    absmax = np.max(np.abs(recipro.data))
     ax.set_ylim(-1.375*absmax, 1.375*absmax)
     plot_label(
         ax, f'max|u|: {absmax:.5g} m',
@@ -155,7 +159,6 @@ plt.subplots_adjust(
 plt.savefig('proof.pdf', dpi=300)
 
 
-# %%
 # %% Get seismograms
 
 
@@ -199,7 +202,7 @@ for _i, comp in enumerate(['N', 'E', 'Z']):
 
     ax = plt.subplot(3, 1, _i+1)
     plt.plot(forward.times("matplotlib")[
-             ::28], forward.data[::28], 'r--', lw=lw, label='Fw. subsampled')
+             ::28], forward.data[::32], 'r--', lw=lw, label='Fw. subsampled')
     plt.plot(recipro.times("matplotlib"), recipro.data,
              'k', lw=lw, label='125 Nodes')
     plt.plot(reciprosub.times("matplotlib"), reciprosub.data,

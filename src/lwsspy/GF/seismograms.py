@@ -117,6 +117,8 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         topography = db['TOPOGRAPHY'][()]
         ellipticity = db['ELLIPTICITY'][()]
         ibathy_topo = db['BATHY'][:]
+        xadj = db['xadj'][:]
+        adjacency = db['adjacency'][:]
         NX_BATHY = db['NX_BATHY'][()]
         NY_BATHY = db['NY_BATHY'][()]
         RESOLUTION_TOPO_FILE = db['RESOLUTION_TOPO_FILE'][()]
@@ -157,11 +159,15 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     )
     print('... Done', flush=True)
 
+    # print('xadj', np.min(xadj), np.max(xadj))
+    # print('adjacency', np.min(adjacency), np.max(adjacency))
+
     # Locate the point in mesh
     print('Locating the point ...', flush=True)
     ispec_selected, xi, eta, gamma, _, _, _, _ = locate_point(
         x_target, y_target, z_target, cmt.latitude, cmt.longitude,
         xyz[ibool[2, 2, 2, :], :], xyz[:, 0], xyz[:, 1], xyz[:, 2], ibool,
+        xadj, adjacency,
         POINT_CAN_BE_BURIED=True, kdtree=kdtree)
     print('...Done', flush=True)
 
@@ -171,12 +177,13 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
 
         factor = db['FACTOR'][()]
         epsilond = dict()
-        for comp in ['N', 'E', 'Z']:
+        for _i, comp in enumerate(['N', 'E', 'Z']):
             # offset = db[f'epsilon/{comp}/offset'][()]
             norm = db[f'epsilon/{comp}/norm'][()]
             epsilond[comp] = \
-                db[f'epsilon/{comp}/array'][:, :, :, :,
-                                            ispec_selected, :].astype(np.float64) * norm / factor
+                db[f'epsilon/{comp}/array'][
+                    :, :, :, :, ispec_selected, :
+            ].astype(np.float64) * norm / factor
 
             print("Min/Max", epsilond[comp].min(), epsilond[comp].min())
     print('... Done', flush=True)

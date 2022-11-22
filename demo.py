@@ -9,10 +9,10 @@ from lwsspy.GF.source import CMTSOLUTION
 from lwsspy.GF.seismograms import SGTManager
 from lwsspy.GF.seismograms import get_seismograms, get_frechet
 from lwsspy.GF.plot.compare_fw_reci import compare_fw_reci, plot_drp
-from lwsspy.GF.utils import blockPrint, enablePrint
+# from lwsspy.GF.utils import blockPrint, enablePrint
 
 # Define directory to save figures to
-demodir = '/home/lsawade/lwsspy/lwsspy.GF/demo'
+demodir = '/home/lsawade/lwsspy/lwsspy.GF/demo2'
 
 # %% Define a CMTSOLUTION of interest
 cmtfile = '/home/lsawade/lwsspy/lwsspy.GF/CMTSOLUTION'
@@ -20,13 +20,14 @@ cmt = CMTSOLUTION.read(cmtfile)
 print(cmt)
 
 # %%
-db = '/scratch/gpfs/lsawade/db'
+db = '/scratch/gpfs/lsawade/SA_database'
 stationfile = os.path.join(db, 'II', 'BFO.h5')
+# stationfile = '/scratch/gpfs/lsawade/testdb.h5'
 # %%
 # Get reciprocal synthetics
-blockPrint()
+# blockPrint()
 rp = get_seismograms(stationfile, cmt)
-enablePrint()
+# enablePrint()
 print(rp)
 
 # %%
@@ -37,12 +38,13 @@ fw = read(os.path.join(
 
 # Simply used time offset for Timing offset (reciprocal is corrected)
 for tr in fw:
-    tr.stats.starttime -= 60
+    tr.stats.starttime -= 120
 
 starttime = fw[0].stats.starttime + 300
-endtime = starttime + 500
+endtime = starttime + 10000
 limits = (starttime.datetime, endtime.datetime)
 
+# %%
 compare_fw_reci(cmt, rp, fw, limits, demodir)
 
 # %% Compute Frechet's with respect to M

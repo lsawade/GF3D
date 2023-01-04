@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from mpi4py import MPI
 import h5py
 from lwsspy.GF.simulation import Simulation
-from pprint import pprint
+from lwsspy.GF.utils import read_toml
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -48,8 +48,13 @@ class ProcessAdios(object):
         self.vars["TOPOGRAPHY"] = bool(self.F.read("TOPOGRAPHY")[0])
 
         # Adjacency values
-        self.vars["NEIGHBORS_LOCAL"] = self.F.read("NUM_NEIGHBORS")
-        self.vars["NEIGHBORS"] = int(np.sum(self.vars["NEIGHBORS_LOCAL"]))
+        self.vars["USE_BUFFER_ELEMENTS"] = bool(
+            self.F.read("USE_BUFFER_ELEMENTS")[0])
+
+        # Get neighbor values
+        if self.vars["USE_BUFFER_ELEMENTS"]:
+            self.vars["NEIGHBORS_LOCAL"] = self.F.read("NUM_NEIGHBORS")
+            self.vars["NEIGHBORS"] = int(np.sum(self.vars["NEIGHBORS_LOCAL"]))
 
         # We also need to save every X-TH frame so that NSTEP_BETWEEN_FRAMES
         # we can thoroughly show the subsampling rate
@@ -60,8 +65,11 @@ class ProcessAdios(object):
             (np.array([0]), np.cumsum(self.vars["NSPEC_LOCAL"])))
         self.vars['CNGLOB'] = np.hstack(
             (np.array([0]), np.cumsum(self.vars["NGLOB_LOCAL"])))
-        self.vars['CNEIGH'] = np.hstack(
-            (np.array([0]), np.cumsum(self.vars["NEIGHBORS_LOCAL"])))
+
+        # Get neighbor values
+        if self.vars["USE_BUFFER_ELEMENTS"]:
+            self.vars['CNEIGH'] = np.hstack(
+                (np.array([0]), np.cumsum(self.vars["NEIGHBORS_LOCAL"])))
 
         # Full shapes for the HDF5 file
         # -----------------------------
@@ -79,8 +87,9 @@ class ProcessAdios(object):
         self.vars['xyz_shape'] = (self.vars['NGLOB'], 3)
 
         # Adjacency shape
-        self.vars['xadj_shape'] = (self.vars["NSPEC"] + 1,)
-        self.vars['adj_shape'] = (self.vars["NEIGHBORS"],)
+        if self.vars["USE_BUFFER_ELEMENTS"]:
+            self.vars['xadj_shape'] = (self.vars["NSPEC"] + 1,)
+            self.vars['adj_shape'] = (self.vars["NEIGHBORS"],)
 
         if self.vars["ELLIPTICITY"]:
 
@@ -379,7 +388,7 @@ class ProcessAdios(object):
                     # x[_l]
 
                     logger.debug(
-                        f'{i}--{_l} min/max: {np.min(xyz[self.vars[{"CNGLOB"}][i]:self.vars[{"CNGLOB"}][i+1], _i])}/{np.max(xyz[self.vars[{"CNGLOB"}][i]:self.vars[{"CNGLOB"}][i+1], _i])}')
+                        f'{i}--{_l} min/max: {np.min(xyz[self.vars["CNGLOB"][i]:self.vars["CNGLOB"][i+1], _i])}/{np.max(xyz[self.vars["CNGLOB"][i]:self.vars["CNGLOB"][i+1], _i])}')
 
                 # plot_coords_slice(i, x['x'], x['y'], x['z'])
 
@@ -469,12 +478,6 @@ class ProcessAdios(object):
         else:
             plt.show()
 
-# Read input file dict
-
-
-def read_toml(file: str):
-    return toml.load(file)
-
 
 class Adios2HDF5(object):
 
@@ -545,6 +548,9 @@ class Adios2HDF5(object):
         # sample!
         self.tc = S.tc
 
+        # Get Half duration
+        self.hdur = S.hdur
+
     def check_consistency(self):
         """
         First we run a simple check to see whether all the variable parameters
@@ -599,6 +605,7 @@ class Adios2HDF5(object):
         self.DB.create_dataset("DT", data=self.dt)
         self.DB.create_dataset("TC", data=self.tc)
         self.DB.create_dataset("T0", data=self.t0)
+        self.DB.create_dataset("HDUR", data=self.hdur)
         self.DB.create_dataset("Network", data=self.config['network'])
         self.DB.create_dataset("Station", data=self.config['station'])
         self.DB.create_dataset(
@@ -648,15 +655,17 @@ class Adios2HDF5(object):
                     self.DB.create_dataset(
                         'ibool', P.vars['ibool_shape'], dtype=int)
 
-                    print('Shape x neighbors', P.vars['xadj_shape'])
+                    if P.vars["USE_BUFFER_ELEMENTS"]:
 
-                    self.DB.create_dataset(
-                        'xadj', P.vars['xadj_shape'], dtype=int)
+                        print('Shape x neighbors', P.vars['xadj_shape'])
 
-                    print('Shape neighbors', P.vars['adj_shape'])
+                        self.DB.create_dataset(
+                            'xadj', P.vars['xadj_shape'], dtype=int)
 
-                    self.DB.create_dataset(
-                        'adjacency', P.vars['adj_shape'], dtype=int)
+                        print('Shape neighbors', P.vars['adj_shape'])
+
+                        self.DB.create_dataset(
+                            'adjacency', P.vars['adj_shape'], dtype=int)
 
                 norm = np.abs(P.get_epsilon_minmax()).max()
 
@@ -698,24 +707,26 @@ class Adios2HDF5(object):
 
                             del ibool
 
-                            # Getting the adjacency vector
-                            xadj, adjacency = P.get_adjacency(j)
+                            # Only get BUFFER_ELEMENTS if providided in the file
+                            if P.vars["USE_BUFFER_ELEMENTS"]:
+                                # Getting the adjacency vector
+                                xadj, adjacency = P.get_adjacency(j)
 
-                            # Neighbor locations in neighbor array note that
-                            # for slices
-                            if j == 0:
-                                self.DB['xadj'][
-                                    P.vars['CNSPEC'][j]:
-                                        P.vars['CNSPEC'][j+1]+1] = xadj
-                            else:
-                                self.DB['xadj'][
-                                    P.vars['CNSPEC'][j] + 1:
-                                        P.vars['CNSPEC'][j+1] + 1] = xadj[1:]
+                                # Neighbor locations in neighbor array note that
+                                # for slices
+                                if j == 0:
+                                    self.DB['xadj'][
+                                        P.vars['CNSPEC'][j]:
+                                            P.vars['CNSPEC'][j+1]+1] = xadj
+                                else:
+                                    self.DB['xadj'][
+                                        P.vars['CNSPEC'][j] + 1:
+                                            P.vars['CNSPEC'][j+1] + 1] = xadj[1:]
 
-                            # Actual neighbors
-                            self.DB['adjacency'][
-                                P.vars['CNEIGH'][j]:
-                                P.vars['CNEIGH'][j+1]] = adjacency
+                                # Actual neighbors
+                                self.DB['adjacency'][
+                                    P.vars['CNEIGH'][j]:
+                                    P.vars['CNEIGH'][j+1]] = adjacency
 
                         self.DB[f'epsilon/{_comp}/array'][
                             :, :, :, :, P.vars['CNSPEC'][j]:P.vars['CNSPEC'][j+1], :
@@ -880,3 +891,16 @@ class Adios2HDF5(object):
             return False  # uncomment to pass exception through
 
         return True
+
+
+def get_number_of_slices(adiosfile):
+
+    with ProcessAdios(adiosfile) as f:
+        f.load_base_vars()
+        slices = np.where(f.vars['NGLOB_LOCAL'] != 0)[0]
+
+    return len(slices)
+
+
+def get_number_of_slices_bin():
+    print(get_number_of_slices(sys.argv[1]))

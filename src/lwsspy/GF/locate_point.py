@@ -3,7 +3,7 @@ from scipy.spatial import KDTree
 import numpy as np
 from .constants import R_PLANET_KM, HUGEVAL
 from .constants_solver import NGLLX, NGLLY, NGLLZ, MIDX, MIDY, MIDZ, \
-    DO_ADJACENT_SEARCH, NGNOD, NUM_ITER
+    DO_ADJACENT_SEARCH as DAS, NGNOD, NUM_ITER
 from .transformations.rthetaphi_xyz import xyz_2_latlon_minmax
 from .lagrange import gll_nodes
 from .hex_nodes import hex_nodes_anchor_ijk
@@ -13,9 +13,10 @@ from .transformations.recompute_jacobian import recompute_jacobian
 def locate_point(
         x_target, y_target, z_target, lat_target, lon_target,
         midpoints, x_store, y_store, z_store, ibool,
-        # xadj, adjacency,
         USE_DISTANCE_CRITERION: bool = False, POINT_CAN_BE_BURIED: bool = True,
-        kdtree: KDTree | None = None):
+        kdtree: KDTree | None = None,
+        xadj=None, adjacency=None,
+        do_adjacent_search: bool | None = None):
     """
     use constants_solver, only: &
         NGLLX, NGLLY, NGLLZ, MIDX, MIDY, MIDZ, HUGEVAL, &
@@ -72,6 +73,12 @@ def locate_point(
     # debug: sync
     #  integer:: iproc
     """
+
+    # Overwrite adjacent search
+    if do_adjacent_search is not None:
+        DO_ADJACENT_SEARCH = do_adjacent_search
+    else:
+        DO_ADJACENT_SEARCH = DAS
 
     # debug: sync
     #  do iproc = 0, NPROCTOT_VAL-1
@@ -198,15 +205,15 @@ def locate_point(
                 print('    Doing Adjacent Search...', flush=True)
                 # searches for better position in neighboring elements
 
-                # xi, eta, gamma, x, y, z = find_best_neighbor(
-                #     x_target, y_target, z_target, xi, eta, gamma, x, y, z,
-                #     x_store, y_store, z_store, ibool, ispec_selected, distmin_squared,
-                #     # xadj, adjacency,
-                #     POINT_CAN_BE_BURIED)
+                xi, eta, gamma, x, y, z = find_best_neighbor(
+                    x_target, y_target, z_target, xi, eta, gamma, x, y, z,
+                    x_store, y_store, z_store, ibool, ispec_selected, distmin_squared,
+                    xadj, adjacency,
+                    POINT_CAN_BE_BURIED)
 
-                raise ValueError(
-                    'Point found is outside element. and adjacent search is'
-                    'not yet implmenented.')
+                # raise ValueError(
+                #     'Point found is outside element. and adjacent search is'
+                #     'not yet implmenented.')
 
                 print('    ...Done', flush=True)
 
@@ -298,10 +305,14 @@ def find_local_coordinates(
         yelm[ia] = y_store[iglob]
         zelm[ia] = z_store[iglob]
 
-    # print("Element coordinates")
-    # print(xelm)
-    # print(yelm)
-    # # print(zelm)
+    print("Element coordinates")
+    print('x')
+    print(xelm)
+    print('y')
+    print(yelm)
+    print('z')
+    print(zelm)
+    print(' ')
 
     # GLL points and weights (degree)
     xigll, _, _ = gll_nodes(NGLLX-1)
@@ -313,7 +324,9 @@ def find_local_coordinates(
     eta = etagll[iy_initial_guess]
     gamma = gammagll[iz_initial_guess]
 
+    print('Initial Guess')
     print(xi, eta, gamma)
+    print('  ')
 
     # impose receiver exactly at the surface
     if (not POINT_CAN_BE_BURIED):
@@ -331,9 +344,6 @@ def find_local_coordinates(
         x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = \
             recompute_jacobian(xelm, yelm, zelm, xi, eta, gamma)
 
-        # print(f"                            ", xelm)
-        # print(f"                            ", yelm)
-        # print(f"                            ", zelm)
         # compute distance to target location
         dx = - (x - x_target)
         dy = - (y - y_target)
@@ -548,7 +558,7 @@ def find_best_neighbor(
 
         # gets xi/eta/gamma and corresponding x/y/z coordinates
         xi_n, eta_n, gamma_n, x_n, y_n, z_n = find_local_coordinates(
-            x_target, y_target, z_target, ispec_selected,
+            x_target, y_target, z_target, ispec,
             ix_initial_guess, iy_initial_guess, iz_initial_guess,
             x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED)
 

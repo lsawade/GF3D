@@ -1,31 +1,33 @@
 # Specfem directory
 specfemdir="/scratch/gpfs/lsawade/SpecfemMagicGF/specfem3d_globe"
+stationdir="/scratch/gpfs/lsawade/SpecfemMagicGF/DB/II/BFO"
 par_file='/scratch/gpfs/lsawade/SpecfemMagicGF/Par_file'
 
 # Station
-network="II"
-station="BFO"
-station_latitude=48.3319
-station_longitude=8.3311
-station_burial=0.0
+# The station information should be added by the workflow
 
 # GF locations
 target_file='GF_LOCATIONS'
+
+# Not used if target_file is set.
 target_latitude=35.0300   #
-target_longitude=26.8500  # Not used if target_file is set.
+target_longitude=26.8500
 target_depth=24.0000      #
+
+# How many neighbouring elements should be saved.
 element_buffer=1          # Should be a sensible choice, but there is technically no limit
 
 # STF parameters
 t0=0.0
-tc=120.0
+tc=200.0
 duration_in_min=240.0
 ndt = 4.0
+lpfilter='butter'
 subsample=true
-force_factor = 1e14
+force_factor = 1e10        # 1e10 seems like a good value?
 
 # Forward parameters
-forward_test=true
+forward_test=false
 cmtsolutionfile='CMTSOLUTION'
 
 # Simultaneous writing

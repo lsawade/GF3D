@@ -10,6 +10,9 @@ from .lagrange import gll_nodes, lagrange_any
 from .source2xyz import source2xyz
 from .locate_point import locate_point
 from .source import CMTSOLUTION
+from .utils import timeshift, next_power_of_2
+from .stf import create_stf
+from scipy import fft
 
 
 def get_frechet(cmt, stationfile):
@@ -117,8 +120,6 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         topography = db['TOPOGRAPHY'][()]
         ellipticity = db['ELLIPTICITY'][()]
         ibathy_topo = db['BATHY'][:]
-        # xadj = db['xadj'][:]
-        # adjacency = db['adjacency'][:]
         NX_BATHY = db['NX_BATHY'][()]
         NY_BATHY = db['NY_BATHY'][()]
         RESOLUTION_TOPO_FILE = db['RESOLUTION_TOPO_FILE'][()]
@@ -132,8 +133,22 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         xyz = db['xyz'][:]
         dt = db['DT'][()]
         tc = db['TC'][()]
+        NT = db['NSTEPS'][()]
+        hdur = db['HDUR'][()]
+
         # t0 = db['TC'][()]
         FACTOR = db['FACTOR'][()]
+        do_adjacency_search = db['USE_BUFFER_ELEMENTS'][()]
+
+        if do_adjacency_search:
+            print('adj', do_adjacency_search)
+            xadj = db['xadj'][:]
+            adjacency = db['adjacency'][:]
+
+        else:
+            print('adj', None)
+            xadj = None
+            adjacency = None
 
     # Create KDTree
     print('Building KDTree ...')
@@ -167,8 +182,9 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     ispec_selected, xi, eta, gamma, _, _, _, _ = locate_point(
         x_target, y_target, z_target, cmt.latitude, cmt.longitude,
         xyz[ibool[2, 2, 2, :], :], xyz[:, 0], xyz[:, 1], xyz[:, 2], ibool,
-        # xadj, adjacency,
-        POINT_CAN_BE_BURIED=True, kdtree=kdtree)
+        xadj=xadj, adjacency=adjacency,
+        POINT_CAN_BE_BURIED=True, kdtree=kdtree,
+        do_adjacent_search=do_adjacency_search)
     print('...Done', flush=True)
 
     # Read strains from the file
@@ -186,6 +202,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
             ].astype(np.float64) * norm / factor
 
             print("Min/Max", epsilond[comp].min(), epsilond[comp].min())
+
     print('... Done', flush=True)
 
     # GLL points and weights (degree)
@@ -210,12 +227,31 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
                     sepsilon[_i, :, :] += hlagrange * \
                         epsilond[comp][:, i, j, k, :]
 
+    # For following FFTs
+    NP2 = next_power_of_2(2*NT)
+
+    # This computes the half duration for the new STF from the
+    hdur_r = np.sqrt((cmt.hdur / 1.628)**2 - hdur**2)
+
+    # Heaviside STF to reproduce SPECFEM stf
+    _, stf_r = create_stf(0, 100.0, NT, dt, hdur_r,
+                          cutoff=None, gaussian=False, lpfilter='butter')
+    STF_R = fft.fft(stf_r, n=NP2)
+    shift = -100.0
+    phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2, dt)*2*np.pi)
+
     # Add traces to the
     traces = []
 
     for _i, comp in enumerate(['N', 'E', 'Z']):
         data = np.sum(np.array([1., 1., 1., 2., 2., 2.])[:, None]
                       * Mx[:, None] * np.squeeze(sepsilon[_i, :, :]), axis=0)
+        data = timeshift(data, dt, 0.0)
+
+        # Convolution with Specfem Heaviside function
+        data = np.real(
+            fft.ifft(phshift * fft.fft(data, n=NP2) * STF_R))[:NT] * dt
+
         stats = Stats()
         stats.delta = dt
         stats.network = network

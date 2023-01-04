@@ -1,4 +1,7 @@
 from __future__ import print_function
+import zipfile
+from typing import List
+import urllib.request
 from collections import deque
 from itertools import chain
 from sys import getsizeof, stderr
@@ -7,6 +10,7 @@ import os
 import sys
 import numpy as np
 import typing as tp
+import toml
 
 try:
     from reprlib import repr
@@ -14,16 +18,53 @@ except ImportError:
     pass
 
 
+def filedir(file):
+    return os.path.dirname(os.path.abspath(file))
+
+
 # Disable
 def blockPrint():
     sys.stdout = open(os.devnull, 'w')
 
 # Restore
+
+
 def enablePrint():
     sys.stdout = sys.__stdout__
 
+
 def next_power_of_2(x):
     return int(1) if x == 0 else int(2**np.ceil(np.log2(x)))
+
+# Read input file dict
+
+
+def read_toml(file: str):
+    return toml.load(file)
+
+
+def timeshift(s: np.ndarray, dt: float, shift: float) -> np.ndarray:
+    """ shift a signal by a given time-shift in the frequency domain
+    Parameters
+    ----------
+    s : Arraylike
+        signal
+    N2 : int
+        length of the signal in f-domain (usually equals the next pof 2)
+    dt : float
+        sampling interval
+    shift : float
+        the time shift in seconds
+    Returns
+    -------
+    Timeshifted signal"""
+
+    S = np.fft.fft(s)
+
+    # Omega
+    phshift = np.exp(-1.0j*shift*np.fft.fftfreq(len(s), dt)*2*np.pi)
+    s_out = np.real(np.fft.ifft(phshift*S))
+    return s_out
 
 
 def get_dt_from_mesh_header(specfemdir: str):
@@ -346,3 +387,23 @@ def total_size(o, handlers={}, verbose=False):
         return s
 
     return sizeof(o)
+
+
+def unzip(zipfilename, directory_to_extract_to):
+    with zipfile.ZipFile(zipfilename, 'r') as zip_ref:
+        zip_ref.extractall(directory_to_extract_to)
+
+
+def downloadfile(url: str, floc: str):
+    """Downloads file to location
+    Parameters
+    ----------
+    url : str
+        Source URL
+    floc : str
+        Destination
+    """
+    try:
+        urllib.request.urlretrieve(url, floc)
+    except Exception as e:
+        print(f"Error when downloading {url}: {e}")

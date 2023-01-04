@@ -23,6 +23,7 @@ class Simulation:
     def __init__(
             self,
             specfemdir,
+            stationdir,
             station_latitude: float,
             station_longitude: float,
             station_burial: float,
@@ -41,11 +42,13 @@ class Simulation:
             ndt: None | float = None,
             lpfilter: str = 'bessel',
             forward_test: bool = False,
+            forwardoutdir: str | None = None,
             broadcast_mesh_model: bool = False,
             simultaneous_runs: bool = False,
             cmtsolutionfile: str | None = None,
             par_file: str | None = None,
-            element_buffer: int | None = None) -> None:
+            element_buffer: int | None = None,
+            overwrite: bool = False) -> None:
         """Makes specfem directory into SGT database simulator.
 
         Note that the specfem Par_file should be written in the same way you
@@ -84,6 +87,8 @@ class Simulation:
         """
 
         self.specfemdir = specfemdir
+        self.stationdir = stationdir
+        self.forwardoutdir = forwardoutdir
         self.station_latitude = station_latitude   # degree
         self.station_longitude = station_longitude  # degree
         self.station_burial = station_burial       # km
@@ -94,6 +99,8 @@ class Simulation:
 
         # Simulation parameters
         self.force_factor = float(force_factor)
+
+        # Signal parameters
         self.t0 = t0
         self.tc = tc
         self.duration_in_min = duration_in_min
@@ -103,23 +110,29 @@ class Simulation:
         self.ndt = ndt
         self.dt = None
         self.xth_sample = None
+        self.hdur = None
+        self.cutoff = None
         self.lpfilter = lpfilter
+
         if element_buffer is not None and element_buffer > 0:
             self.use_element_buffer = True
             self.element_buffer = element_buffer
         else:
             self.use_element_buffer = False
             self.element_buffer = 0
+
         # Parameters for a forward backward test
         self.forward_test = forward_test
         self.cmtsolutionfile = cmtsolutionfile
         self.network = network
         self.station = station
+        self.use_forward_stf = False
 
         # Submission specific options
         self.simultaneous_runs = simultaneous_runs
         self.broadcast_mesh_model = broadcast_mesh_model
         self.par_file = par_file
+        self.overwrite = overwrite
 
         # Logger
         self.logger = logger
@@ -151,30 +164,31 @@ class Simulation:
                 raise ValueError(
                     'For forward test CMTSOLUTION must be provided')
 
-    def create(self):
+    def create(self, no_specfem=False):
         """Actually creates all necessary directories, after .setup() is run."""
 
-        if self.forward_test:
+        if not no_specfem:
+            if self.forward_test:
 
-            self.logger.debug('Creating Forward Test directory.')
+                self.logger.debug('Creating Forward Test directory.')
 
-            # Copy specfemdirectory
-            copytreecmd = f"""
-            rsync -av \
-                --include='.git/logs' \
-                --exclude='run00*' \
-                --exclude='.*' \
-                --exclude='EXAMPLES' \
-                --exclude='tests' \
-                --exclude='utils' \
-                --exclude='doc' \
-                --exclude='DATABASES_MPI/*' \
-                --exclude='obj/*' \
-                --exclude='bin/*' \
-                --delete \
-                {self.specfemdir}/ {self.specfemdir_forward}"""
+                # Copy specfemdirectory
+                copytreecmd = f"""
+                rsync -av \
+                    --include='.git/logs' \
+                    --exclude='run00*' \
+                    --exclude='.*' \
+                    --exclude='EXAMPLES' \
+                    --exclude='tests' \
+                    --exclude='utils' \
+                    --exclude='doc' \
+                    --exclude='DATABASES_MPI/*' \
+                    --exclude='obj/*' \
+                    --exclude='bin/*' \
+                    --delete \
+                    {self.specfemdir}/ {self.specfemdir_forward}"""
 
-            subprocess.check_call(copytreecmd, shell=True)
+                subprocess.check_call(copytreecmd, shell=True)
 
         # make rundirs
         for _comp, _compdict in self.compdict.items():
@@ -184,43 +198,46 @@ class Simulation:
                 f'Creating Simulation Directory for {_comp}: {_compdict["dir"]}')
 
             # Remove pre-existing directory
-            if os.path.exists(_compdict['dir']):
+            if (os.path.exists(_compdict['dir']) and self.overwrite) or not os.path.exists(_compdict['dir']):
                 subprocess.check_call(f'rm -rf {_compdict["dir"]}', shell=True)
 
-            # Make dir
-            os.makedirs(_compdict["dir"])
+                # Make dir
+                os.makedirs(_compdict["dir"])
 
-            # DATA DIR
-            DATADIR = os.path.join(_compdict["dir"], 'DATA')
-            os.makedirs(DATADIR)
+                # DATA DIR
+                DATADIR = os.path.join(_compdict["dir"], 'DATA')
+                os.makedirs(DATADIR)
 
-            # OUTPUT DIR
-            OUTPUT_DIR = os.path.join(_compdict["dir"], 'OUTPUT_FILES')
-            os.makedirs(OUTPUT_DIR)
+                # OUTPUT DIR
+                OUTPUT_DIR = os.path.join(_compdict["dir"], 'OUTPUT_FILES')
+                os.makedirs(OUTPUT_DIR)
 
-            if self.simultaneous_runs is False:
+                if self.simultaneous_runs is False:
 
-                # Link DATABASES
-                DATABASES_MPI_SOURCE = os.path.join(
-                    '..', "DATABASES_MPI")
-                DATABASES_MPI_TARGET = os.path.join(
-                    _compdict["dir"], "DATABASES_MPI")
+                    # Link DATABASES
+                    DATABASES_MPI_SOURCE = os.path.join(
+                        self.specfemdir, "DATABASES_MPI")
+                    DATABASES_MPI_TARGET = os.path.join(
+                        _compdict["dir"], "DATABASES_MPI")
 
-                os.symlink(DATABASES_MPI_SOURCE, DATABASES_MPI_TARGET)
+                    os.symlink(DATABASES_MPI_SOURCE, DATABASES_MPI_TARGET)
 
-                # Link BINs
-                BINS_SOURCE = os.path.join(
-                    "..", "bin")
-                BINS_TARGET = os.path.join(
-                    _compdict["dir"], "bin")
+                    # Link BINs
+                    BINS_SOURCE = os.path.join(
+                        self.specfemdir, "bin")
+                    BINS_TARGET = os.path.join(
+                        _compdict["dir"], "bin")
 
-                os.symlink(BINS_SOURCE, BINS_TARGET)
+                    os.symlink(BINS_SOURCE, BINS_TARGET)
 
         # Create Write all the files
 
         # Write Rotation files
         self.logger.debug('Updating constants.h.in ...')
-        self.update_constants()
+
+        # Specfem not updated
+        if not no_specfem:
+            self.update_constants()
 
         # Update forces and STATIONS
         self.update_forces_and_stations()
@@ -268,19 +285,24 @@ class Simulation:
 
         # Print statement showing the setup
         self.compdict = dict(
-            N=dict(dir=os.path.join(self.specfemdir, 'run0001')),
-            E=dict(dir=os.path.join(self.specfemdir, 'run0002')),
-            Z=dict(dir=os.path.join(self.specfemdir, 'run0003'))
+            N=dict(dir=os.path.join(self.stationdir, 'N', 'specfem')),
+            E=dict(dir=os.path.join(self.stationdir, 'E', 'specfem')),
+            Z=dict(dir=os.path.join(self.stationdir, 'Z', 'specfem'))
         )
 
         if self.forward_test:
             self.setup_forward()
 
     def setup_forward(self):
-        basename = os.path.basename(self.specfemdir)
-        upper = os.path.dirname(self.specfemdir)
-        self.specfemdir_forward = os.path.join(
-            upper, basename + '_forward')
+
+        # Use specfem base name to find outdir for forward simulation
+        if self.forwardoutdir is None:
+            basename = os.path.basename(self.specfemdir)
+            upper = os.path.dirname(self.specfemdir)
+            self.specfemdir_forward = os.path.join(
+                upper, basename + '_forward')
+        else:
+            self.specfemdir_forward = self.forwardoutdir
 
         # Constants file has to be updated for reciprocal simulations
         self.constants_file_forward = os.path.join(
@@ -324,9 +346,11 @@ class Simulation:
             rotation=rotation, external_stf=external_stf)
 
         if self.forward_test:
+            # Don't do this to check really whether we can recover the
+            # Seismogram
             utils.update_constants(
                 self.constants_file_forward, self.constants_file_forward,
-                rotation='+', external_stf=external_stf)
+                rotation='+', external_stf=self.use_forward_stf)
 
     def get_timestep_period(self):
         """Gets the actual timestep from the mesh header, then takes the
@@ -383,11 +407,10 @@ class Simulation:
         self.logger.debug(f"Mesh resolves period: {self.T:.4f} s")
         self.logger.debug(f"Sampling at period:   {self.ndt:.4f} s")
 
-        # Following specfem 3D globe we set the the half duration of the STF to
-        # very short 5*DT, where DT is the subsampled sampling time ``self.ndt``
-        # For all filters to work fine, we just need to choose a half duration
-        # that is 2.0 the length outgoing smapling interval.
-        self.hdur = 2.0*self.ndt
+        # Following specfem3D_globe we set the the half duration of the STF to
+        # very short 5*DT, where DT is the integration sampling time ``self.dt``
+        # Playing around with other half durations does not make sense for now.
+        self.hdur = 5.0*self.dt
         self.logger.debug(f"hdur of step:         {self.hdur:.4f} s")
 
         # The distance between t0 and tc should be larger than the
@@ -398,11 +421,17 @@ class Simulation:
 
         # Determine low pass filter dependent on ndt and corresponding nyquist
         # frequency fny or fcutoff = 1/(2*dt)
-        self.cutoff = 1.0/(self.ndt*4.0)
+        self.cutoff = 1.0/(self.ndt*2.0)
 
         # Create new STF using the
         self.t, self.stf = create_stf(
-            self.t0, self.tc, self.nstep, self.dt, self.hdur, self.cutoff, lpfilter=self.lpfilter)
+            self.t0, self.tc, self.nstep, self.dt, self.hdur, self.cutoff,
+            gaussian=True, lpfilter=self.lpfilter)
+
+        if self.forward_test:
+            self.t_forward, self.stf_forward = create_stf(
+                self.t0, self.tc, self.nstep, self.dt, self.hdur, self.cutoff,
+                gaussian=True, lpfilter=self.lpfilter)
 
     def write_STF(self):
 
@@ -437,7 +466,7 @@ class Simulation:
 
             # Write STF to file using numpy
             np.savetxt(stf_file, self.stf, fmt='% 30.15f',
-                       header=header, comments=' #')
+                       header='', comments=' #')
 
         if self.forward_test:
 
@@ -459,8 +488,9 @@ class Simulation:
                 self.specfemdir_forward, 'DATA', 'stf')
 
             # Save STF
-            np.savetxt(stf_forward_file, self.stf, fmt='%30.15f',
-                       header=header, comments=' #')
+            if self.use_forward_stf:
+                np.savetxt(stf_forward_file, self.stf_forward, fmt='%30.15f',
+                           header="", comments=' #')
 
     def read_GF_LOCATIONS(self):
         """GF LOCATIONS must have the format """
@@ -554,12 +584,8 @@ class Simulation:
             else:
                 raise ValueError('Component must be N, E, or Z')
 
-            if self.forward_test:
-                hdur = self.cmt.hdur
-                time_shift = self.cmt.time_shift
-            else:
-                hdur = 0.0
-                time_shift = 0.0
+            hdur = 0.0
+            time_shift = 0.0
 
             # Create force and
             force = FORCESOLUTION(
@@ -590,8 +616,17 @@ class Simulation:
                 f.write(
                     "%-9s %5s %15.4f %12.4f %10.1f %6.1f\n"
                     % (self.station, self.network,
-                       self.station_latitude, self.station_longitude, 0.0, self.station_burial*1.0e3)
+                       self.station_latitude, self.station_longitude, 0.0,
+                       self.station_burial*1.0e3)
                 )
+
+                # Add test source as station for reference
+                if self.forward_test:
+                    f.write(
+                        "%-9s %5s %15.4f %12.4f %10.1f %6.1f\n"
+                        % ('SRC', 'EQ', self.cmt.latitude, self.cmt.longitude,
+                           0.0, self.cmt.depth*1.0e3)
+                    )
 
         if self.forward_test:
             # write stations file with one line
@@ -600,7 +635,14 @@ class Simulation:
                 f.write(
                     "%-9s %5s %15.4f %12.4f %10.1f %6.1f\n"
                     % (self.station, self.network,
-                       self.station_latitude, self.station_longitude, 0.0, self.station_burial*1.0e3)
+                       self.station_latitude, self.station_longitude, 0.0,
+                       self.station_burial*1.0e3)
+                )
+
+                f.write(
+                    "%-9s %5s %15.4f %12.4f %10.1f %6.1f\n"
+                    % ('SRC', 'EQ', self.cmt.latitude, self.cmt.longitude, 0.0,
+                       self.cmt.depth*1.0e3)
                 )
 
     def write_CMT(self):
@@ -643,18 +685,24 @@ class Simulation:
             pardict['NTSTEP_BETWEEN_FRAMES'] = 1
             pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
 
+            if 'NSTEP' in pardict:
+                pardict.pop('NSTEP')
+            if 'T0' in pardict:
+                pardict.pop('T0')
+
         # pardict['DT'] = self.dt
 
+        par_file = os.path.join(self.specfemdir, 'DATA', 'Par_file')
+
+        # Write separate Par file for main specfem directory
+        utils.write_par_file(pardict, par_file)
+
+        # Write Par_file for each separate component directory
         for _comp, _compdict in self.compdict.items():
 
             # Don't write first Par_file since it is in the
             # Main directory
-            if _comp == 'N':
-                par_file = os.path.join(
-                    os.path.dirname(_compdict['dir']),
-                    'DATA', 'Par_file')
-            else:
-                par_file = os.path.join(_compdict['dir'], 'DATA', 'Par_file')
+            par_file = os.path.join(_compdict['dir'], 'DATA', 'Par_file')
 
             # Write Par file for each sub dir
             utils.write_par_file(pardict, par_file)
@@ -663,7 +711,7 @@ class Simulation:
 
             # modify Reciprocal Par_file
             pardict = deepcopy(self.pardict)
-            pardict['SAVE_GREEN_FUNCTIONS'] = True
+            pardict['SAVE_GREEN_FUNCTIONS'] = False
             pardict['USE_FORCE_POINT_SOURCE'] = False
 
             pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
@@ -680,12 +728,28 @@ class Simulation:
 
             if self.subsample:
                 if self.ndt_requested is not None:
+                    pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
+
+                if self.use_forward_stf:
                     pardict['NSTEP'] = self.nstep
                     pardict['T0'] = self.t0
-                    pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
+                else:
+                    # For now so that specfem makes it's
+                    if 'NSTEP' in pardict:
+                        pardict.pop('NSTEP')
+                    if 'T0' in pardict:
+                        pardict.pop('T0')
+
+                    pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
+
             else:
                 pardict['NTSTEP_BETWEEN_FRAMES'] = 1
                 pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
+
+                if 'NSTEP' in pardict:
+                    pardict.pop('NSTEP')
+                if 'T0' in pardict:
+                    pardict.pop('T0')
 
             # Write Par_file
             utils.write_par_file(pardict, self.par_file_forward)
@@ -717,9 +781,15 @@ class Simulation:
             if self.xth_sample is not None:
                 rstr += f"X_TH_SAMPLE:{self.xth_sample:.>60d}\n"
 
+            if self.hdur is not None:
+                rstr += f"HDUR:{self.hdur:.>67.4f}\n"
+
+            if self.cutoff is not None:
+                rstr += f"CUTOFF:{self.cutoff:.>65.4f}\n"
+
         if self.nstep is not None:
             rstr += f"NT:{self.nstep:.>69d}\n"
-            rstr += f"T:{self.nstep*self.dt:>70.4f}\n"
+            rstr += f"T:{self.nstep*self.dt/60.0:>70.4f} min\n"
         rstr += "\n"
         rstr += f"ROTATION:{self.pardict['ROTATION']!s:.>63}\n"
         rstr += f"SIMULTANEOUS_RUNS:{self.simultaneous_runs!s:.>54}\n"

@@ -3,11 +3,11 @@ import numpy as np
 import typing as tp
 from . import utils
 from .signal import filter
-from scipy import special
+from scipy import special, integrate
 
 
 def create_stf(
-        t0, tc, nstep, dt, hdur, cutoff: float | None = None,
+        t0, tc, nstep, dt, hdur, cutoff: float | None = None, gaussian: bool = True,
         lpfilter: str = 'bessel') -> tp.Tuple[np.ndarray, np.ndarray]:
     """Computes a source time function wih optional low pass filter.
 
@@ -38,8 +38,12 @@ def create_stf(
     # Compute STF
     t = np.arange(t0, t0 + nstep*dt, dt)
 
-    # Compute step
-    stf = erf(t, tc, hdur)
+    if gaussian:
+        # Use Gaussian for FORCE source
+        stf = gauss(t, tc, hdur)
+    else:
+        # Compute step function
+        stf = erf(t, tc, hdur)
 
     # Filter the data, and plot both the original and filtered signals.
     if cutoff is not None:
@@ -64,10 +68,15 @@ def create_stf(
         else:
             raise ValueError(f'Filter "{lpfilter}" not supported.')
 
+    # As correct as possible
+    # stf = integrate.cumtrapz(stf, x=t, initial=0)
+    # stf = stf/np.max(np.abs(stf))
+    # print('STF SUM', integrate.trapz(stf, x=t)
+
     return t, stf
 
 
-def gaussian(t, tc, hdur):
+def gauss(t, tc, hdur):
     """Computes specfem style Gaussian"""
     return np.exp(-(t-tc)**2/hdur**2) / (np.sqrt(np.pi) * hdur)
 

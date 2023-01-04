@@ -7,6 +7,8 @@ import warnings
 import numpy as np
 from obspy import UTCDateTime
 from copy import deepcopy
+from obspy.imaging.beachball import beach
+from matplotlib import transforms  # For beachball fix
 
 
 class FORCESOLUTION:
@@ -194,7 +196,7 @@ class CMTSOLUTION:
     ms: float        # magnitude scale
     region_tag: str  # string
     eventname: str   # event id -> GCMT
-    timeshift: float  # in s
+    time_shift: float  # in s
     hdur: float      # in s
     latitude: float  # in deg
     longitude: float  # in deg
@@ -408,6 +410,32 @@ class CMTSOLUTION:
                 out += '.d0'
 
         return out
+
+    def axbeach(
+            self, ax, x, y, width=50, facecolor='k', linewidth=2, alpha=1.0,
+            clip_on=False, **kwargs):
+        """Plots beach ball into given axes.
+        Note that width heavily depends on the given screen size/dpi. Therefore
+        often does not work."""
+
+        # Plot beach ball
+        bb = beach(self.tensor,
+                   linewidth=linewidth,
+                   facecolor=facecolor,
+                   bgcolor='w',
+                   edgecolor='k',
+                   alpha=alpha,
+                   xy=(x, y),
+                   width=width,
+                   size=100,  # Defines number of interpolation points
+                   axes=ax,
+                   **kwargs)
+        bb.set(clip_on=clip_on)
+
+        # This fixes pdf output issue
+        bb.set_transform(transforms.Affine2D(np.identity(3)))
+
+        ax.add_collection(bb)
 
     def write(self, outfile: str):
 

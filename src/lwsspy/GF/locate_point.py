@@ -193,7 +193,7 @@ def locate_point(
 
         # gets xi/eta/gamma and corresponding x/y/z coordinates
         print('    Finding local coordinates...', flush=True)
-        xi, eta, gamma, x, y, z = find_local_coordinates(
+        xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = find_local_coordinates(
             x_target, y_target, z_target, ispec_selected,
             ix_initial_guess, iy_initial_guess, iz_initial_guess,
             x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED)
@@ -205,8 +205,9 @@ def locate_point(
                 print('    Doing Adjacent Search...', flush=True)
                 # searches for better position in neighboring elements
 
-                xi, eta, gamma, x, y, z = find_best_neighbor(
+                xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = find_best_neighbor(
                     x_target, y_target, z_target, xi, eta, gamma, x, y, z,
+                    xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz,
                     x_store, y_store, z_store, ibool, ispec_selected, distmin_squared,
                     xadj, adjacency,
                     POINT_CAN_BE_BURIED)
@@ -240,7 +241,7 @@ def locate_point(
 #  call synchronize_all()
 #  enddo
 
-    return ispec_selected, xi, eta, gamma, x, y, z, distmin_not_squared,
+    return ispec_selected, xi, eta, gamma, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz, x, y, z, distmin_not_squared,
 
 #
 # -------------------------------------------------------------------------------------------------
@@ -414,13 +415,16 @@ def find_local_coordinates(
     x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = \
         recompute_jacobian(xelm, yelm, zelm, xi, eta, gamma)
 
-    return xi, eta, gamma, x, y, z
+    return xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz
 
 
 def find_best_neighbor(
         x_target: float, y_target: float, z_target: float,
         xi: float, eta: float, gamma: float,
         x: float, y: float, z: float,
+        xix: float, xiy: float, xiz: float,
+        etax: float, etay: float, etaz: float,
+        gammax: float, gammay: float, gammaz: float,
         x_store, y_store, z_store,
         ibool, ispec_selected: int,
         distmin_squared: float,
@@ -557,7 +561,7 @@ def find_best_neighbor(
                         iz_initial_guess = k
 
         # gets xi/eta/gamma and corresponding x/y/z coordinates
-        xi_n, eta_n, gamma_n, x_n, y_n, z_n = find_local_coordinates(
+        xi_n, eta_n, gamma_n, x_n, y_n, z_n, xix_n, xiy_n, xiz_n, etax_n, etay_n, etaz_n, gammax_n, gammay_n, gammaz_n = find_local_coordinates(
             x_target, y_target, z_target, ispec,
             ix_initial_guess, iy_initial_guess, iz_initial_guess,
             x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED)
@@ -587,6 +591,15 @@ def find_best_neighbor(
             x = x_n
             y = y_n
             z = z_n
+            xix = xix_n
+            xiy = xiy_n
+            xiz = xiz_n
+            etax = etax_n
+            etay = etay_n
+            etaz = etaz_n
+            gammax = gammax_n
+            gammay = gammay_n
+            gammaz = gammaz_n
 
         # checks if position lies inside element(which usually means that located position is accurate)
         if (np.abs(xi) < 1.099 and np.abs(eta) < 1.099 and np.abs(gamma) < 1.099):
@@ -596,4 +609,4 @@ def find_best_neighbor(
         print('neighbors: final ', ispec_selected, xi, eta, gamma,
               'distance', np.sqrt(distmin_squared)*R_PLANET_KM)
 
-    return xi, eta, gamma, x, y, z
+    return xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz

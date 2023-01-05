@@ -9,6 +9,7 @@ HALF: float = 0.5
 TWO: float = 2.0
 TINYVAL: float = 1.0e-9
 HUGEVAL: float = 1.0e30
+VERYSMALLVAL: float = 1e-24
 
 # Degrees and Radians and their conversions
 PI: float = np.pi

@@ -4,12 +4,12 @@ from .constants_solver import NGLLX, NGLLY, NGLLZ, MIDX, MIDY, MIDZ, NGNOD
 
 def hex_nodes():
     """
-    ! topology of the elements
+    topology of the elements
     integer, dimension(NGNOD), intent(out):: iaddx, iaddy, iaddz
 
-    ! define the topology of the hexahedral elements
+    define the topology of the hexahedral elements
 
-    ! the topology of the nodes is described in UTILS/chunk_notes_scanned/numbering_convention_27_nodes.tif
+    the topology of the nodes is described in UTILS/chunk_notes_scanned/numbering_convention_27_nodes.tif
     """
 
     if (NGNOD != 27):

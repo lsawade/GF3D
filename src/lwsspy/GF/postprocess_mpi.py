@@ -84,6 +84,10 @@ class ProcessAdios(object):
             self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
             self.vars["NSPEC"])
 
+        # displacement/component
+        self.vars['displacement_shape'] = (
+            3, self.vars["NGLOB"], self.vars["NSTEPS"])
+
         # epsilon/component
         self.vars['epsilon_shape'] = (
             6, self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
@@ -183,6 +187,51 @@ class ProcessAdios(object):
                 self.F.available_variables()[f'{key}/array']['Min']))
 
         return np.min(mins), np.max(maxs)
+
+    def get_displacement_minmax(self):
+        '''This gets the overall minimum and maximum for all epsilon arrays.'''
+
+        maxs = np.float64(self.F.available_variables()[
+                          f'displacement/array']['Max'])
+        mins = np.float64(self.F.available_variables()[
+                          f'displacement/array']['Min'])
+
+        return mins, maxs
+
+    def get_displacement(self, i, norm, dtype):
+        """Gets ``epsilon`` for a single slice ``i``."""
+
+        # GLOBAL ARRAY DIMENSIONS
+        if "NGLOB" not in self.vars:
+            self.load_base_vars()
+
+        # To access rank specific variables
+        rankname = f'{i:d}'.zfill(5)
+
+        # Only store things if there are points
+        if self.vars['NGLOB_LOCAL'][i] > 0:
+            logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
+
+            displacement = np.zeros(
+                (3, self.vars['NGLOB_LOCAL'][i], self.vars["NSTEPS"]))
+
+            logger.debug(f'... Loading displacement')
+            key = f'displacement'
+            local_dim = self.F.read(f'{key}/local_dim')[i]
+            offset = self.F.read(f'{key}/offset')[i]
+
+            displacement[:, :, :] = self.F.read(
+                f'{key}/array', start=[offset],
+                count=[3*self.vars['NGLOB_LOCAL'][i]],
+                step_start=0, step_count=self.vars['NSTEPS'],
+                block_id=0).transpose().reshape(
+                3, self.vars['NGLOB_LOCAL'][i],
+                self.vars['NSTEPS'], order='F') / norm
+
+            return displacement.astype(dtype, copy=False)
+        else:
+            logger.debug(f"Proc {i:d} does not have elements.")
+            return None
 
     def get_epsilon(self, i, norm, dtype):
         """Gets ``epsilon`` for a single slice ``i``."""
@@ -615,23 +664,28 @@ class Adios2HDF5(object):
                         adjacency_ds = self.DB.create_dataset(
                             'adjacency', P.vars['adj_shape'], dtype='i')
 
+                norm_disp = np.abs(P.get_displacement_minmax()).max()
+
+                self.DB.create_dataset(
+                    f"displacement/{_comp}/norm", data=norm_disp)
+
                 # Create epsilon for each components
-                disp_ds = self.DB.create_dataset(
-                    f'displacement/{_comp}/array', P.vars['epsilon_shape'],
+                displacement_ds = self.DB.create_dataset(
+                    f'displacement/{_comp}/array', P.vars['displacement_shape'],
                     dtype=self.precision,
-                    chunks=(6, 5, 5, 5, 1, P.vars['epsilon_shape'][-1]),
+                    chunks=(3, 1, P.vars['displacement_shape'][-1]),
                     compression=self.compression,
                     compression_opts=self.compression_opts,
                     shuffle=True
                 )
 
-                norm = np.abs(P.get_epsilon_minmax()).max()
+                norm_eps = np.abs(P.get_epsilon_minmax()).max()
+
+                self.DB.create_dataset(
+                    f"epsilon/{_comp}/norm", data=norm_eps)
 
                 if self.rank == 0:
-                    print(norm)
-
-                norm_ds = self.DB.create_dataset(
-                    f'epsilon/{_comp}/norm', data=norm)
+                    print(norm_eps)
 
                 # Create epsilon for each components
                 epsilon_ds = self.DB.create_dataset(
@@ -711,11 +765,19 @@ class Adios2HDF5(object):
 
                 self.comm.Barrier()
 
+                with displacement_ds.collective:
+                    if P.vars['NGLOB_LOCAL'][j] > 0:
+                        displacement_ds[
+                            :, P.vars['CNGLOB'][j]:P.vars['CNGLOB'][j+1], :
+                        ] = P.get_displacement(j, norm_disp, self.precision)
+
+                self.comm.Barrier()
+
                 with epsilon_ds.collective:
                     if P.vars['NGLOB_LOCAL'][j] > 0:
                         epsilon_ds[
                             :, :, :, :, P.vars['CNSPEC'][j]:P.vars['CNSPEC'][j+1], :
-                        ] = P.get_epsilon(j, norm, self.precision)
+                        ] = P.get_epsilon(j, norm_eps, self.precision)
 
                 if self.rank == 0:
                     t111 = time.time()

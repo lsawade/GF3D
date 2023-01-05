@@ -1,0 +1,6 @@
+# Station list for the Reciprocal database
+# Sensor information is only kept from the inventory. For most
+# stations all sensors are at the same location.
+#
+# Net.Sta,    Lat,    Lon,   Elev,    Bur, Sensor
+  II.BFO ,   48.3,    8.3,  638.0,  160.0, Streckeisen STS-1V/VBB Seismometer

@@ -192,17 +192,8 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     with h5py.File(stationfile, 'r') as db:
 
         factor = db['FACTOR'][()]
-        epsilond = dict()
         displacementd = dict()
         for _i, comp in enumerate(['N', 'E', 'Z']):
-            # offset = db[f'epsilon/{comp}/offset'][()]
-            norm = db[f'epsilon/{comp}/norm'][()]
-            epsilond[comp] = \
-                db[f'epsilon/{comp}/array'][
-                    :, :, :, :, ispec_selected, :
-            ].astype(np.float64) * norm / factor
-
-            print("Min/Max", epsilond[comp].min(), epsilond[comp].min())
 
             norm_disp = db[f'displacement/{comp}/norm'][()]
 
@@ -210,7 +201,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
             iglob = ibool[:, :, :, ispec_selected].flatten()
 
             # HDF5 can only access indeces in incresing order. So, we have to
-            #  sort the globs, and after we retreive the array unsort it and
+            # sort the globs, and after we retreive the array unsort it and
             # reshape it
             sglob = np.argsort(iglob)
             rsglob = np.argsort(sglob)
@@ -231,12 +222,10 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     hgamma, hpgamma = lagrange_any(gamma, xigll, npol)
 
     # Initialize epsilon array
-    sepsilon = np.zeros((3, 6, epsilond['N'].shape[-1]))
-    epsilon_disp = np.zeros((3, 6, epsilond['N'].shape[-1]))
+    epsilon = np.zeros((3, 6, NT))
     for k in range(NGLLZ):
         for j in range(NGLLY):
             for i in range(NGLLX):
-                hlagrange = hxi[i] * heta[j] * hgamma[k]
 
                 hlagrange_xi = hpxi[i] * heta[j] * hgamma[k]
                 hlagrange_eta = hxi[i] * hpeta[j] * hgamma[k]
@@ -247,22 +236,19 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
 
                 for _i, comp in enumerate(['N', 'E', 'Z']):
 
-                    sepsilon[_i, :, :] += hlagrange * \
-                        epsilond[comp][:, i, j, k, :]
-
-                    epsilon_disp[_i, 0, :] += displacementd[comp][0,
-                                                                  i, j, k, :] * hlagrange_x
-                    epsilon_disp[_i, 1, :] += displacementd[comp][1,
-                                                                  i, j, k, :] * hlagrange_y
-                    epsilon_disp[_i, 2, :] += displacementd[comp][2,
-                                                                  i, j, k, :] * hlagrange_z
-                    epsilon_disp[_i, 3, :] += 0.5 * (
+                    epsilon[_i, 0, :] += (
+                        displacementd[comp][0, i, j, k, :] * hlagrange_x)
+                    epsilon[_i, 1, :] += (
+                        displacementd[comp][1, i, j, k, :] * hlagrange_y)
+                    epsilon[_i, 2, :] += (
+                        displacementd[comp][2, i, j, k, :] * hlagrange_z)
+                    epsilon[_i, 3, :] += 0.5 * (
                         displacementd[comp][1, i, j, k, :] * hlagrange_x
                         + displacementd[comp][0, i, j, k, :] * hlagrange_y)
-                    epsilon_disp[_i, 4, :] += 0.5 * (
+                    epsilon[_i, 4, :] += 0.5 * (
                         displacementd[comp][2, i, j, k, :] * hlagrange_x
                         + displacementd[comp][0, i, j, k, :] * hlagrange_z)
-                    epsilon_disp[_i, 5, :] += 0.5 * (
+                    epsilon[_i, 5, :] += 0.5 * (
                         displacementd[comp][2, i, j, k, :] * hlagrange_y
                         + displacementd[comp][1, i, j, k, :] * hlagrange_z)
 
@@ -281,24 +267,16 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
 
     # Add traces to the
     traces = []
-    traces2 = []
 
     for _i, comp in enumerate(['N', 'E', 'Z']):
+
+        # Get displacement from strain
         data = np.sum(np.array([1., 1., 1., 2., 2., 2.])[:, None]
-                      * Mx[:, None] * np.squeeze(sepsilon[_i, :, :]), axis=0)
-        # data = timeshift(data, dt, 0.0)
+                      * Mx[:, None] * np.squeeze(epsilon[_i, :, :]), axis=0)
 
         # Convolution with Specfem Heaviside function
         data = np.real(
             fft.ifft(phshift * fft.fft(data, n=NP2) * STF_R))[:NT] * dt
-
-        data2 = np.sum(np.array([1., 1., 1., 2., 2., 2.])[:, None]
-                       * Mx[:, None] * np.squeeze(epsilon_disp[_i, :, :]), axis=0)
-        # data2 = timeshift(data2, dt, 0.0)
-
-        # Convolution with Specfem Heaviside function
-        data2 = np.real(
-            fft.ifft(phshift * fft.fft(data2, n=NP2) * STF_R))[:NT] * dt
 
         stats = Stats()
         stats.delta = dt
@@ -311,14 +289,9 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         stats.starttime = cmt.cmt_time - tc
         stats.npts = len(data)
         tr = Trace(data=data, header=stats)
-
         traces.append(tr)
 
-        tr2 = Trace(data=data2, header=stats)
-
-        traces2.append(tr2)
-
-    return Stream(traces), Stream(traces2), sepsilon, epsilon_disp
+    return Stream(traces)
 
 
 def get_seismograms_sub(stationfile: str, cmt: CMTSOLUTION):

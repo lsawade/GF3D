@@ -88,11 +88,6 @@ class ProcessAdios(object):
         self.vars['displacement_shape'] = (
             3, self.vars["NGLOB"], self.vars["NSTEPS"])
 
-        # epsilon/component
-        self.vars['epsilon_shape'] = (
-            6, self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
-            self.vars["NSPEC"], self.vars["NSTEPS"])
-
         # xyz
         self.vars['xyz_shape'] = (self.vars['NGLOB'], 3)
 
@@ -233,82 +228,6 @@ class ProcessAdios(object):
             logger.debug(f"Proc {i:d} does not have elements.")
             return None
 
-    def get_epsilon(self, i, norm, dtype):
-        """Gets ``epsilon`` for a single slice ``i``."""
-
-        # GLOBAL ARRAY DIMENSIONS
-        if "NGLOB" not in self.vars:
-            self.load_base_vars()
-
-        # To access rank specific variables
-        rankname = f'{i:d}'.zfill(5)
-
-        # Cube gll points
-        NGLL3 = self.vars['NGLLX'] * self.vars['NGLLY'] * self.vars['NGLLZ']
-
-        # Only store things if there are points
-        if self.vars['NGLOB_LOCAL'][i] > 0:
-            logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
-
-            epsilon = np.zeros(
-                (6, self.vars["NGLLX"], self.vars["NGLLY"], self.vars["NGLLZ"],
-                 self.vars['NSPEC_LOCAL'][i], self.vars["NSTEPS"]))
-
-            # Getting the epsilon
-            for _i, _l in enumerate(['xx', 'yy', 'zz', 'xy', 'xz', 'yz']):
-                logger.debug(f'... Loading strain component {_l}')
-                key = f'epsilon_{_l}'
-                local_dim = self.F.read(f'{key}/local_dim')[i]
-                offset = self.F.read(f'{key}/offset')[i]
-
-                epsilon[_i, :, :, :, :, :] = self.F.read(
-                    f'{key}/array', start=[offset],
-                    count=[NGLL3*self.vars['NSPEC_LOCAL'][i]],
-                    step_start=0, step_count=self.vars['NSTEPS'],
-                    block_id=0).transpose().reshape(
-                    NGLLX, NGLLY, NGLLZ, self.vars['NSPEC_LOCAL'][i],
-                    self.vars['NSTEPS'], order='F') / norm
-
-            return epsilon.astype(dtype, copy=False)
-        else:
-            logger.debug(f"Proc {i:d} does not have elements.")
-            return None
-
-    def get_epsilon_comp(self, i, comp):
-        """Gets ``epsilon`` for a single slice ``i``."""
-
-        # GLOBAL ARRAY DIMENSIONS
-        if "NGLOB" not in self.vars:
-            self.load_base_vars()
-
-        # To access rank specific variables
-        rankname = f'{i:d}'.zfill(5)
-
-        # Cube gll points
-        NGLL3 = self.vars['NGLLX'] * self.vars['NGLLY'] * self.vars['NGLLZ']
-
-        # Only store things if there are points
-        if self.vars['NGLOB_LOCAL'][i] > 0:
-            logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
-
-            # Getting the epsilon
-            logger.debug(f'... Loading strain component {comp}')
-            key = f'epsilon_{comp}'
-            local_dim = self.F.read(f'{key}/local_dim')[i]
-            offset = self.F.read(f'{key}/offset')[i]
-
-            epsilon_comp = self.F.read(
-                f'{key}/array', start=[offset],
-                count=[NGLL3*self.vars['NSPEC_LOCAL'][i]],
-                step_start=0, step_count=self.vars['NSTEPS'],
-                block_id=0).transpose().reshape(
-                NGLLX, NGLLY, NGLLZ, self.vars['NSPEC_LOCAL'][i], self.vars['NSTEPS'], order='F')
-
-            return epsilon_comp
-        else:
-            logger.debug(f"Proc {i:d} does not have elements.")
-            return None
-
     def get_adjacency(self, i):
 
         local_dim = self.F.read(f'xadj_gf/local_dim')[i]
@@ -322,7 +241,6 @@ class ProcessAdios(object):
             + self.vars['CNEIGH'][i]
 
         # count is always 1 more than number of elements
-
         local_dim = self.F.read(f'adjncy_gf/local_dim')[i]
         offset = self.F.read(f'adjncy_gf/offset')[i]
         adjacency = self.F.read(
@@ -679,24 +597,6 @@ class Adios2HDF5(object):
                     shuffle=True
                 )
 
-                norm_eps = np.abs(P.get_epsilon_minmax()).max()
-
-                self.DB.create_dataset(
-                    f"epsilon/{_comp}/norm", data=norm_eps)
-
-                if self.rank == 0:
-                    print(norm_eps)
-
-                # Create epsilon for each components
-                epsilon_ds = self.DB.create_dataset(
-                    f'epsilon/{_comp}/array', P.vars['epsilon_shape'],
-                    dtype=self.precision,
-                    chunks=(6, 5, 5, 5, 1, P.vars['epsilon_shape'][-1]),
-                    compression=self.compression,
-                    compression_opts=self.compression_opts,
-                    shuffle=True
-                )
-
                 j = slices[self.rank]
 
                 if self.rank == 0:
@@ -772,12 +672,6 @@ class Adios2HDF5(object):
                         ] = P.get_displacement(j, norm_disp, self.precision)
 
                 self.comm.Barrier()
-
-                with epsilon_ds.collective:
-                    if P.vars['NGLOB_LOCAL'][j] > 0:
-                        epsilon_ds[
-                            :, :, :, :, P.vars['CNSPEC'][j]:P.vars['CNSPEC'][j+1], :
-                        ] = P.get_epsilon(j, norm_eps, self.precision)
 
                 if self.rank == 0:
                     t111 = time.time()

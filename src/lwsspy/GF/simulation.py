@@ -1,14 +1,12 @@
 import os
 import subprocess
 import typing as tp
-from unittest.mock import NonCallableMagicMock
 from lwsspy.GF.stf import create_stf
 import numpy as np
 from copy import deepcopy
 from .source import FORCESOLUTION, CMTSOLUTION
 from . import utils
 from .logger import logger
-from pprint import pprint
 
 
 class Simulation:

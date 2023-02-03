@@ -1,9 +1,7 @@
-from multiprocessing.sharedctypes import Value
 import numpy as np
 import typing as tp
-from . import utils
 from .signal import filter
-from scipy import special, integrate
+from scipy import special
 
 
 def create_stf(

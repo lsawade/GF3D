@@ -1,6 +1,6 @@
 import numpy as np
 
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = "INFO"
 
 # Some constant numbers
 ONE: float = 1.0

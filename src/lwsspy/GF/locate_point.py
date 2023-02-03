@@ -2,24 +2,23 @@
 from scipy.spatial import KDTree
 import numpy as np
 from .constants import R_PLANET_KM, HUGEVAL
-from .constants_solver import NGLLX, NGLLY, NGLLZ, MIDX, MIDY, MIDZ, \
-    DO_ADJACENT_SEARCH as DAS, NGNOD, NUM_ITER
+from .constants_solver import DO_ADJACENT_SEARCH as DAS, NGNOD, NUM_ITER
 from .transformations.rthetaphi_xyz import xyz_2_latlon_minmax
 from .lagrange import gll_nodes
 from .hex_nodes import hex_nodes_anchor_ijk
 from .transformations.recompute_jacobian import recompute_jacobian
+from .logger import logger
 
 
 def locate_point(
         x_target, y_target, z_target, lat_target, lon_target,
         midpoints, x_store, y_store, z_store, ibool,
         USE_DISTANCE_CRITERION: bool = False, POINT_CAN_BE_BURIED: bool = True,
-        kdtree: KDTree | None = None,
-        xadj=None, adjacency=None,
-        do_adjacent_search: bool | None = None):
+        kdtree: KDTree | None = None, xadj=None, adjacency=None,
+        do_adjacent_search: bool | None = None, NGLL=5):
     """
     use constants_solver, only: &
-        NGLLX, NGLLY, NGLLZ, MIDX, MIDY, MIDZ, HUGEVAL, &
+        NGLLX, NGLLY, Z, MIDX, MIDY, MIDZ, HUGEVAL, &
         USE_DISTANCE_CRITERION
 
         use shared_parameters, only: R_PLANET_KM
@@ -83,7 +82,7 @@ def locate_point(
     # debug: sync
     #  do iproc = 0, NPROCTOT_VAL-1
     # if (iproc == myrank) then
-    # print *, 'iproc ', iproc; flush(6)
+    # logger.debug *, 'iproc ', iproc; flush(6)
 
     # set distance to huge initial value
     distmin_squared = HUGEVAL
@@ -92,9 +91,9 @@ def locate_point(
     # if we have not located a target element, the receiver is not in this slice
     # therefore use first element only for fictitious iterative search
     ispec_selected = 1
-    ix_initial_guess = MIDX
-    iy_initial_guess = MIDY
-    iz_initial_guess = MIDZ
+    ix_initial_guess = NGLL//2
+    iy_initial_guess = NGLL//2
+    iz_initial_guess = NGLL//2
 
     # limits latitude to[-90.0, 90.0]
     lat = lat_target
@@ -111,10 +110,10 @@ def locate_point(
     # don't split in slices!
     # ######################################################################
     # Get bounds
-    # print('    Get bounds...', flush=True)
+    # logger.debug('    Get bounds...')
     # lat_min, lat_max, lon_min, lon_max = xyz_2_latlon_minmax(
     #     x_store, y_store, z_store)
-    # print('    ...Done', flush=True)
+    # logger.debug('    ...Done')
     # # checks if source in this slice?
     # if (lat >= lat_min and lat <= lat_max and
     #         lon >= lon_min and lon <= lon_max):
@@ -124,7 +123,7 @@ def locate_point(
     # ######################################################################
     target_located = True
     # debug
-    # print *, 'target located:', target_located, 'lat', sngl(lat), sngl(lat_min), sngl(lat_max), 'lon', sngl(lon), sngl(lon_min), sngl(lon_max)
+    # logger.debug *, 'target located:', target_located, 'lat', sngl(lat), sngl(lat_min), sngl(lat_max), 'lon', sngl(lon), sngl(lon_min), sngl(lon_max)
 
     if not isinstance(kdtree, KDTree):
         kdtree = KDTree(midpoints)
@@ -134,16 +133,16 @@ def locate_point(
         # finds closest point(inside GLL points) in this chunk
         point_target = np.array([x_target, y_target, z_target])
 
-        print('    Querying KDTree...')
+        logger.debug('    Querying KDTree...')
         dist, ispec_selected = kdtree.query(point_target, k=1)
-        print('    ...Done')
+        logger.debug('    ...Done')
         # debug
-        # print *, 'kd-tree found location :', inode_min
+        # logger.debug *, 'kd-tree found location :', inode_min
 
         # loops over GLL points in this element to get(i, j, k) for initial guess
-        for k in range(NGLLZ):
-            for j in range(NGLLY):
-                for i in range(NGLLX):
+        for k in range(NGLL):
+            for j in range(NGLL):
+                for i in range(NGLL):
                     iglob = ibool[i, j, k, ispec_selected]
 
                     dist_squared = (
@@ -192,31 +191,34 @@ def locate_point(
         #      endif
 
         # gets xi/eta/gamma and corresponding x/y/z coordinates
-        print('    Finding local coordinates...', flush=True)
+        logger.debug('    Finding local coordinates...')
         xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = find_local_coordinates(
             x_target, y_target, z_target, ispec_selected,
             ix_initial_guess, iy_initial_guess, iz_initial_guess,
-            x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED)
-        print('    ...Done', flush=True)
+            x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED, NGLL=NGLL)
+
+        logger.debug('    ...Done')
         # loops over neighbors and try to find better location
         if (DO_ADJACENT_SEARCH):
+            logger.debug("    REALYY DOING THE ADJACENCY SEARCH")
             # checks if position lies on an element boundary
-            if (np.abs(xi) > 1.0990 or np.abs(eta) > 1.0990 or np.abs(gamma) > 1.0990):
-                print('    Doing Adjacent Search...', flush=True)
+            if ((np.abs(xi) > 1.0990) or (np.abs(eta) > 1.0990) or (np.abs(gamma) > 1.0990)):
+                logger.debug('    Doing Adjacent Search...')
                 # searches for better position in neighboring elements
+                logger.debug(
+                    "   REALYY DOING THE ADJACENCY SEARCH   on boundary")
 
                 xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = find_best_neighbor(
                     x_target, y_target, z_target, xi, eta, gamma, x, y, z,
                     xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz,
                     x_store, y_store, z_store, ibool, ispec_selected, distmin_squared,
-                    xadj, adjacency,
-                    POINT_CAN_BE_BURIED)
+                    xadj, adjacency, POINT_CAN_BE_BURIED, NGLL=NGLL)
 
                 # raise ValueError(
                 #     'Point found is outside element. and adjacent search is'
                 #     'not yet implmenented.')
 
-                print('    ...Done', flush=True)
+                logger.debug('    ...Done')
 
     else:
         # point not found in this slice
@@ -252,7 +254,7 @@ def find_local_coordinates(
         x_target, y_target, z_target, ispec_selected,
         ix_initial_guess: int, iy_initial_guess: int, iz_initial_guess: int,
         x_store, y_store, z_store, ibool,
-        POINT_CAN_BE_BURIED: bool = False):
+        POINT_CAN_BE_BURIED: bool = False, NGLL=5):
     """
     use constants_solver, only: &
         NGNOD, HUGEVAL, NUM_ITER
@@ -290,11 +292,11 @@ def find_local_coordinates(
     double precision : : gammax, gammay,gammaz
     """
     # Get anchors
-    anchor_iax, anchor_iay, anchor_iaz = hex_nodes_anchor_ijk()
+    anchor_iax, anchor_iay, anchor_iaz = hex_nodes_anchor_ijk(NGLL)
 
-    print("Anchors")
-    # print(anchor_iax)
-    print(anchor_iay)
+    logger.debug("Anchors")
+    # logger.debug(anchor_iax)
+    logger.debug(anchor_iay)
 
     # Get anchors
     xelm, yelm, zelm = np.zeros(NGNOD), np.zeros(NGNOD), np.zeros(NGNOD)
@@ -306,28 +308,28 @@ def find_local_coordinates(
         yelm[ia] = y_store[iglob]
         zelm[ia] = z_store[iglob]
 
-    print("Element coordinates")
-    print('x')
-    print(xelm)
-    print('y')
-    print(yelm)
-    print('z')
-    print(zelm)
-    print(' ')
+    logger.debug("Element coordinates")
+    logger.debug('x')
+    logger.debug(xelm)
+    logger.debug('y')
+    logger.debug(yelm)
+    logger.debug('z')
+    logger.debug(zelm)
+    logger.debug(' ')
 
     # GLL points and weights (degree)
-    xigll, _, _ = gll_nodes(NGLLX-1)
-    etagll, _, _ = gll_nodes(NGLLY-1)
-    gammagll, _, _ = gll_nodes(NGLLZ-1)
+    xigll, _, _ = gll_nodes(NGLL-1)
+    etagll, _, _ = gll_nodes(NGLL-1)
+    gammagll, _, _ = gll_nodes(NGLL-1)
 
     # use initial guess in xi and eta
     xi = xigll[ix_initial_guess]
     eta = etagll[iy_initial_guess]
     gamma = gammagll[iz_initial_guess]
 
-    print('Initial Guess')
-    print(xi, eta, gamma)
-    print('  ')
+    logger.debug('Initial Guess')
+    logger.debug(xi, eta, gamma)
+    logger.debug('  ')
 
     # impose receiver exactly at the surface
     if (not POINT_CAN_BE_BURIED):
@@ -336,8 +338,8 @@ def find_local_coordinates(
     d_min_sq = HUGEVAL
 
     # iterate to solve the non linear system
-    print("START", x_target, y_target, z_target)
-    print("     ", xi, eta, gamma)
+    logger.debug("START", x_target, y_target, z_target)
+    logger.debug("     ", xi, eta, gamma)
 
     for iter_loop in range(NUM_ITER):
 
@@ -351,7 +353,7 @@ def find_local_coordinates(
         dz = - (z - z_target)
 
         # debug
-        # print *,'  iter ',iter_loop,'dx',sngl(dx),sngl(dx_min),'dy',sngl(dy),sngl(dy_min),'dz',sngl(dz),sngl(dz_min),d_min_sq
+        # logger.debug *,'  iter ',iter_loop,'dx',sngl(dx),sngl(dx_min),'dy',sngl(dy),sngl(dy_min),'dz',sngl(dz),sngl(dz_min),d_min_sq
 
         # compute increments
         if ((dx**2 + dy**2 + dz**2) < d_min_sq):
@@ -378,15 +380,15 @@ def find_local_coordinates(
         # if (np.abs(dgamma) > 0.30 ) dgamma = sign(1.00,dgamma)*0.30
 
         # debug
-        # print *,'  dxi/..',(dxi**2 + deta**2 + dgamma**2),dxi,deta,dgamma
+        # logger.debug *,'  dxi/..',(dxi**2 + deta**2 + dgamma**2),dxi,deta,dgamma
 
         # update values
         xi = xi + dxi
         eta = eta + deta
         gamma = gamma + dgamma
 
-        print(f"    iter {iter_loop}", x, y, z)
-        print(f"                        ", xi, eta, gamma)
+        logger.debug(f"    iter {iter_loop}", x, y, z)
+        logger.debug(f"                        ", xi, eta, gamma)
 
         # impose that we stay in that element
         # (useful if user gives a receiver outside the mesh for instance)
@@ -404,7 +406,7 @@ def find_local_coordinates(
         if (gamma > 1.100):
             gamma = 1.100
         if (gamma < -1.100):
-            print('hello')
+            logger.debug('hello')
             gamma = -1.100
 
     # impose receiver exactly at the surface
@@ -428,9 +430,9 @@ def find_best_neighbor(
         x_store, y_store, z_store,
         ibool, ispec_selected: int,
         distmin_squared: float,
-        xadj, adjacency, POINT_CAN_BE_BURIED: bool = True):
+        xadj, adjacency, POINT_CAN_BE_BURIED: bool = True, NGLL=5):
 
-    print(ibool.shape)
+    logger.debug(ibool.shape)
     nspec = ibool.shape[-1]
     MAX_NEIGHBORS = 50
     DEBUG = True
@@ -462,7 +464,7 @@ def find_best_neighbor(
     #                   + (z_target - z)*(z_target - z)
 
     #   !debug
-    #   if (DEBUG) print *, 'neighbors: best guess ',ispec_selected,xi,eta,gamma,'distance',sngl(sqrt(distmin_squared)*R_PLANET_KM)
+    #   if (DEBUG) logger.debug *, 'neighbors: best guess ',ispec_selected,xi,eta,gamma,'distance',sngl(sqrt(distmin_squared)*R_PLANET_KM)
 
     # fill neighbors arrays
     #
@@ -479,7 +481,7 @@ def find_best_neighbor(
         ispec_ref = adjacency[ientry]
 
         if DEBUG:
-            print('ispec_ref', ispec_ref)
+            logger.debug('ispec_ref', ispec_ref)
         # checks
         if (ispec_ref < 0 or ispec_ref > nspec-1):
             raise ValueError(
@@ -544,9 +546,9 @@ def find_best_neighbor(
 
         # loop only on points inside the element
         # exclude edges to ensure this point is not shared with other elements
-        for k in range(1, NGLLZ-1):
-            for j in range(1, NGLLY-1):
-                for i in range(1, NGLLX-1):
+        for k in range(1, NGLL-1):
+            for j in range(1, NGLL-1):
+                for i in range(1, NGLL-1):
                     iglob = ibool[i, j, k, ispec]
                     dist_squared = (x_target - x_store[iglob])**2 \
                         + (y_target - y_store[iglob])**2 \
@@ -564,7 +566,7 @@ def find_best_neighbor(
         xi_n, eta_n, gamma_n, x_n, y_n, z_n, xix_n, xiy_n, xiz_n, etax_n, etay_n, etaz_n, gammax_n, gammay_n, gammaz_n = find_local_coordinates(
             x_target, y_target, z_target, ispec,
             ix_initial_guess, iy_initial_guess, iz_initial_guess,
-            x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED)
+            x_store, y_store, z_store, ibool, POINT_CAN_BE_BURIED, NGLL=NGLL)
 
         # final distance to target
         dist_squared = (x_target - x_n)*(x_target - x_n) \
@@ -573,7 +575,7 @@ def find_best_neighbor(
 
         # debug
         if DEBUG:
-            print(
+            logger.debug(
                 '  neighbor ', ispec, i_n, ientry, 'ispec = ', ispec_selected,
                 xi_n, eta_n, gamma_n, 'distance',
                 np.sqrt(dist_squared) * R_PLANET_KM,
@@ -606,7 +608,7 @@ def find_best_neighbor(
             break
 
     if (DEBUG):
-        print('neighbors: final ', ispec_selected, xi, eta, gamma,
-              'distance', np.sqrt(distmin_squared)*R_PLANET_KM)
+        logger.debug('neighbors: final ', ispec_selected, xi, eta, gamma,
+                     'distance', np.sqrt(distmin_squared)*R_PLANET_KM)
 
     return xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz

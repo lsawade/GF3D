@@ -377,6 +377,13 @@ class CMTSOLUTION:
 
         self.update_hdur()
 
+    @property
+    def Mw(self):
+        """
+        Moment magnitude M_w
+        """
+        return 2/3 * np.log10(7 + self.M0) - 10.73
+
     def pert(self, param: str, pert: float):
 
         outcmt = deepcopy(self)

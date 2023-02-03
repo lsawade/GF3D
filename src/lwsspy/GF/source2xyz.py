@@ -7,6 +7,7 @@ from .constants import PI_OVER_TWO, DEGREES_TO_RADIANS, ONE_MINUS_F_SQUARED, \
 from .get_topo_bathy import get_topo_bathy
 from .spline_eval import spline_evaluation
 from .transformations.rthetaphi_xyz import lat_2_geocentric_colat, reduce_geocentric
+from .logger import logger
 
 
 def source2xyz(
@@ -31,8 +32,8 @@ def source2xyz(
     phi = lon*DEGREES_TO_RADIANS
     theta, phi = reduce_geocentric(theta, phi)
 
-    print("lat  ", lat, "lon", lon)
-    print("theta", theta, "phi", phi)
+    logger.debug("lat  ", lat, "lon", lon)
+    logger.debug("theta", theta, "phi", phi)
 
     sint = np.sin(theta)
     cost = np.cos(theta)
@@ -112,8 +113,8 @@ def source2xyz(
     # normalized source radius
     r0 = R_UNIT_SPHERE
 
-    print('depth  ', depth)
-    print('RPLANET', R_PLANET)
+    logger.debug('depth  ', depth)
+    logger.debug('RPLANET', R_PLANET)
 
     # finds elevation of position
     if topography:
@@ -134,7 +135,7 @@ def source2xyz(
         elevation = get_topo_bathy(
             lat, lon, ibathy_topo, NX_BATHY, NY_BATHY, RESOLUTION_TOPO_FILE)
 
-        print(elevation)
+        logger.debug(elevation)
 
         r0 = r0 + elevation/R_PLANET
 
@@ -164,14 +165,14 @@ def source2xyz(
         ell = spline_evaluation(rspl, ellipicity_spline,
                                 ellipicity_spline2, radius)
 
-        print("ELL", ell, "p20", p20)
+        logger.debug("ELL", ell, "p20", p20)
         # this is eq(14.4) in Dahlen and Tromp(1998)
         r0 = r0*(1.0-(2.0/3.0)*ell*p20)
 
     # stores surface radius for info output
     r0_source = r0
 
-    print("rsource", r0_source)
+    logger.debug("rsource", r0_source)
 
     # subtracts source depth(given in m)
     r_target = r0 - depth/R_PLANET

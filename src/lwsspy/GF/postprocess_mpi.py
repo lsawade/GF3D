@@ -1,20 +1,15 @@
-from scipy.spatial import KDTree  # Only import to avoid a certain error message
-import time
-import logging
-import sys
-import toml
-import typing as tp
-from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ
-import numpy as np
-import adios2
-import traceback
-import matplotlib.pyplot as plt
 from mpi4py import MPI
+import numpy as np
 import h5py
 from lwsspy.GF.simulation import Simulation
+import adios2
+# from scipy.spatial import KDTree  # Only import to avoid a certain error message
+import time
+import logging
+from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ
+
+import traceback
 from lwsspy.GF.utils import read_toml
-from pprint import pprint
-# from lwsspy.GF.postprocess import ProcessAdios
 
 # if tp.TYPE_CHECKING:
 #     from adios2 import File  # type: ignore
@@ -208,7 +203,8 @@ class ProcessAdios(object):
             logger.debug(f'{self.vars["NGLOB_LOCAL"][i]} -- {rankname}')
 
             displacement = np.zeros(
-                (3, self.vars['NGLOB_LOCAL'][i], self.vars["NSTEPS"]))
+                (3, self.vars['NGLOB_LOCAL'][i], self.vars["NSTEPS"]),
+                dtype=dtype)
 
             logger.debug(f'... Loading displacement')
             key = f'displacement'
@@ -223,7 +219,8 @@ class ProcessAdios(object):
                 3, self.vars['NGLOB_LOCAL'][i],
                 self.vars['NSTEPS'], order='F') / norm
 
-            return displacement.astype(dtype, copy=False)
+            logger.debug(f'Displacement ... {displacement.dtype}')
+            return displacement
         else:
             logger.debug(f"Proc {i:d} does not have elements.")
             return None
@@ -403,8 +400,11 @@ class Adios2HDF5(object):
 
         # Compression
         if compression is not None:
-            if compression in ['lzf', 'gzip', 'szip']:
-                self.compression = compression
+            if compression in ['lzf', 'gzip', 'szip', 'None']:
+                if compression == 'None':
+                    self.compression = None
+                else:
+                    self.compression = compression
             else:
                 raise ValueError(f'Compression {compression} not implemented')
 
@@ -591,13 +591,19 @@ class Adios2HDF5(object):
                 displacement_ds = self.DB.create_dataset(
                     f'displacement/{_comp}/array', P.vars['displacement_shape'],
                     dtype=self.precision,
-                    chunks=(3, 1, P.vars['displacement_shape'][-1]),
-                    compression=self.compression,
-                    compression_opts=self.compression_opts,
-                    shuffle=True
+                    chunks=(3, 1, P.vars['displacement_shape'][-1])
+                    # shuffle=True,
+                    # compression=self.compression,
+                    # compression_opts=self.compression_opts
                 )
 
                 j = slices[self.rank]
+                logger.debug(
+                    f"Displacement Shape: { P.vars['displacement_shape']}")
+                logger.debug(
+                    f"CNSPEC {j:>02d}: {P.vars['CNSPEC'][j]} {P.vars['CNSPEC'][j+1]}")
+                logger.debug(
+                    f"CNGLOB {j:>02d}: {P.vars['CNGLOB'][j]} {P.vars['CNGLOB'][j+1]}")
 
                 if self.rank == 0:
                     t000 = time.time()
@@ -665,35 +671,67 @@ class Adios2HDF5(object):
 
                 self.comm.Barrier()
 
-                with displacement_ds.collective:
-                    if P.vars['NGLOB_LOCAL'][j] > 0:
+                if P.vars['NGLOB_LOCAL'][j] > 0:
+
+                    # disp = P.get_displacement(j, norm_disp, self.precision)
+                    # disp = np.ascontiguousarray(disp, dtype=self.precision)
+
+                    disp = (self.rank+1)*np.ones(
+                        (3, P.vars['CNGLOB'][j+1] -
+                         P.vars['CNGLOB'][j], P.vars['NSTEPS']),
+                        dtype=self.precision)
+                    disp[:, :, :] = P.get_displacement(
+                        j, norm_disp, self.precision)
+
+                    logger.debug(
+                        f"Rank {j:>03d} Shape of get displacement {np.shape(disp)}")
+                    logger.debug(
+                        f"Rank {j:>03d} type of get displacement {disp.dtype}")
+                    logger.debug(
+                        f"Rank {j:>03d} CNGLOB: {P.vars['CNGLOB'][j]:d} : {P.vars['CNGLOB'][j+1]:d}")
+                    logger.debug(
+                        f"Rank {j:>03d} {disp.flags}")
+
+                    logger.debug(
+                        f"Rank {j:>03d} ISNAN-SUM = {np.sum(np.isnan(disp))}")
+                    logger.debug(
+                        f"Rank {j:>03d} ISINF-SUM = {np.sum(np.isinf(disp))}")
+
+                    self.comm.Barrier()
+
+                    with displacement_ds.collective:
                         displacement_ds[
                             :, P.vars['CNGLOB'][j]:P.vars['CNGLOB'][j+1], :
-                        ] = P.get_displacement(j, norm_disp, self.precision)
+                        ] = disp
 
+                    del disp
+
+                logger.debug('Hello this is after the writing')
                 self.comm.Barrier()
 
                 if self.rank == 0:
                     t111 = time.time()
-                    print(72*'-')
+                    print(72*'-', flush=True)
                     print(
-                        f'+ --> Writing arrays for slice {j} took {t111-t000:.1f} seconds')
-                    print(72*'-')
+                        f'+ --> Writing arrays for slice {j} took {t111-t000:.1f} seconds',
+                        flush=True)
+                    print(72*'-', flush=True)
 
             # self.comm.Barrier()
 
             if self.rank == 0:
                 t11 = time.time()
-                print(72*'+')
+                print(72*'+', flush=True)
                 print(
-                    f'+ --> Writing arrays for component {_comp} took {t11-t00:.1f} seconds')
-                print(72*'+')
+                    f'+ --> Writing arrays for component {_comp} took {t11-t00:.1f} seconds',
+                    flush=True)
+                print(72*'+', flush=True)
 
         if self.rank == 0:
             t1 = time.time()
-            print(72*'=')
-            print(f'      All arrays took {t1-t0:.1f} seconds')
-            print(72*'=')
+            print(72*'=', flush=True)
+            print(f'      All arrays took {t1-t0:.1f} seconds', flush=True)
+            print(72*'=', flush=True)
 
     def open(self):
         self.DB = h5py.File(self.h5file, 'w', driver='mpio', comm=self.comm)

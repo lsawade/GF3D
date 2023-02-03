@@ -3,7 +3,7 @@ system = [ "nnodes.job", "Traverse",]
 name = "Database maker"
 nnodes = 8
 account = "GEO111"
-walltime = 360.0
+walltime = 480.0
 gap = 50.0
 debug = true
 
@@ -11,11 +11,11 @@ debug = true
 task = [ "workflow", "main",]
 workflowname = "Making a database right now, yeaah!"
 db = "/scratch/gpfs/lsawade/SpecfemMagicGF/DB"
-station_file = "stations_BFO.txt"
+station_file = "stations.txt"
 creation = true
 simulation = true
 processing = true
-clear = true
+clear = false
 
 [root.cfg]
 specfemdir = "/scratch/gpfs/lsawade/SpecfemMagicGF/specfem3d_globe"
@@ -40,4 +40,4 @@ overwrite = false
 
 [root.processparams]
 precision = "half"
-compression = "gzip"
+compression = "None"

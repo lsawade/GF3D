@@ -138,7 +138,7 @@ def hex_nodes():
     return iaddx, iaddy, iaddz
 
 
-def hex_nodes_anchor_ijk():
+def hex_nodes_anchor_ijk(NGLL):
     """
     gets control point indices
 
@@ -158,6 +158,9 @@ def hex_nodes_anchor_ijk():
     # define topology of the control element
     iaddx, iaddy, iaddr = hex_nodes()
 
+    # NGLL setup
+    MID = NGLL//2
+
     # define(i, j, k) indices of the control/anchor points of the elements
     for ia in range(NGNOD):
         # control point index
@@ -165,9 +168,9 @@ def hex_nodes_anchor_ijk():
         if (iaddx[ia] == 0):
             iax = 0
         elif (iaddx[ia] == 1):
-            iax = MIDX
+            iax = MID
         elif (iaddx[ia] == 2):
-            iax = NGLLX-1
+            iax = NGLL-1
         else:
             raise ValueError('incorrect value of iaddx')
 
@@ -177,9 +180,9 @@ def hex_nodes_anchor_ijk():
         if (iaddy[ia] == 0):
             iay = 0
         elif (iaddy[ia] == 1):
-            iay = MIDY
+            iay = MID
         elif (iaddy[ia] == 2):
-            iay = NGLLY-1
+            iay = NGLL-1
         else:
             raise ValueError('incorrect value of iaddy')
 
@@ -189,9 +192,9 @@ def hex_nodes_anchor_ijk():
         if (iaddr[ia] == 0):
             iaz = 0
         elif (iaddr[ia] == 1):
-            iaz = MIDZ
+            iaz = MID
         elif (iaddr[ia] == 2):
-            iaz = NGLLZ - 1
+            iaz = NGLL - 1
         else:
             raise ValueError('incorrect value of iaddz')
 

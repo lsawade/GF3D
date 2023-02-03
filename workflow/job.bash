@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J Database-maker
-#SBATCH -t 06:00:00
+#SBATCH -t 08:00:00
 #SBATCH -N 8
 #SBATCH --ntasks-per-node=32
 #SBATCH --cpus-per-task=4
@@ -12,6 +12,8 @@
 
 cd /scratch/gpfs/lsawade/SpecfemMagicGF/
 source ./00_compilations_parameters.sh
+cd /home/lsawade/thirdparty/python/ph5py-testing
+source vars.sh
 cd /home/lsawade/lwsspy/lwsspy.GF/workflow
 
 

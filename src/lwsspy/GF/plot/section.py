@@ -7,7 +7,7 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
 from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.plot.utill import plot_label
+from lwsspy.GF.plot.util import plot_label
 
 
 def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,

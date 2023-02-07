@@ -15,7 +15,7 @@ import typing as tp
 from scipy.optimize import minimize
 
 # Internal
-from lwsspy.plot import plot_label
+from lwsspy.GF.plot.util import plot_label
 from lwsspy.GF.source import CMTSOLUTION
 from lwsspy.GF.seismograms import SGTManager
 from lwsspy.GF.process import process_stream, select_pairs

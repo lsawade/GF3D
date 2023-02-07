@@ -1,5 +1,5 @@
 import os
-from lwsspy.plot import plot_label
+from lwsspy.GF.plot.util import plot_label
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np

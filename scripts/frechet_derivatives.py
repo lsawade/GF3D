@@ -7,7 +7,7 @@ from obspy import Stream
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from lwsspy.plot import plot_label
+from lwsspy.GF.plot.util import plot_label
 from lwsspy.GF.source import CMTSOLUTION
 # from lwsspy.GF.postprocess import Adios2HDF5
 from lwsspy.GF.seismograms import get_seismograms, get_frechet

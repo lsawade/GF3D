@@ -9,7 +9,7 @@ from .lagrange import lagrange_any, gll_nodes
 from obspy import read
 from time import sleep
 from copy import deepcopy
-from lwsspy.plot import plot_label
+from lwsspy.GF.plot.utill import plot_label
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
@@ -334,7 +334,8 @@ for _dir in dirs:
 
                 ax.plot(tr.times(), tr.data, 'k',
                         lw=0.75, label='Forward')
-                ax.plot(tr.times(), s[2, :], 'r--', lw=0.75, label=f'Fw-GF {_dir}')
+                ax.plot(tr.times(), s[2, :], 'r--',
+                        lw=0.75, label=f'Fw-GF {_dir}')
                 ax.plot(tr.times(), z/z.max() *
                         tr.data.max(), 'b:', lw=0.75, label=f'Reciprocal {_dir}')
                 ax.plot(tr.times(), tr.data-z/z.max() *

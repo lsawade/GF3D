@@ -7,7 +7,6 @@ import adios2
 import matplotlib.pyplot as plt
 from lwsspy.GF.lagrange import lagrange_any, gll_nodes
 from obspy import read
-# from lwsspy.plot import plot_label
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()

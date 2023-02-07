@@ -13,7 +13,7 @@ import matplotlib.axes
 from matplotlib.gridspec import GridSpec
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-from lwsspy.plot import plot_label
+from lwsspy.GF.plot.util import plot_label
 from lwsspy.GF.source import CMTSOLUTION
 from lwsspy.GF.postprocess import Adios2HDF5
 from lwsspy.GF.seismograms import \
@@ -229,6 +229,9 @@ fw = read(os.path.join(specfemmagic,
 
 # %%  Process tracess
 
+def process_stream(st: Stream):
+    st.filter('bandpass', freqmin=1/300.0, freqmax=1/40.0, zerophase=True)
+
 
 if True:
     process_stream(rp)
@@ -321,7 +324,7 @@ fig.autofmt_xdate()
 plt.subplots_adjust(
     left=0.1, right=0.9, bottom=0.2, top=0.85, hspace=0.2)
 
-plt.savefig('proof.pdf', dpi=300)
+plt.savefig('element_subsampling.pdf', dpi=300)
 
 
 # %% Get seismograms

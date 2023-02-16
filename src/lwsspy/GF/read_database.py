@@ -9,7 +9,7 @@ from .lagrange import lagrange_any, gll_nodes
 from obspy import read
 from time import sleep
 from copy import deepcopy
-from lwsspy.GF.plot.utill import plot_label
+from lwsspy.GF.plot.util import plot_label
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()

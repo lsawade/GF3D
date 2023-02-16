@@ -1,5 +1,6 @@
 from obspy import Stream
-from obspy.geodetics.base import locations2degrees
+from obspy.geodetics.base import locations2degrees, gps2dist_azimuth
+
 import typing as tp
 import numpy as np
 import matplotlib.axes
@@ -16,7 +17,7 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
                 limits: tp.Tuple[float] | None = None,
                 newsyn: Stream or None = None,
                 newcmt: CMTSOLUTION or None = None,
-                ** kwargs):
+                **kwargs):
 
     plt.rcParams["font.family"] = "monospace"
 
@@ -28,25 +29,41 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
         plottitle = False
 
     # Get a single component
-    pobs = obs.select(component=comp)
-    psyn = syn.select(component=comp)
+    pobs = obs.select(component=comp).copy()
+    psyn = syn.select(component=comp).copy()
 
     if newsyn is not None:
-        pnewsyn = newsyn.select(component=comp)
+        pnewsyn = newsyn.select(component=comp).copy()
     else:
         pnewsyn = None
 
-    # Get station event distances, labels
+        # Get station event distances, labels
     for _i, (_obs, _syn) in enumerate(zip(pobs, psyn)):
-        dist = locations2degrees(
-            _syn.stats.latitude, _syn.stats.longitude,
-            cmt.latitude, cmt.longitude)
+        # Assign lats/lons
+        latA = cmt.latitude
+        lonA = cmt.longitude
+        latB = _syn.stats.latitude
+        lonB = _syn.stats.longitude
 
+        # Compute distance
+        dist = locations2degrees(latA, lonA, latB, lonB)
+
+        # Compute azimuth
+        # dist_in_m, az_A2B_deg, az_B2A_deg = gps2dist_azimuth
+        _, az_A2B_deg, az_B2A_deg = gps2dist_azimuth(latA, lonA, latB, lonB)
+
+        # Add info to traces
         _obs.stats.distance = dist
         _syn.stats.distance = dist
+        _obs.stats.azimuth = az_A2B_deg
+        _syn.stats.azimuth = az_A2B_deg
+        _obs.stats.backazimuth = az_B2A_deg
+        _syn.stats.backazimuth = az_B2A_deg
 
         if pnewsyn:
-            setattr(pnewsyn[_i].stats, 'distance', dist)
+            pnewsyn[_i].stats.distance = dist
+            pnewsyn[_i].stats.azimuth = az_A2B_deg
+            pnewsyn[_i].stats.backazimuth = az_B2A_deg
 
     # Sort the stream
     pobs.sort(keys=['distance', 'network', 'station'])
@@ -56,12 +73,13 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
         pnewsyn.sort(keys=['distance', 'network', 'station'])
 
     # Get scaling
-    absmax = np.max(pobs.max())
+    absmax = np.max([np.max(np.abs(_tr.data)) for _tr in pobs])
+
     plot_label(ax, f'max|u|: {absmax:.5g} m',
                fontsize='small', box=False, dist=0.0, location=4)
 
     # Plot label
-    plot_label(ax, f'{comp} component',
+    plot_label(ax, f'{comp}', fontweight='bold',
                fontsize='medium', box=False, dist=0.0, location=1)
 
     # Number of stations
@@ -70,24 +88,36 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
     # Set ylabels
     # Set text labels and properties.
     # , rotation=20)
-    ax.set_yticks(y, [f"{tr.stats.network}.{tr.stats.station}" for tr in pobs])
-
+    ax.set_yticks(
+        y, [f"{tr.stats.network}.{tr.stats.station}" for tr in pobs],
+        verticalalignment='center',
+        horizontalalignment='right')
     # TO have epicentral distances on the right
     ax2 = ax.secondary_yaxis("right")
-    ax2.set_yticks(y, [f"{tr.stats.distance:>6.2f}" for tr in pobs])
+    ax2.set_yticks(
+        y, [f"D:{tr.stats.distance:>6.2f}\nA:{tr.stats.azimuth:>6.2f}" for tr in pobs],
+        verticalalignment='center',
+        horizontalalignment='left', fontsize='x-small')
     ax2.spines.right.set_visible(False)
     ax2.tick_params(left=False, right=False)
 
     # Normalize
     for _i, (_obs, _syn, _y) in enumerate(zip(pobs, psyn, y)):
-        plt.plot(_obs.times('matplotlib'), _obs.data / absmax + _y, 'k',
-                 *args, **kwargs)
-        plt.plot(_syn.times('matplotlib'), _syn.data / absmax + _y, 'r',
-                 *args, **kwargs)
+
+        plt.plot(
+            _obs.times('matplotlib'),
+            _obs.data / absmax + _y, 'k',
+            *args, **kwargs)
+        plt.plot(
+            _syn.times('matplotlib'),
+            _syn.data / absmax + _y, 'r',
+            *args, **kwargs)
 
         if pnewsyn:
-            plt.plot(pnewsyn[_i].times('matplotlib'), pnewsyn[_i].data / absmax + _y, 'b',
-                     *args, **kwargs)
+            plt.plot(
+                pnewsyn[_i].times('matplotlib'),
+                pnewsyn[_i].data / absmax + _y, 'b',
+                *args, **kwargs)
 
     # Remove all spines
     ax.spines.top.set_visible(False)

@@ -7,7 +7,7 @@ import warnings
 import numpy as np
 from obspy import UTCDateTime
 from copy import deepcopy
-from obspy.imaging.beachball import beach
+from obspy.imaging.mopad_wrapper import beach
 from matplotlib import transforms  # For beachball fix
 
 
@@ -348,6 +348,12 @@ class CMTSOLUTION:
         return np.array([self.Mrr, self.Mtt, self.Mpp, self.Mrt, self.Mrp, self.Mtp])
 
     @property
+    def fulltensor(self):
+        return np.array([[self.Mrr, self.Mrt, self.Mrp],
+                         [self.Mrt, self.Mtt, self.Mtp],
+                         [self.Mrp, self.Mtp, self.Mpp]])
+
+    @property
     def cmt_time(self):
         return self.origin_time + self.time_shift
 
@@ -440,7 +446,7 @@ class CMTSOLUTION:
         bb.set(clip_on=clip_on)
 
         # This fixes pdf output issue
-        bb.set_transform(transforms.Affine2D(np.identity(3)))
+        # bb.set_transform(transforms.Affine2D(np.identity(3)))
 
         ax.add_collection(bb)
 

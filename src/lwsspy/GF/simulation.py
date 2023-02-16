@@ -21,12 +21,12 @@ class Simulation:
     def __init__(
             self,
             specfemdir,
-            stationdir,
-            station_latitude: float,
-            station_longitude: float,
-            station_burial: float,
-            network: str,
-            station: str,
+            stationdir: str | None = None,
+            station_latitude: float | None = None,
+            station_longitude: float | None = None,
+            station_burial: float | None = None,
+            network: str | None = None,
+            station: str | None = None,
             target_file: str | None = None,
             target_latitude: float | np.ndarray | tp.Iterable | None = None,
             target_longitude: float | np.ndarray | tp.Iterable | None = None,
@@ -162,32 +162,37 @@ class Simulation:
                 raise ValueError(
                     'For forward test CMTSOLUTION must be provided')
 
-    def create(self, no_specfem=False):
+    def create_specfem(self):
         """Actually creates all necessary directories, after .setup() is run."""
 
-        if not no_specfem:
-            if self.forward_test:
+        # Specfem not updated
+        if self.forward_test:
 
-                self.logger.debug('Creating Forward Test directory.')
+            self.logger.debug('Creating Forward Test directory.')
 
-                # Copy specfemdirectory
-                copytreecmd = f"""
-                rsync -av \
-                    --include='.git/logs' \
-                    --exclude='run00*' \
-                    --exclude='.*' \
-                    --exclude='EXAMPLES' \
-                    --exclude='tests' \
-                    --exclude='utils' \
-                    --exclude='doc' \
-                    --exclude='DATABASES_MPI/*' \
-                    --exclude='obj/*' \
-                    --exclude='bin/*' \
-                    --delete \
-                    {self.specfemdir}/ {self.specfemdir_forward}"""
+            # Copy specfemdirectory
+            copytreecmd = f"""
+            rsync -av \
+                --include='.git/logs' \
+                --exclude='run00*' \
+                --exclude='.*' \
+                --exclude='EXAMPLES' \
+                --exclude='tests' \
+                --exclude='utils' \
+                --exclude='doc' \
+                --exclude='DATABASES_MPI/*' \
+                --exclude='obj/*' \
+                --exclude='bin/*' \
+                --delete \
+                {self.specfemdir}/ {self.specfemdir_forward}"""
 
-                subprocess.check_call(copytreecmd, shell=True)
+            subprocess.check_call(copytreecmd, shell=True)
 
+        # After syncing since these would get overwritten otherwise
+        self.write_Par_file()
+        self.update_constants()
+
+    def create(self):
         # make rundirs
         for _comp, _compdict in self.compdict.items():
 
@@ -233,10 +238,6 @@ class Simulation:
         # Write Rotation files
         self.logger.debug('Updating constants.h.in ...')
 
-        # Specfem not updated
-        if not no_specfem:
-            self.update_constants()
-
         # Update forces and STATIONS
         self.update_forces_and_stations()
 
@@ -255,9 +256,6 @@ class Simulation:
         """Setting up the directory structure for specfem."""
         # Mostly setting up paths
         # self.specfemdir = os.path.abspath(self.specfemdir)
-
-        # Source Time Function file
-        self.stf_file = os.path.join(self.specfemdir, 'DATA', 'stf')
 
         # Constants file has to be updated for reciprocal simulations
         self.constants_file = os.path.join(
@@ -282,11 +280,12 @@ class Simulation:
             self.par_file, savecomments=True, verbose=False)
 
         # Print statement showing the setup
-        self.compdict = dict(
-            N=dict(dir=os.path.join(self.stationdir, 'N', 'specfem')),
-            E=dict(dir=os.path.join(self.stationdir, 'E', 'specfem')),
-            Z=dict(dir=os.path.join(self.stationdir, 'Z', 'specfem'))
-        )
+        if self.station is not None:
+            self.compdict = dict(
+                N=dict(dir=os.path.join(self.stationdir, 'N', 'specfem')),
+                E=dict(dir=os.path.join(self.stationdir, 'E', 'specfem')),
+                Z=dict(dir=os.path.join(self.stationdir, 'Z', 'specfem'))
+            )
 
         if self.forward_test:
             self.setup_forward()
@@ -664,6 +663,11 @@ class Simulation:
         pardict['USE_BUFFER_ELEMENTS'] = self.use_element_buffer
         pardict['NUMBER_OF_BUFFER_ELEMENTS'] = self.element_buffer
 
+        if 'NSTEP' in pardict:
+            pardict.pop('NSTEP')
+        if 'T0' in pardict:
+            pardict.pop('T0')
+
         # IF runs have to be parallel
         if self.simultaneous_runs:
             pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 3
@@ -674,7 +678,8 @@ class Simulation:
 
         if self.subsample:
             pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
-            if self.ndt_requested is not None:
+            if (self.ndt_requested is not None) and (self.station is not None):
+
                 pardict['NSTEP'] = self.nstep
                 pardict['T0'] = self.t0
                 pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
@@ -683,74 +688,67 @@ class Simulation:
             pardict['NTSTEP_BETWEEN_FRAMES'] = 1
             pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
 
-            if 'NSTEP' in pardict:
-                pardict.pop('NSTEP')
-            if 'T0' in pardict:
-                pardict.pop('T0')
+        if self.station is not None:
+            # Write Par_file for each separate component directory
+            for _comp, _compdict in self.compdict.items():
 
-        # pardict['DT'] = self.dt
+                # Don't write first Par_file since it is in the
+                # Main directory
+                par_file = os.path.join(_compdict['dir'], 'DATA', 'Par_file')
 
-        par_file = os.path.join(self.specfemdir, 'DATA', 'Par_file')
+                # Write Par file for each sub dir
+                utils.write_par_file(pardict, par_file)
 
-        # Write separate Par file for main specfem directory
-        utils.write_par_file(pardict, par_file)
+        else:
+            # Par_file location
+            par_file = os.path.join(self.specfemdir, 'DATA', 'Par_file')
 
-        # Write Par_file for each separate component directory
-        for _comp, _compdict in self.compdict.items():
-
-            # Don't write first Par_file since it is in the
-            # Main directory
-            par_file = os.path.join(_compdict['dir'], 'DATA', 'Par_file')
-
-            # Write Par file for each sub dir
+            # Write separate Par file for main specfem directory
             utils.write_par_file(pardict, par_file)
 
-        if self.forward_test:
+            # Write even more separate Par file for a forward test directory
+            if self.forward_test:
 
-            # modify Reciprocal Par_file
-            pardict = deepcopy(self.pardict)
-            pardict['SAVE_GREEN_FUNCTIONS'] = False
-            pardict['USE_FORCE_POINT_SOURCE'] = False
+                # modify Reciprocal Par_file
+                pardict = deepcopy(self.pardict)
+                pardict['SAVE_GREEN_FUNCTIONS'] = False
+                pardict['USE_FORCE_POINT_SOURCE'] = False
 
-            pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
-            pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
+                pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
+                pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
 
-            pardict['USE_BUFFER_ELEMENTS'] = False
-            pardict['NUMBER_OF_BUFFER_ELEMENTS'] = 0
+                pardict['USE_BUFFER_ELEMENTS'] = False
+                pardict['NUMBER_OF_BUFFER_ELEMENTS'] = 0
 
-            # Force STF print
-            if self.subsample:
-                pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
-            else:
-                pardict['PRINT_SOURCE_TIME_FUNCTION'] = True
-
-            if self.subsample:
-                if self.ndt_requested is not None:
-                    pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
-
-                if self.use_forward_stf:
-                    pardict['NSTEP'] = self.nstep
-                    pardict['T0'] = self.t0
-                else:
-                    # For now so that specfem makes it's
-                    if 'NSTEP' in pardict:
-                        pardict.pop('NSTEP')
-                    if 'T0' in pardict:
-                        pardict.pop('T0')
-
-                    pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
-
-            else:
-                pardict['NTSTEP_BETWEEN_FRAMES'] = 1
-                pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
-
+                # For now so that specfem makes it's
                 if 'NSTEP' in pardict:
                     pardict.pop('NSTEP')
                 if 'T0' in pardict:
                     pardict.pop('T0')
 
-            # Write Par_file
-            utils.write_par_file(pardict, self.par_file_forward)
+                # Force STF print
+                if self.subsample:
+                    pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
+                else:
+                    pardict['PRINT_SOURCE_TIME_FUNCTION'] = True
+
+                if self.subsample:
+                    if (self.ndt_requested is not None) and (self.station is not None):
+                        pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
+
+                    if self.use_forward_stf:
+                        pardict['NSTEP'] = self.nstep
+                        pardict['T0'] = self.t0
+                    else:
+                        pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
+
+                else:
+                    pardict['NTSTEP_BETWEEN_FRAMES'] = 1
+                    pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
+
+                # Write Par_file
+
+                utils.write_par_file(pardict, self.par_file_forward)
 
     def __str__(self) -> str:
 
@@ -758,10 +756,11 @@ class Simulation:
         rstr += "Reciprocal Simulation Setup:\n"
         rstr += "-----------------------------\n"
         rstr += f"Specfem basedir:{self.specfemdir:.>56}\n"
-        rstr += f"E:{self.compdict['E']['dir']:.>70}\n"
-        rstr += f"N:{self.compdict['N']['dir']:.>70}\n"
-        rstr += f"Z:{self.compdict['Z']['dir']:.>70}\n"
-        rstr += "\n"
+        if self.station is not None:
+            rstr += f"E:{self.compdict['E']['dir']:.>70}\n"
+            rstr += f"N:{self.compdict['N']['dir']:.>70}\n"
+            rstr += f"Z:{self.compdict['Z']['dir']:.>70}\n"
+            rstr += "\n"
         rstr += f"Force Factor:{self.force_factor:.>59.4g}\n"
         rstr += f"T0:{self.t0:.>69.4f}\n"
         rstr += f"TC:{self.tc:.>69.4f}\n"

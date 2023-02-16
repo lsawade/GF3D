@@ -272,10 +272,14 @@ def write_par_file(pardict: OrderedDict, par_file: str | None = None, write_comm
                 continue
 
             # Fix the parfile print depending on whether value has comment
-            if f'{key}-comment' in pardict and write_comments:
-                outstr = f'{key:31s} = {par2par_file(value):<s}   # {pardict[f"{key}-comment"]:<s}\n'
-            else:
-                outstr = f"{key:31s} = {par2par_file(value):<s}\n"
+            try:
+                if f'{key}-comment' in pardict and write_comments:
+                    outstr = f'{key:31s} = {par2par_file(value):<s}   # {pardict[f"{key}-comment"]:<s}\n'
+                else:
+                    outstr = f"{key:31s} = {par2par_file(value):<s}\n"
+            except ValueError as e:
+                raise ValueError(
+                    f'Key: {key} has value {value}. Par2parfile is not implemented for that type.')
 
             # Print string or write to file
             if f is not None:

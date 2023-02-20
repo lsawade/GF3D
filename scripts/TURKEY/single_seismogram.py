@@ -6,7 +6,7 @@
 import matplotlib
 from copy import deepcopy
 import toml
-from lwsspy.GF.seismograms import SGTManager
+from lwsspy.GF.seismograms import GFManager
 from obspy import read, Stream
 import os
 import numpy as np

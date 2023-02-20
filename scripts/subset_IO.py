@@ -15,7 +15,7 @@ import typing as tp
 # Internal
 from gf3d.plot.util import plot_label
 from gf3d.source import CMTSOLUTION
-from gf3d.seismograms import SGTManager
+from gf3d.seismograms import GFManager
 from gf3d.process import process_stream, select_pairs
 from gf3d.plot.section import plotsection
 from gf3d.download import download_stream
@@ -36,17 +36,17 @@ h5files = os.path.join(specfemmagic, 'DB', '*', '*', '*.h5')
 cmt = CMTSOLUTION.read('/home/lsawade/lwsspy/gf3d/scripts/DATA/CHILE_CMT')
 
 # %% Initialize the GF manager
-sgt = SGTManager(glob(h5files)[:])
-sgt.load_header_variables()
-sgt.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 1, NGLL=3)
+gfm = GFManager(glob(h5files)[:])
+gfm.load_header_variables()
+gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 1, NGLL=3)
 
 # %% Write a subset
-sgt.write_subset(subsetfilename, duration=3600.0)
+gfm.write_subset(subsetfilename, duration=3600.0)
 
 # %% load a subset
 
-sgtsub = SGTManager(subsetfilename)
-sgtsub.load()
+gfsub = GFManager(subsetfilename)
+gfsub.load()
 
 
 # %% Download data
@@ -55,7 +55,7 @@ raw, inv = download_stream(
     cmt.origin_time,
     duration=3600,
     network='II,IU',
-    station=','.join(sgtsub.stations),
+    station=','.join(gfsub.stations),
     location='00',
     channel='LH*',
     starttimeoffset=-300,
@@ -71,7 +71,7 @@ inv.write(stationxml, format='STATIONXML')
 
 # %% Get a bunch of seismograms
 
-rp = sgtsub.get_seismograms(cmt)
+rp = gfsub.get_seismograms(cmt)
 
 # %% Process
 

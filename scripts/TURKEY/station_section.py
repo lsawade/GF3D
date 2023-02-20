@@ -16,7 +16,7 @@ import typing as tp
 # Internal
 from lwsspy.GF.plot.util import plot_label
 from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.seismograms import SGTManager
+from lwsspy.GF.seismograms import GFManager
 from lwsspy.GF.process import process_stream, select_pairs, process_stream_trace_by_trace
 from lwsspy.GF.plot.section import plotsection
 from lwsspy.GF.plot.section_aligned import plotsection_aligned, get_azimuth_distance_traveltime, filter_stations
@@ -34,9 +34,9 @@ cmt = CMTSOLUTION.read(
     '/home/lsawade/lwsspy/lwsspy.GF/scripts/TURKEY/DATA/CMTSOLUTION')
 
 # %% Initialize the GF manager
-sgt = SGTManager(glob(h5files)[:])
-sgt.load_header_variables()
-sgt.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 1)
+gfm = GFManager(glob(h5files)[:])
+gfm.load_header_variables()
+gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 1)
 
 # %% Download data
 
@@ -57,7 +57,7 @@ endtime = cmt.origin_time + 1800 + 300
 minimum_length = 0.9
 reject_channels_with_gaps = False
 network = 'KO,TU,MP,GO,II,IU,A2,GE,AB,HC,HP,HT,HL,RO'
-station = ','.join(sgt.stations)
+station = ','.join(gfm.stations)
 channel = None,
 location = None,
 providers = ['EIDA', 'IRIS', 'GEOFON', 'GFZ']  # list(URL_MAPPINGS.keys())
@@ -110,7 +110,7 @@ raw.merge(fill_value=0)
 # %% Get a bunch of seismograms
 
 # cmt = CMTSOLUTION.read('/scratch/gpfs/lsawade/SpecfemMagicGF/CMTSOLUTION')
-rp = sgt.get_seismograms(cmt)
+rp = gfm.get_seismograms(cmt)
 
 
 # %% Process

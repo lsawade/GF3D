@@ -15,7 +15,7 @@ from cartopy import crs
 # Internal
 from gf3d.plot.util import plot_label
 from gf3d.source import CMTSOLUTION
-from gf3d.seismograms import SGTManager
+from gf3d.seismograms import GFManager
 from gf3d.process import process_stream, select_pairs
 from gf3d.plot.section import plotsection
 from gf3d.plot.section_aligned import plotsection_aligned, get_azimuth_distance_traveltime, filter_stations
@@ -35,11 +35,11 @@ cmt = CMTSOLUTION.read(
     '/home/lsawade/lwsspy/gf3d//scripts/DATA/CHILE_CMT')
 
 # %% Initialize the GF manager
-sgt = SGTManager(glob(h5files)[:])
-sgt.load_header_variables()
+gfm = GFManager(glob(h5files)[:])
+gfm.load_header_variables()
 
 t0 = time.time()
-sgt.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 30)
+gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 30)
 print(72*"=")
 print(f"Retrieving elements took {time.time() - t0:.0f} seconds.")
 
@@ -49,7 +49,7 @@ raw, inv = download_stream(
     cmt.origin_time,
     duration=4*3600,
     network='II,IU',
-    station=','.join(sgt.stations),
+    station=','.join(gfm.stations),
     location='00',
     channel='LH*',
     starttimeoffset=-300,
@@ -100,7 +100,7 @@ m_init_scaled = m_init/scaling_vector
 def optfunc(x_scaled, data, compute_gradient=True):
 
     # Get input data
-    [initcmt, obs, sgt, keys, scaling_vector, duration] = data  # get data block
+    [initcmt, obs, gfm, keys, scaling_vector, duration] = data  # get data block
 
     # Create model vector
     newcmt = deepcopy(cmt)
@@ -112,7 +112,7 @@ def optfunc(x_scaled, data, compute_gradient=True):
         setattr(newcmt, _key, _x)
 
     # Forward model
-    syn = process_stream(sgt.get_seismograms(
+    syn = process_stream(gfm.get_seismograms(
         newcmt), cmt=initcmt, duration=duration)
 
     # Sort pairs
@@ -120,7 +120,7 @@ def optfunc(x_scaled, data, compute_gradient=True):
 
     # Frechet derivatives
     if compute_gradient:
-        fsyn = sgt.get_frechet(newcmt)
+        fsyn = gfm.get_frechet(newcmt)
         pfsyn = dict()
         for _parameter, _fstream in fsyn.items():
 
@@ -164,7 +164,7 @@ def optfunc(x_scaled, data, compute_gradient=True):
 # %% Setting up the inversion
 
 # Data
-data = [cmt, obs, sgt, keys, scaling_vector, 4.0*3600]
+data = [cmt, obs, gfm, keys, scaling_vector, 4.0*3600]
 
 # Constraints
 # cons = ({'type': 'ineq', 'fun': lambda x:  x[5] + x[6] + x[7]},)
@@ -192,7 +192,7 @@ print(72*"=")
 print(f"Optimization took {time.time() - t0:.0f} seconds.")
 
 # %% Get new synthetics
-syn = process_stream(sgt.get_seismograms(cmt), cmt=cmt, duration=4*3600)
+syn = process_stream(gfm.get_seismograms(cmt), cmt=cmt, duration=4*3600)
 
 
 newcmt = []
@@ -215,7 +215,7 @@ for x in Wits:
     # Appending the CMT solution to list
     newcmt.append(ncmt)
     newsyn.append(process_stream(
-        sgt.get_seismograms(ncmt), cmt=cmt, duration=4*3600))
+        gfm.get_seismograms(ncmt), cmt=cmt, duration=4*3600))
 
     # Compute coset
     cost, _ = optfunc(x, data, compute_gradient=False)

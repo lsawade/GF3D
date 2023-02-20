@@ -9,7 +9,7 @@ from scipy.optimize import minimize
 # Internal
 from lwsspy.GF.plot.util import plot_label
 from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.seismograms import SGTManager
+from lwsspy.GF.seismograms import GFManager
 from lwsspy.GF.process import process_stream, select_pairs
 
 # %% Files
@@ -18,7 +18,7 @@ from obspy import read, read_inventory
 
 # Internal
 from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.seismograms import SGTManager
+from lwsspy.GF.seismograms import GFManager
 from lwsspy.GF.process import process_stream, select_pairs
 from lwsspy.GF.plot.section import plotsection
 from lwsspy.GF.plot.optimization import plot_panel, plot_summary
@@ -31,9 +31,9 @@ cmt = CMTSOLUTION.read(
     '/home/lsawade/lwsspy/lwsspy.GF/scripts/DATA/single_element_read/CMTSOLUTION')
 
 # Load subset
-sgtsub = SGTManager(
+gfsub = GFManager(
     "/home/lsawade/lwsspy/lwsspy.GF/scripts/DATA/single_element_read/single_element.h5")
-sgtsub.load()
+gfsub.load()
 
 # Load Observed Data
 raw = read(
@@ -75,7 +75,7 @@ m_init_scaled = m_init/scaling_vector
 def optfunc(x_scaled, data, compute_gradient=True):
 
     # Get input data
-    [initcmt, obs, sgt, keys, scaling_vector, duration] = data  # get data block
+    [initcmt, obs, gfm, keys, scaling_vector, duration] = data  # get data block
 
     # Create model vector
     newcmt = deepcopy(cmt)
@@ -87,7 +87,7 @@ def optfunc(x_scaled, data, compute_gradient=True):
         setattr(newcmt, _key, _x)
 
     # Forward model
-    syn = process_stream(sgt.get_seismograms(
+    syn = process_stream(gfm.get_seismograms(
         newcmt), cmt=initcmt, duration=duration)
 
     # Sort pairs
@@ -95,7 +95,7 @@ def optfunc(x_scaled, data, compute_gradient=True):
 
     # Frechet derivatives
     if compute_gradient:
-        fsyn = sgt.get_frechet(newcmt)
+        fsyn = gfm.get_frechet(newcmt)
         pfsyn = dict()
         for _parameter, _fstream in fsyn.items():
 
@@ -139,7 +139,7 @@ def optfunc(x_scaled, data, compute_gradient=True):
 # %% Setting up the inversion
 
 # Data
-data = [cmt, obs, sgt, keys, scaling_vector, 4.0*3600]
+data = [cmt, obs, gfm, keys, scaling_vector, 4.0*3600]
 
 # Constraints
 cons = ({'type': 'ineq', 'fun': lambda x:  x[5] + x[6] + x[7]},)
@@ -172,8 +172,8 @@ newcmt = deepcopy(cmt)
 for _key, _x, _scale in zip(keys, Wits[-1], scaling_vector):
     setattr(newcmt, _key, _x * _scale)
 
-syn = process_stream(sgt.get_seismograms(cmt), cmt=cmt, duration=4*3600)
-newsyn = process_stream(sgt.get_seismograms(newcmt), cmt=cmt, duration=4*3600)
+syn = process_stream(gfm.get_seismograms(cmt), cmt=cmt, duration=4*3600)
+newsyn = process_stream(gfm.get_seismograms(newcmt), cmt=cmt, duration=4*3600)
 
 
 # %% Get new synthetics

@@ -17,7 +17,7 @@ from gf3d.plot.util import plot_label
 from gf3d.source import CMTSOLUTION
 from gf3d.postprocess import Adios2HDF5
 from gf3d.seismograms import \
-    get_seismograms, get_seismograms_sub, get_frechet, SGTManager
+    get_seismograms, get_seismograms_sub, get_frechet, GFManager
 from gf3d.simulation import Simulation
 from gf3d.stf import create_stf
 
@@ -104,17 +104,17 @@ h5files = f'/scratch/gpfs/lsawade/SpecfemMagicGF/DB/*/*/*.h5'
 cmt = CMTSOLUTION.read('/scratch/gpfs/lsawade/SpecfemMagicGF/CMTSOLUTION')
 
 
-sgt = SGTManager(glob(h5files)[:])
+gfm = GFManager(glob(h5files)[:])
 
-sgt.load_header_variables()
+gfm.load_header_variables()
 
-sgt.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 30)
+gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 30)
 
 
 # %% Get a bunch of seismograms
 
 cmt = CMTSOLUTION.read('/scratch/gpfs/lsawade/SpecfemMagicGF/CMTSOLUTION')
-rp = sgt.get_seismograms(cmt)
+rp = gfm.get_seismograms(cmt)
 
 # %% Process seismograms
 
@@ -213,7 +213,7 @@ cmt = CMTSOLUTION.read('/scratch/gpfs/lsawade/SpecfemMagicGF/CMTSOLUTION')
 
 # %% Get reciprocal synthetics
 # for pert in np.arange(-1.0, 1.0):
-rp = sgt.get_seismogram(cmt)
+rp = gfm.get_seismogram(cmt)
 
 # %%
 

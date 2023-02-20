@@ -5,7 +5,7 @@ from obspy import read, read_inventory, Stream
 
 # Internal
 from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.seismograms import SGTManager
+from lwsspy.GF.seismograms import GFManager
 from lwsspy.GF.process import process_stream, select_pairs
 from lwsspy.GF.plot.section_aligned import plotsection_aligned, get_azimuth_distance_traveltime, filter_stations
 
@@ -17,9 +17,9 @@ cmt = CMTSOLUTION.read(
     '/home/lsawade/lwsspy/lwsspy.GF/scripts/DATA/single_element_read/CMTSOLUTION')
 
 # Load subset
-sgtsub = SGTManager(
+gfsub = GFManager(
     "/home/lsawade/lwsspy/lwsspy.GF/scripts/DATA/single_element_read/single_element.h5")
-sgtsub.load()
+gfsub.load()
 
 # Load Observed Data
 raw = read(
@@ -30,7 +30,7 @@ inv = read_inventory(
 
 # %% Get a bunch of seismograms
 
-rp = sgtsub.get_seismograms(cmt)
+rp = gfsub.get_seismograms(cmt)
 
 
 # %% Process

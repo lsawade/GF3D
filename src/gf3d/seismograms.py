@@ -108,7 +108,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     * returns Stream() containing all three components
 
     Use this function ONLY if your goal is retrieveing a single seismogram for
-    a single station. Otherwise, please use the SGTManager. It makes more sense
+    a single station. Otherwise, please use the GFManager. It makes more sense
     if your goal is to perform source inversion using a set of stations, and/or
     a single station, but the location may change.
 
@@ -316,7 +316,7 @@ def get_seismograms_sub(stationfile: str, cmt: CMTSOLUTION):
     * returns Stream() containing all three components
 
     Use this function ONLY if your goal is retrieveing a single seismogram for
-    a single station. Otherwise, please use the SGTManager. It makes more sense
+    a single station. Otherwise, please use the GFManager. It makes more sense
     if your goal is to perform source inversion using a set of stations, and/or
     a single station, but the location may change.
 
@@ -504,7 +504,7 @@ def get_seismograms_sub(stationfile: str, cmt: CMTSOLUTION):
     return Stream(traces)
 
 
-class SGTManager(object):
+class GFManager(object):
     """
     This class expects that your DB list is completely consistent. Meaning all
     station databases have been created using the exact same GF_LOCATIONS file,
@@ -559,7 +559,7 @@ class SGTManager(object):
     adjacency: np.ndarray | None = None
 
     def __init__(self, db: list[str] | str) -> None:
-        """Initializes the SGT manager"""
+        """Initializes the gfm manager"""
 
         # List of station files
         self.db = db
@@ -1089,7 +1089,7 @@ class SGTManager(object):
         """Given the files in the database, get a set of strains and write it
         into to a single file in a single epsilon array.
         Also write a list of stations and normal header info required for
-        source location. This very same SGTManager would be used to read the.
+        source location. This very same GFManager would be used to read the.
         Where """
 
         with h5py.File(outfile, 'w') as db:
@@ -1155,7 +1155,7 @@ class SGTManager(object):
         """Given the files in the database, get a set of strains and write it
         into to a single file in a single epsilon array.
         Also write a list of stations and normal header info required for
-        source location. This very same SGTManager would be used to read the.
+        source location. This very same GFManager would be used to read the.
         Where """
 
         self.header = dict()

@@ -67,7 +67,7 @@ pobs, psyn = select_pairs(obs, syn)
 
 starttime = psyn[0].stats.starttime + 0
 endtime = starttime + 4*3600
-limits = (starttime.datetime, endtime.datetime)
+limits = (starttime, endtime)
 
 # Plots a section of observed and synthetic
 plotsection(pobs, psyn, cmt, comp='Z', lw=0.75, limits=limits)

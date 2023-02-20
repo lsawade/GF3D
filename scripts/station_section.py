@@ -28,7 +28,7 @@ specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
 h5files = os.path.join(specfemmagic, 'DB', '*', '*', '*.h5')
 
 # CMTSOLUTION
-cmt = CMTSOLUTION.read('/home/lsawade/lwsspy/gf3d/scripts/DATA/CHILE_CMT')
+cmt = CMTSOLUTION.read('/home/lsawade/GF3D/scripts/DATA/CHILE_CMT')
 
 # %% Initialize the GF manager
 gfm = GFManager(glob(h5files)[:])

@@ -1,4 +1,4 @@
-from obspy import Stream
+from obspy import Stream, UTCDateTime
 from obspy.geodetics.base import locations2degrees, gps2dist_azimuth
 
 import typing as tp
@@ -14,15 +14,15 @@ from gf3d.plot.util import plot_label
 def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
                 *args,
                 ax: matplotlib.axes.Axes | None = None, comp='Z',
-                limits: tp.Tuple[float] | None = None,
+                limits: tp.Tuple[UTCDateTime] | None = None,
                 newsyn: Stream or None = None,
-                newcmt: CMTSOLUTION or None = None,
+                newcmt: CMTSOLUTION or None = None, scale: float = 1.0,
                 **kwargs):
 
     plt.rcParams["font.family"] = "monospace"
 
     if ax is None:
-        plt.figure(figsize=(9, 6))
+        plt.figure(figsize=(10, 6))
         ax = plt.axes()
         plottitle = True
     else:
@@ -73,7 +73,13 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
         pnewsyn.sort(keys=['distance', 'network', 'station'])
 
     # Get scaling
-    absmax = np.max([np.max(np.abs(_tr.data)) for _tr in pobs])
+    if limits:
+        slicestart = limits[0]
+        sliceend = limits[1]
+        absmax = np.max([np.max(np.abs(_tr.copy().slice(slicestart, sliceend).data))
+                        for _tr in pobs])
+    else:
+        absmax = np.max([np.max(np.abs(_tr.data)) for _tr in pobs])
 
     plot_label(ax, f'max|u|: {absmax:.5g} m',
                fontsize='small', box=False, dist=0.0, location=4)
@@ -91,11 +97,12 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
     ax.set_yticks(
         y, [f"{tr.stats.network}.{tr.stats.station}" for tr in pobs],
         verticalalignment='center',
-        horizontalalignment='right')
+        horizontalalignment='right',
+        fontsize='small')
     # TO have epicentral distances on the right
     ax2 = ax.secondary_yaxis("right")
     ax2.set_yticks(
-        y, [f"D:{tr.stats.distance:>6.2f}\nA:{tr.stats.azimuth:>6.2f}" for tr in pobs],
+        y, [f"D:{tr.stats.distance:>6.2f} A:{tr.stats.azimuth:>6.2f}" for tr in pobs],
         verticalalignment='center',
         horizontalalignment='left', fontsize='x-small')
     ax2.spines.right.set_visible(False)
@@ -106,17 +113,17 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
 
         plt.plot(
             _obs.times('matplotlib'),
-            _obs.data / absmax + _y, 'k',
+            _obs.data / absmax * scale + _y, 'k',
             *args, **kwargs)
         plt.plot(
             _syn.times('matplotlib'),
-            _syn.data / absmax + _y, 'r',
+            _syn.data / absmax * scale + _y, 'r',
             *args, **kwargs)
 
         if pnewsyn:
             plt.plot(
                 pnewsyn[_i].times('matplotlib'),
-                pnewsyn[_i].data / absmax + _y, 'b',
+                pnewsyn[_i].data / absmax * scale + _y, 'b',
                 *args, **kwargs)
 
     # Remove all spines
@@ -131,7 +138,7 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
         mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
 
     if limits is not None:
-        ax.set_xlim(limits)
+        ax.set_xlim([lim.datetime for lim in limits])
 
     plt.xlabel('Time')
 
@@ -144,8 +151,8 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
 
         else:
             title = (
-                f"{cmt.cmt_time.ctime()} Loc: {cmt.latitude:.2f}dg, {cmt.longitude:.2f}dg, {cmt.depth:.1f}km - BP: [40s, 300s]")
+                f"{cmt.cmt_time.ctime()} Loc: {cmt.latitude:.2f}dg, {cmt.longitude:.2f}dg, {cmt.depth:.1f}km - BP: [20s, 50s]")
         ax.set_title(title, loc='left', ha='left', fontsize='small')
-        plt.subplots_adjust(left=0.1, right=0.9, top=0.925)
+        plt.subplots_adjust(left=0.1, right=0.85, top=0.925)
 
         return ax

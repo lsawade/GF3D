@@ -617,14 +617,6 @@ class Simulation:
                        self.station_burial*1.0e3)
                 )
 
-                # Add test source as station for reference
-                if self.forward_test:
-                    f.write(
-                        "%-9s %5s %15.4f %12.4f %10.1f %6.1f\n"
-                        % ('SRC', 'EQ', self.cmt.latitude, self.cmt.longitude,
-                           0.0, self.cmt.depth*1.0e3)
-                    )
-
         if self.forward_test:
             # write stations file with one line
             with open(self.stations_file_forward, 'w') as f:

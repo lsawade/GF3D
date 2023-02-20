@@ -296,7 +296,7 @@ def find_local_coordinates(
 
     logger.debug("Anchors")
     # logger.debug(anchor_iax)
-    logger.debug(anchor_iay)
+    logger.debug(f"{anchor_iay}")
 
     # Get anchors
     xelm, yelm, zelm = np.zeros(NGNOD), np.zeros(NGNOD), np.zeros(NGNOD)
@@ -310,11 +310,11 @@ def find_local_coordinates(
 
     logger.debug("Element coordinates")
     logger.debug('x')
-    logger.debug(xelm)
+    logger.debug(f"{xelm}")
     logger.debug('y')
-    logger.debug(yelm)
+    logger.debug(f"{yelm}")
     logger.debug('z')
-    logger.debug(zelm)
+    logger.debug(f"{zelm}")
     logger.debug(' ')
 
     # GLL points and weights (degree)
@@ -328,7 +328,7 @@ def find_local_coordinates(
     gamma = gammagll[iz_initial_guess]
 
     logger.debug('Initial Guess')
-    logger.debug(xi, eta, gamma)
+    logger.debug(f"{xi}, {eta}, {gamma}")
     logger.debug('  ')
 
     # impose receiver exactly at the surface
@@ -338,8 +338,8 @@ def find_local_coordinates(
     d_min_sq = HUGEVAL
 
     # iterate to solve the non linear system
-    logger.debug("START", x_target, y_target, z_target)
-    logger.debug("     ", xi, eta, gamma)
+    logger.debug(f"START: {x_target}, {y_target}, {z_target}")
+    logger.debug(f"       {xi}, {eta}, {gamma}")
 
     for iter_loop in range(NUM_ITER):
 
@@ -387,8 +387,8 @@ def find_local_coordinates(
         eta = eta + deta
         gamma = gamma + dgamma
 
-        logger.debug(f"    iter {iter_loop}", x, y, z)
-        logger.debug(f"                        ", xi, eta, gamma)
+        logger.debug(f"    iter {iter_loop}: {x}, {y}, {z}")
+        logger.debug(f"                      {xi}, {eta}, {gamma}")
 
         # impose that we stay in that element
         # (useful if user gives a receiver outside the mesh for instance)
@@ -406,7 +406,6 @@ def find_local_coordinates(
         if (gamma > 1.100):
             gamma = 1.100
         if (gamma < -1.100):
-            logger.debug('hello')
             gamma = -1.100
 
     # impose receiver exactly at the surface
@@ -432,7 +431,7 @@ def find_best_neighbor(
         distmin_squared: float,
         xadj, adjacency, POINT_CAN_BE_BURIED: bool = True, NGLL=5):
 
-    logger.debug(ibool.shape)
+    logger.debug(f"iboolshape: {ibool.shape}")
     nspec = ibool.shape[-1]
     MAX_NEIGHBORS = 50
     DEBUG = True
@@ -481,7 +480,7 @@ def find_best_neighbor(
         ispec_ref = adjacency[ientry]
 
         if DEBUG:
-            logger.debug('ispec_ref', ispec_ref)
+            logger.debug(f'ispec_ref {ispec_ref}')
         # checks
         if (ispec_ref < 0 or ispec_ref > nspec-1):
             raise ValueError(
@@ -576,10 +575,10 @@ def find_best_neighbor(
         # debug
         if DEBUG:
             logger.debug(
-                '  neighbor ', ispec, i_n, ientry, 'ispec = ', ispec_selected,
-                xi_n, eta_n, gamma_n, 'distance',
-                np.sqrt(dist_squared) * R_PLANET_KM,
-                np.sqrt(distmin_squared)*R_PLANET_KM)
+                f'  neighbor  {ispec}, {i_n}, {ientry} ispec = {ispec_selected},'
+                f'{xi_n}, {eta_n}, {gamma_n} distance: '
+                f'{np.sqrt(dist_squared) * R_PLANET_KM} '
+                f'mindist: {np.sqrt(distmin_squared)*R_PLANET_KM}')
 
         # takes this point if it is closer to the receiver
         # (we compare squared distances instead of distances themselves to significantly speed up calculations)
@@ -608,7 +607,7 @@ def find_best_neighbor(
             break
 
     if (DEBUG):
-        logger.debug('neighbors: final ', ispec_selected, xi, eta, gamma,
-                     'distance', np.sqrt(distmin_squared)*R_PLANET_KM)
+        logger.debug(f'neighbors: final {ispec_selected}   {xi}, {eta}, {gamma},'
+                     f'distance: {np.sqrt(distmin_squared)*R_PLANET_KM}')
 
     return xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz

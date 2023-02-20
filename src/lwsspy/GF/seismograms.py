@@ -143,7 +143,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         do_adjacency_search = db['USE_BUFFER_ELEMENTS'][()]
 
         if do_adjacency_search:
-            logger.debug('adj', do_adjacency_search)
+            logger.debug(f'adj {do_adjacency_search}')
             xadj = db['xadj'][:]
             adjacency = db['adjacency'][:]
         else:
@@ -258,11 +258,14 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     # This computes the half duration for the new STF from the
     hdur_r = np.sqrt((cmt.hdur / 1.628)**2 - hdur**2)
 
+    logger.debug(
+        f"CMT hdur: {cmt.hdur:.3f}, GF DB hdur: {hdur:.3f} -> Used hdur: {hdur_r}")
+
     # Heaviside STF to reproduce SPECFEM stf
-    _, stf_r = create_stf(0, 400.0, NT, dt, hdur_r,
+    _, stf_r = create_stf(0, 200.0, NT, dt, hdur_r,
                           cutoff=None, gaussian=False, lpfilter='butter')
     STF_R = fft.fft(stf_r, n=NP2)
-    shift = -400.0
+    shift = -200.0
     phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2, dt)*2*np.pi)
 
     # Add traces to the
@@ -839,8 +842,7 @@ class SGTManager(object):
                     self.header['nsteps']
                 ))
 
-                logger.debug("Arraylength:", len(self.nglob2sub))
-                logger.debug(self.nglob2sub[::100])
+                logger.debug("Arraylength: {len(self.nglob2sub)}")
 
                 self.Ndb
                 self.networks = self.Ndb * [None]
@@ -852,7 +854,7 @@ class SGTManager(object):
                 def read_stuff(args):
                     _i, db = args
 
-                    logger.debug(_i, db)
+                    logger.debug(f'{_i}: {db}')
                     network = db['Network'][()].decode("utf-8")
                     station = db['Station'][()].decode("utf-8")
                     self.networks[_i] = network
@@ -860,7 +862,7 @@ class SGTManager(object):
                     self.latitudes[_i] = db['latitude'][()]
                     self.longitudes[_i] = db['longitude'][()]
 
-                    logger.debug("Reading", network, station)
+                    logger.debug(f"Reading {network}.{station}")
 
                     # Get force factor specific to file
                     factor = db['FACTOR'][()]
@@ -962,7 +964,7 @@ class SGTManager(object):
         # Since the database is the same for all
         seismograms = np.einsum('hijo,j->hio', epsilon[:, :, :, :], M)
 
-        logger.debug("SEISUM:", np.sum(seismograms))
+        logger.debug(f"SEISUM: {np.sum(seismograms)}")
 
         # For following FFTs
         NP2 = next_power_of_2(2 * self.header['nsteps'])

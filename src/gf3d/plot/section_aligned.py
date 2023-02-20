@@ -8,8 +8,8 @@ import matplotlib.axes
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
-from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.plot.util import plot_label
+from gf3d.source import CMTSOLUTION
+from gf3d.plot.util import plot_label
 
 
 def get_azimuth_distance_traveltime(

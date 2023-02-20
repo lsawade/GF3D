@@ -20,7 +20,7 @@ stationdir = os.path.join(specfemmagic, 'DB', 'II', 'BFO')
 h5file = os.path.join(stationdir,  'II.BFO.h5')
 
 # %% Get CMTSOLUTION
-cmt = CMTSOLUTION.read('CMTSOLUTION')
+cmt = CMTSOLUTION.read('/home/lsawade/GF3D/scripts/DATA/CMTSOLUTION')
 
 # %% Define Processing function
 

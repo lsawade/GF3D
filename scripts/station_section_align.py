@@ -4,29 +4,29 @@ import matplotlib.pyplot as plt
 from obspy import read, read_inventory, Stream
 
 # Internal
-from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.seismograms import GFManager
-from lwsspy.GF.process import process_stream, select_pairs
-from lwsspy.GF.plot.section_aligned import plotsection_aligned, get_azimuth_distance_traveltime, filter_stations
+from gf3d.source import CMTSOLUTION
+from gf3d.seismograms import GFManager
+from gf3d.process import process_stream, select_pairs
+from gf3d.plot.section_aligned import plotsection_aligned, get_azimuth_distance_traveltime, filter_stations
 
 
 # %% Files
 
 # CMTSOLUTION
 cmt = CMTSOLUTION.read(
-    '/home/lsawade/lwsspy/lwsspy.GF/scripts/DATA/single_element_read/CMTSOLUTION')
+    '/home/lsawade/GF3D/scripts/DATA/single_element_read/CMTSOLUTION')
 
 # Load subset
 gfsub = GFManager(
-    "/home/lsawade/lwsspy/lwsspy.GF/scripts/DATA/single_element_read/single_element.h5")
+    "/home/lsawade/GF3D/scripts/DATA/single_element_read/single_element.h5")
 gfsub.load()
 
 # Load Observed Data
 raw = read(
-    "/home/lsawade/lwsspy/lwsspy.GF/scripts/DATA/single_element_read/traces/*.SAC")
+    "/home/lsawade/GF3D/scripts/DATA/single_element_read/traces/*.SAC")
 
 inv = read_inventory(
-    "/home/lsawade/lwsspy/lwsspy.GF/scripts/DATA/single_element_read/station.xml")
+    "/home/lsawade/GF3D/scripts/DATA/single_element_read/station.xml")
 
 # %% Get a bunch of seismograms
 

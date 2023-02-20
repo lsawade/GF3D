@@ -2,22 +2,21 @@ from scipy.spatial import KDTree  # Only import to avoid a certain error message
 import time
 import logging
 import sys
-import toml
-from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ
 import numpy as np
 import adios2
 import traceback
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 import h5py
-from lwsspy.GF.simulation import Simulation
-from lwsspy.GF.utils import read_toml
+from gf3d.simulation import Simulation
+from gf3d.utils import read_toml
+from gf3d.constants_solver import NGLLX, NGLLY, NGLLZ
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-logger = logging.getLogger('lwsspy.GF')
+logger = logging.getLogger('gf3d')
 logger.setLevel('DEBUG')
 
 

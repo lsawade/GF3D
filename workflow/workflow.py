@@ -1,5 +1,5 @@
-from lwsspy.GF.simulation import Simulation
-from lwsspy.GF.utils import read_toml
+from gf3d.simulation import Simulation
+from gf3d.utils import read_toml
 # from lwsspy.seismo.
 from copy import deepcopy
 from nnodes import Node

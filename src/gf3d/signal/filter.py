@@ -1,5 +1,4 @@
-from scipy.signal import butter, bessel, lfilter, freqz, cheby1, cheby2, sosfilt, sosfiltfilt
-import numpy as np
+from scipy.signal import butter, bessel, cheby1, cheby2, sosfilt, sosfiltfilt
 
 
 def butter_lowpass(cutoff, fs, order=5):

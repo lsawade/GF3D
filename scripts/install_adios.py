@@ -51,7 +51,7 @@ else:
     reinstall = False
 
 # Set variables for download and compilation
-# Root is at path/to/lwsspy.GF/dependencies/
+# Root is at path/to/gf3d/dependencies/
 ROOT = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     'dependencies')

@@ -6,17 +6,17 @@
 import matplotlib
 from copy import deepcopy
 import toml
-from lwsspy.GF.seismograms import SGTManager
+from gf3d.seismograms import SGTManager
 from obspy import read, Stream
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from lwsspy.GF.plot.util import plot_label
-from lwsspy.GF.source import CMTSOLUTION
-# from lwsspy.GF.postprocess import Adios2HDF5
-from lwsspy.GF.seismograms import get_seismograms, get_seismograms_sub, get_frechet
-from lwsspy.GF.simulation import Simulation
-from lwsspy.GF.stf import create_stf
+from gf3d.plot.util import plot_label
+from gf3d.source import CMTSOLUTION
+# from gf3d.postprocess import Adios2HDF5
+from gf3d.seismograms import get_seismograms, get_seismograms_sub, get_frechet
+from gf3d.simulation import Simulation
+from gf3d.stf import create_stf
 
 import matplotlib.dates as mdates
 from scipy import integrate, fft

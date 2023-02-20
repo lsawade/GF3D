@@ -14,7 +14,7 @@ cd /scratch/gpfs/lsawade/SpecfemMagicGF/
 source ./00_compilations_parameters.sh
 cd /home/lsawade/thirdparty/python/ph5py-testing
 source vars.sh
-cd /home/lsawade/lwsspy/lwsspy.GF/workflow
+cd /home/lsawade/lwsspy/gf3d/workflow
 
 
 python -c "from nnodes import root; root.run()"

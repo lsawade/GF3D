@@ -13,13 +13,13 @@ import matplotlib.axes
 from matplotlib.gridspec import GridSpec
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-from lwsspy.GF.plot.util import plot_label
-from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.postprocess import Adios2HDF5
-from lwsspy.GF.seismograms import \
+from gf3d.plot.util import plot_label
+from gf3d.source import CMTSOLUTION
+from gf3d.postprocess import Adios2HDF5
+from gf3d.seismograms import \
     get_seismograms, get_seismograms_sub, get_frechet, SGTManager
-from lwsspy.GF.simulation import Simulation
-from lwsspy.GF.stf import create_stf
+from gf3d.simulation import Simulation
+from gf3d.stf import create_stf
 
 
 # import matplotlib.dates as mdates

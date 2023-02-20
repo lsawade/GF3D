@@ -4,14 +4,14 @@
 # doesn't contain the right GLIBCXX version
 
 import os
-from lwsspy.GF.plot.mesh import meshplot
-from lwsspy.GF.utils import downloadfile, unzip
+from gf3d.plot.mesh import meshplot
+from gf3d.utils import downloadfile, unzip
 import shapefile
 # Get file name
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
 stationdir = os.path.join(specfemmagic, 'DB', 'II', 'BFO')
 h5file = os.path.join(stationdir,  'II.BFO.h5')
-DIRNAME = f'{os.getenv("HOME")}/lwsspy/lwsspy.GF/scripts'
+DIRNAME = f'{os.getenv("HOME")}/lwsspy/gf3d/scripts'
 
 
 def read_land():
@@ -29,6 +29,7 @@ def read_land():
     land = shapefile.Reader(os.path.join(fname, 'ne_50m_land.shp'))
 
     return land
+
 
 land = read_land()
 

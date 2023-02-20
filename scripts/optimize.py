@@ -13,15 +13,15 @@ from scipy.optimize import minimize
 import cartopy
 from cartopy import crs
 # Internal
-from lwsspy.GF.plot.util import plot_label
-from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.seismograms import SGTManager
-from lwsspy.GF.process import process_stream, select_pairs
-from lwsspy.GF.plot.section import plotsection
-from lwsspy.GF.plot.section_aligned import plotsection_aligned, get_azimuth_distance_traveltime, filter_stations
-from lwsspy.GF.plot.compare_cmts import compare_cmts
-# from lwsspy.GF.plot.frechet import plotfrechet
-from lwsspy.seismo.download_data import download_data
+from gf3d.plot.util import plot_label
+from gf3d.source import CMTSOLUTION
+from gf3d.seismograms import SGTManager
+from gf3d.process import process_stream, select_pairs
+from gf3d.plot.section import plotsection
+from gf3d.plot.section_aligned import plotsection_aligned, get_azimuth_distance_traveltime, filter_stations
+from gf3d.plot.compare_cmts import compare_cmts
+# from gf3d.plot.frechet import plotfrechet
+from gf3d.download import download_stream
 
 
 # %% Files
@@ -32,7 +32,7 @@ h5files = os.path.join(specfemmagic, 'DB', '*', '*', '*.h5')
 
 # CMTSOLUTION
 cmt = CMTSOLUTION.read(
-    '/home/lsawade/lwsspy/lwsspy.GF//scripts/DATA/CHILE_CMT')
+    '/home/lsawade/lwsspy/gf3d//scripts/DATA/CHILE_CMT')
 
 # %% Initialize the GF manager
 sgt = SGTManager(glob(h5files)[:])
@@ -45,7 +45,7 @@ print(f"Retrieving elements took {time.time() - t0:.0f} seconds.")
 
 # %% Download data
 
-raw, inv = download_data(
+raw, inv = download_stream(
     cmt.origin_time,
     duration=4*3600,
     network='II,IU',

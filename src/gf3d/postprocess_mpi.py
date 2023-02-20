@@ -1,21 +1,20 @@
 from mpi4py import MPI
 import numpy as np
 import h5py
-from lwsspy.GF.simulation import Simulation
 import adios2
-# from scipy.spatial import KDTree  # Only import to avoid a certain error message
+
 import time
 import logging
-from lwsspy.GF.constants_solver import NGLLX, NGLLY, NGLLZ
 
-import traceback
-from lwsspy.GF.utils import read_toml
+from gf3d.utils import read_toml
+from gf3d.simulation import Simulation
+from gf3d.constants_solver import NGLLX, NGLLY, NGLLZ
 
 # if tp.TYPE_CHECKING:
 #     from adios2 import File  # type: ignore
 from mpi4py.MPI import Intracomm
 
-logger = logging.getLogger('lwsspy.GF')
+logger = logging.getLogger('gf3d')
 logger.setLevel('DEBUG')
 
 

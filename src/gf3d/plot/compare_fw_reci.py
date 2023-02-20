@@ -1,5 +1,5 @@
 import os
-from lwsspy.GF.plot.util import plot_label
+from gf3d.plot.util import plot_label
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -63,7 +63,6 @@ def compare_fw_reci(cmt, rp, fw, limits, outdir):
 
 
 def plot_drp(cmt, rp, drp, limits, outdir, comp='Z'):
-
 
     N = 1 + len(drp.keys())
     keys = list(drp.keys())

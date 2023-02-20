@@ -9,9 +9,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import cartopy
 from cartopy.crs import Orthographic, PlateCarree, Geodetic
-from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.seismograms import get_seismograms
-from lwsspy.GF.geoutils import geomidpointv
+from gf3d.source import CMTSOLUTION
+from gf3d.seismograms import get_seismograms
+from gf3d.geoutils import geomidpointv
 
 # Get station dir
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'

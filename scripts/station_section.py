@@ -13,12 +13,12 @@ import os
 import typing as tp
 
 # Internal
-from lwsspy.GF.plot.util import plot_label
-from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.seismograms import SGTManager
-from lwsspy.GF.process import process_stream, select_pairs
-from lwsspy.GF.plot.section import plotsection
-from lwsspy.seismo.download_data import download_data
+from gf3d.plot.util import plot_label
+from gf3d.source import CMTSOLUTION
+from gf3d.seismograms import SGTManager
+from gf3d.process import process_stream, select_pairs
+from gf3d.plot.section import plotsection
+from gf3d.download import download_stream
 
 
 # %% Files
@@ -28,7 +28,7 @@ specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
 h5files = os.path.join(specfemmagic, 'DB', '*', '*', '*.h5')
 
 # CMTSOLUTION
-cmt = CMTSOLUTION.read('/home/lsawade/lwsspy/lwsspy.GF/scripts/DATA/CHILE_CMT')
+cmt = CMTSOLUTION.read('/home/lsawade/lwsspy/gf3d/scripts/DATA/CHILE_CMT')
 
 # %% Initialize the GF manager
 sgt = SGTManager(glob(h5files)[:])
@@ -37,7 +37,7 @@ sgt.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 30)
 
 # %% Download data
 
-raw, inv = download_data(
+raw, inv = download_stream(
     cmt.origin_time,
     duration=4*3600,
     network='II,IU',

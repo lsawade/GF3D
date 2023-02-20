@@ -1,5 +1,5 @@
 import os
-from lwsspy.GF.plot.util import plot_label
+from gf3d.plot.util import plot_label
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np

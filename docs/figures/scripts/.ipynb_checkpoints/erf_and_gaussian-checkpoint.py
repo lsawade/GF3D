@@ -2,12 +2,11 @@ import os
 from scipy.special import erf
 from numpy import *
 from matplotlib.pyplot import *
-from lwsspy.GF.signal.plot import compare_lowpass_filters
+from gf3d.signal.plot import compare_lowpass_filters
 
 # File paths
 SCRIPTDIR = os.path.dirname(os.path.abspath(__file__))
 FIGUREDIR = os.path.dirname(SCRIPTDIR)
-
 
 
 t0 = -5
@@ -25,8 +24,8 @@ g = exp(-(t-tc)**2/hdur**2) / (sqrt(pi) * hdur)
 e = 0.5*erf((t-tc)/hdur)+0.5
 
 figure()
-plot(t,g)
-plot(t,e)
+plot(t, g)
+plot(t, e)
 plot(t, np.gradient(e, t))
 plot(t, np.gradient(e, t)-g)
 xlim(min(t), max(t))

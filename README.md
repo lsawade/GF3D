@@ -1,4 +1,4 @@
-# lwsspy.GF
+# gf3d
 
 ## 'Quick'-Install
 

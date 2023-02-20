@@ -3,24 +3,16 @@
 # If other packages are loaded, the wrong libstdc++ is picked up and
 # doesn't contain the right GLIBCXX version
 
-import matplotlib
 from copy import deepcopy
-import toml
-from lwsspy.GF.seismograms import SGTManager
-from obspy import read, Stream
+from obspy import Stream
 import os
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
-from lwsspy.GF.plot.util import plot_label
-from lwsspy.GF.source import CMTSOLUTION
-# from lwsspy.GF.postprocess import Adios2HDF5
-from lwsspy.GF.seismograms import get_seismograms, get_seismograms_sub, get_frechet
-from lwsspy.GF.simulation import Simulation
-from lwsspy.GF.stf import create_stf
-
+from gf3d.plot.util import plot_label
+from gf3d.source import CMTSOLUTION
+# from gf3d.postprocess import Adios2HDF5
+from gf3d.seismograms import get_seismograms
 import matplotlib.dates as mdates
-from scipy import integrate, fft
 
 # Get file name
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'

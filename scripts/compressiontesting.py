@@ -5,6 +5,7 @@ import h5py
 import os
 import numpy as np
 import time
+
 x = np.random.randn(6, 5, 5, 5, 30, 4000)
 x[::3].shape
 x.flatten().shape

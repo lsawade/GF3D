@@ -1,5 +1,5 @@
 from obspy import Stream, Inventory
-from lwsspy.GF.source import CMTSOLUTION
+from gf3d.source import CMTSOLUTION
 
 
 def process_stream(st: Stream, inv: Inventory | None = None, cmt: CMTSOLUTION | None = None, duration: float | None = None):

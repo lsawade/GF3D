@@ -1,11 +1,11 @@
 import os
 import subprocess
 import typing as tp
-from lwsspy.GF.stf import create_stf
 import numpy as np
 from copy import deepcopy
-from .source import FORCESOLUTION, CMTSOLUTION
 from . import utils
+from .stf import create_stf
+from .source import FORCESOLUTION, CMTSOLUTION
 from .logger import logger
 
 

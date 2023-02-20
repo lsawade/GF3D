@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from lwsspy.GF.signal.plot import compare_lowpass_filters
+from gf3d.signal.plot import compare_lowpass_filters
 
 # File paths
 SCRIPTDIR = os.path.dirname(os.path.abspath(__file__))

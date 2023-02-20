@@ -2,7 +2,7 @@ import os
 from scipy.special import erf
 from numpy import *
 from matplotlib.pyplot import *
-from lwsspy.GF.stf import gaussian, erf
+from gf3d.stf import gaussian, erf
 
 # File paths
 SCRIPTDIR = os.path.dirname(os.path.abspath(__file__))
@@ -24,8 +24,8 @@ g = exp(-(t-tc)**2/hdur**2) / (sqrt(pi) * hdur)
 e = 0.5*erf((t-tc)/hdur)+0.5
 
 figure()
-plot(t,g)
-plot(t,e)
+plot(t, g)
+plot(t, e)
 plot(t, np.gradient(e, t))
 plot(t, np.gradient(e, t)-g)
 xlim(min(t), max(t))

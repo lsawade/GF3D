@@ -7,11 +7,11 @@ from obspy import Stream
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from lwsspy.GF.plot.util import plot_label
-from lwsspy.GF.source import CMTSOLUTION
-# from lwsspy.GF.postprocess import Adios2HDF5
-from lwsspy.GF.seismograms import get_seismograms, get_frechet
-from lwsspy.GF.plot.compare_fw_reci import plot_drp
+from gf3d.plot.util import plot_label
+from gf3d.source import CMTSOLUTION
+# from gf3d.postprocess import Adios2HDF5
+from gf3d.seismograms import get_seismograms, get_frechet
+from gf3d.plot.compare_fw_reci import plot_drp
 import matplotlib.dates as mdates
 
 # Get file name

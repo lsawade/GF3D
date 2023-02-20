@@ -5,7 +5,7 @@ from mpi4py import MPI
 import numpy as np
 import adios2
 import matplotlib.pyplot as plt
-from lwsspy.GF.lagrange import lagrange_any, gll_nodes
+from gf3d.lagrange import lagrange_any, gll_nodes
 from obspy import read
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()

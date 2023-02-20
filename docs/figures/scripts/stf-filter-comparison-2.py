@@ -1,7 +1,7 @@
 import os
 from numpy import *
 from matplotlib.pyplot import *
-from lwsspy.GF.stf import create_stf
+from gf3d.stf import create_stf
 
 # File paths
 SCRIPTDIR = os.path.dirname(os.path.abspath(__file__))

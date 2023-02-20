@@ -2,17 +2,17 @@
 # coding: utf-8
 
 # %%
-from lwsspy.GF.lagrange import gll_nodes
+from gf3d.lagrange import gll_nodes
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
 
-from lwsspy.GF.plot.util import plot_label
+from gf3d.plot.util import plot_label
 
 # This two functions are from my homemade library, i put them in the next cell.
 # from lwsspy.plot import plot_label
-# from lwsspy.GF.lagrange import gll_nodes
+# from gf3d.lagrange import gll_nodes
 
 
 # %%

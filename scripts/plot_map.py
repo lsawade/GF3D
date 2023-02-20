@@ -3,10 +3,10 @@ import os
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from lwsspy.seismo import CMTCatalog
-from lwsspy.GF.utils import filedir
+from gf3d.utils import filedir
 
 
-DIRNAME = f'{os.getenv("HOME")}/lwsspy/lwsspy.GF/scripts'
+DIRNAME = f'{os.getenv("HOME")}/lwsspy/gf3d/scripts'
 # %%
 
 cat = CMTCatalog.load(os.path.join(DIRNAME, 'DATA/gcmt_catalog_20220924.pkl'))

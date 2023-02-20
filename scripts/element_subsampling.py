@@ -4,9 +4,9 @@ from obspy import read, Stream
 import numpy as np
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-from lwsspy.GF.plot.util import plot_label
-from lwsspy.GF.source import CMTSOLUTION
-from lwsspy.GF.seismograms import get_seismograms, get_seismograms_sub
+from gf3d.plot.util import plot_label
+from gf3d.source import CMTSOLUTION
+from gf3d.seismograms import get_seismograms, get_seismograms_sub
 
 # %%
 

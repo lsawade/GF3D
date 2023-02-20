@@ -1,7 +1,7 @@
 import h5py
 import plotly
 import plotly.graph_objs as go
-from lwsspy.GF.geoutils import geo2cart
+from gf3d.geoutils import geo2cart
 
 
 def meshplot(stationfile, outfile, land=None):

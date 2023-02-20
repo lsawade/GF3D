@@ -1,6 +1,6 @@
 import numpy as np
-from lwsspy.GF.constants import ZERO, HALF, ONE, TWO
-from lwsspy.GF.constants_solver import NGNOD, NDIM
+from gf3d.constants import ZERO, HALF, ONE, TWO
+from gf3d.constants_solver import NGNOD, NDIM
 
 
 def recompute_jacobian(

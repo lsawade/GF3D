@@ -1,0 +1,19 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10
+  - numpy
+  - matplotlib
+  - scipy
+  - pytest
+  - autopep8
+  - cartopy
+  - gdal
+  - obspy
+  - pip
+  - pip:
+    - sphinx
+    - sphinx_book_theme
+    - numpydoc
+    - -e .

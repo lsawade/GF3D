@@ -32,13 +32,17 @@ def plot_label(ax: Axes, label: str, aspect: float = 1,
                **kwargs):
     """Plots label one of the corners of the plot.
     Plot locations are set as follows::
-           6   14   7
+
+        17  6  14  7  18
             --------
-         5 |1      2|  8
-        13 |        | 15
-        12 |3      4|  9
+         5 |1  22  2| 8
+        13 |21  0 23| 15
+        12 |3  24  4| 9
             --------
-          11   16  10
+        20  11 16 10  19
+
+    Tee dist parameter defines the distance between the axes and the text.
+
     Parameters
     ----------
     label : str
@@ -70,7 +74,12 @@ def plot_label(ax: Axes, label: str, aspect: float = 1,
     aspect = 1.0/get_aspect(ax)
 
     # Inside
-    if location == 1:
+    if location == 0:
+        ax.text(0.5, 0.5, label,
+                horizontalalignment='center', verticalalignment='center_baseline',
+                transform=ax.transAxes, bbox=boxdict,
+                fontdict=fontdict, **kwargs)
+    elif location == 1:
         ax.text(dist, 1.0 - dist * aspect, label, horizontalalignment='left',
                 verticalalignment='top', transform=ax.transAxes, bbox=boxdict,
                 fontdict=fontdict, **kwargs)
@@ -144,6 +153,41 @@ def plot_label(ax: Axes, label: str, aspect: float = 1,
     elif location == 17:
         ax.text(- dist, 1.0 + dist * aspect, label,
                 horizontalalignment='right', verticalalignment='bottom',
+                transform=ax.transAxes, bbox=boxdict,
+                fontdict=fontdict, **kwargs)
+    elif location == 18:
+        ax.text(1.0 + dist, 1.0 + dist * aspect, label,
+                horizontalalignment='left', verticalalignment='bottom',
+                transform=ax.transAxes, bbox=boxdict,
+                fontdict=fontdict, **kwargs)
+    elif location == 19:
+        ax.text(1.0 + dist, 0.0 - dist * aspect, label,
+                horizontalalignment='left', verticalalignment='top',
+                transform=ax.transAxes, bbox=boxdict,
+                fontdict=fontdict, **kwargs)
+    elif location == 20:
+        ax.text(0.0 - dist, 0.0 - dist * aspect, label,
+                horizontalalignment='right', verticalalignment='top',
+                transform=ax.transAxes, bbox=boxdict,
+                fontdict=fontdict, **kwargs)
+    elif location == 21:
+        ax.text(0.0 + dist, 0.5, label,
+                horizontalalignment='left', verticalalignment='center_baseline',
+                transform=ax.transAxes, bbox=boxdict,
+                fontdict=fontdict, **kwargs)
+    elif location == 22:
+        ax.text(0.5, 1.0 - dist * aspect, label,
+                horizontalalignment='center', verticalalignment='top',
+                transform=ax.transAxes, bbox=boxdict,
+                fontdict=fontdict, **kwargs)
+    elif location == 23:
+        ax.text(1.0 - dist, 0.5, label,
+                horizontalalignment='right', verticalalignment='center_baseline',
+                transform=ax.transAxes, bbox=boxdict,
+                fontdict=fontdict, **kwargs)
+    elif location == 24:
+        ax.text(0.5, 0.0 + dist * aspect, label,
+                horizontalalignment='center', verticalalignment='bottom',
                 transform=ax.transAxes, bbox=boxdict,
                 fontdict=fontdict, **kwargs)
     else:

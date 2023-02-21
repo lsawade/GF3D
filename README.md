@@ -1,18 +1,28 @@
-# gf3d
+# 3D Green Function generation and extraction software.
 
 ## 'Quick'-Install
 
-For post-processing the following pacakges need to be installed by hand after
-`numpy`, `scipy` and `matplotlib` have been installed. Before you start make
-sure that you install the packages using the same `MPI` compiler. Otherwise,
-you are going to be in trouble.
+***For extraction only***:
 
-```python
-conda create -n gf "python=3.10" numpy scipy matplotlib
+Make environment
+```bash
+conda create -n gf "python=3.10" numpy scipy matplotlib h5py
+```
+activate
+```bash
+conda activate gf
+```
+and install
+```bash
+cd path/to/GF3D
+pip install -e .
 ```
 
-Do not use `python>3.10` yet, there are issues with `h5py`. `h5py` does not
-seem to find `mpi4py`.
+***For generation***:
+
+For post-processing the following pacakges need to be installed by hand after
+`numpy`, `scipy` and `matplotlib` have been installed:
+
 
 ### `mpi4py`
 

@@ -162,10 +162,13 @@ def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
                         *args,
                         ax: matplotlib.axes.Axes | None = None, comp='Z',
                         newsyn: Stream | None = None,
+                        labels: bool = True,
                         labelright: bool = True, labelleft: bool = True,
+                        obsc='k', sync='r', newsync='b',
                         **kwargs):
 
     plt.rcParams["font.family"] = "monospace"
+    plt.rcParams["axes.edgecolor"] = obsc
 
     if ax is None:
         plt.figure(figsize=(9, 6))
@@ -191,12 +194,16 @@ def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
     # absmax = np.max(pobs.max())
     absmax = np.max([np.max(np.abs(_tr.data)) for _tr in pobs])
 
-    plot_label(ax, f'max|u|: {absmax:.5g} m',
-               fontsize='small', box=False, dist=0.0, location=7)
+    if labels:
+        plot_label(ax, f'max|u|: {absmax:.5g} m',
+                   fontsize='small', box=False, dist=0.0, location=7)
 
-    # Plot label
-    plot_label(ax, f'{comp}', fontweight='bold',
-               fontsize='medium', box=False, dist=0.0, location=6)
+        # Plot label
+        plot_label(ax, f'{comp}', fontweight='bold',
+                   fontsize='medium', box=False, dist=0.0, location=6)
+    else:
+        labelleft = False
+        labelright = False
 
     # Number of stations
     y = np.arange(1, len(pobs)+1)
@@ -207,7 +214,8 @@ def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
     ax.set_yticks(
         y, [f"{tr.stats.network}.{tr.stats.station}" for tr in pobs],
         verticalalignment='center',
-        horizontalalignment='right', fontsize='x-small')
+        horizontalalignment='right', fontsize='x-small',
+        color=obsc)
     ax.tick_params(
         left=False, right=False, labelleft=labelleft, pad=50.0)
 
@@ -217,7 +225,8 @@ def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
         y, [f"D:{tr.stats.distance:>6.2f} A:{tr.stats.azimuth:>6.2f}" for tr in pobs],
         verticalalignment='center',
         horizontalalignment='left',
-        fontsize='x-small')
+        fontsize='x-small',
+        color=obsc)
     ax2.spines.right.set_visible(False)
     ax2.tick_params(
         left=False, right=False, labelright=labelright, pad=-10.0)
@@ -239,22 +248,23 @@ def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
         # Condition for "Planned sections"
         plt.plot(
             _obs.times(type='relative', reftime=reftime),
-            _obs.data / absmax + _y, 'k',
+            _obs.data / absmax + _y, c=obsc,
             *args, **kwargs)
         plt.plot(
             _syn.times(type='relative', reftime=reftime),
-            _syn.data / absmax + _y, 'r',
+            _syn.data / absmax + _y, c=sync,
             *args, **kwargs)
 
         if pnewsyn:
             plt.plot(
                 pnewsyn[_i].times(type='relative', reftime=reftime),
-                pnewsyn[_i].data / absmax + _y, 'b',
+                pnewsyn[_i].data / absmax + _y, c=newsync,
                 *args, **kwargs)
 
     top = len(pobs) + 1.0
     bottom = -0.5
-    plt.plot([0, 0], [bottom, top], 'k-',
+
+    plt.plot([0, 0], [bottom, top], c=obsc,
              lw=ax.spines.bottom.get_linewidth())
 
     ax.set_ylim(bottom, top)

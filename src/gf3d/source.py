@@ -425,7 +425,8 @@ class CMTSOLUTION:
         return out
 
     def axbeach(
-            self, ax, x, y, width=50, facecolor='k', linewidth=2, alpha=1.0,
+            self, ax, x, y, width=50, facecolor='k', edgecolor='k',
+            bgcolor='w', linewidth=2, alpha=1.0,
             clip_on=False, **kwargs):
         """Plots beach ball into given axes.
         Note that width heavily depends on the given screen size/dpi. Therefore
@@ -435,8 +436,8 @@ class CMTSOLUTION:
         bb = beach(self.tensor,
                    linewidth=linewidth,
                    facecolor=facecolor,
-                   bgcolor='w',
-                   edgecolor='k',
+                   bgcolor=bgcolor,
+                   edgecolor=edgecolor,
                    alpha=alpha,
                    xy=(x, y),
                    width=width,

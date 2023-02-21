@@ -23,7 +23,7 @@ gfsub.load()
 
 # Load Observed Data
 raw = read(
-    "/home/lsawade/GF3D/scripts/DATA/single_element_read/traces/*.SAC")
+    "/home/lsawade/GF3D/scripts/DATA/single_element_read/traces/*.sac")
 
 inv = read_inventory(
     "/home/lsawade/GF3D/scripts/DATA/single_element_read/station.xml")

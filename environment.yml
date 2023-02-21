@@ -6,6 +6,7 @@ dependencies:
   - numpy
   - matplotlib
   - scipy
+  - h5py
   - pytest
   - autopep8
   - cartopy
@@ -13,7 +14,8 @@ dependencies:
   - obspy
   - pip
   - pip:
-    - sphinx
-    - sphinx_book_theme
+    - sphinx<6.0
+    - pydata-sphinx-theme
+    - sphinx-design
     - numpydoc
     - -e .

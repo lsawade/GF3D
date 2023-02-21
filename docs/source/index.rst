@@ -55,6 +55,7 @@ for the generation of a database you will need to manually install
 
 
 Installation
+
 .. grid:: 1 1 2 2
 
     .. grid-item::

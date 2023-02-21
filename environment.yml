@@ -12,6 +12,7 @@ dependencies:
   - cartopy
   - gdal
   - obspy
+  - joblib
   - pip
   - pip:
     - sphinx<6.0

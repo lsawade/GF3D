@@ -2,7 +2,7 @@
 
 .. title:: GF3D Documentation
 
-.. module:: gf3d
+.. module:: gf-index
 
 .. GF3D documentation master file, created by
    sphinx-quickstart on Mon Feb 20 15:43:45 2023.

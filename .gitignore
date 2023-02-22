@@ -12,3 +12,4 @@ docs/build
 data
 .vscode
 _build
+docs/source/examples

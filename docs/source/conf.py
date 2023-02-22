@@ -40,6 +40,7 @@ extensions = [
     'numpydoc',
     'sphinx_design',
     "sphinx_togglebutton",
+    'sphinx_gallery.gen_gallery'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -48,7 +49,8 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
+exclude_patterns = ["_build", "Thumbs.db",
+                    ".DS_Store", "**.ipynb_checkpoints", "build"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -102,6 +104,34 @@ html_context = {
     "doc_path": "docs/source",
 }
 
-html_context = {
+# --------------------------------
 
+
+def reset_mpl(gallery_conf, fname):
+    """Function to set default look of the figures.
+    """
+    import matplotlib as mpl
+    from gf3d.constants import DARKGRAY
+    COLOR = DARKGRAY
+    mpl.rcParams["font.family"] = "monospace"
+    mpl.rcParams["savefig.transparent"] = True
+    mpl.rcParams['axes.edgecolor'] = COLOR
+    mpl.rcParams['text.color'] = COLOR
+    mpl.rcParams['axes.labelcolor'] = COLOR
+    mpl.rcParams['xtick.color'] = COLOR
+    mpl.rcParams['ytick.color'] = COLOR
+
+
+# Sphinx Gallery config
+sphinx_gallery_conf = {
+    # path to your example scripts
+    'examples_dirs': ['../../examples/extraction/subset', '../../examples/generation'],
+    # path to where to save gallery generated output
+    'gallery_dirs': ["examples/extraction/subset", "examples/generation"],
+    # Checks matplotlib for figure creation
+    'image_scrapers': ('matplotlib'),
+    # Which files to include
+    'filename_pattern': r"\.py",
+
+    'reset_modules': (reset_mpl, ),
 }

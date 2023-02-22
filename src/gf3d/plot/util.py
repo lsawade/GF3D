@@ -267,3 +267,11 @@ def get_aspect(ax: Axes) -> float:
     disp_ratio = (figH * h) / (figW * w)
 
     return disp_ratio
+
+
+def set_default_color(COLOR):
+    plt.rcParams['axes.edgecolor'] = COLOR
+    plt.rcParams['text.color'] = COLOR
+    plt.rcParams['axes.labelcolor'] = COLOR
+    plt.rcParams['xtick.color'] = COLOR
+    plt.rcParams['ytick.color'] = COLOR

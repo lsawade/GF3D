@@ -8,7 +8,7 @@ from matplotlib.gridspec import GridSpec
 from obspy import read, read_inventory, Stream
 
 # Internal
-from gf3d.constants import GRAY, ORANGE, BLUE
+from gf3d.constants import GRAY, ORANGE, BLUE, DARKGRAY
 from gf3d.source import CMTSOLUTION
 from gf3d.seismograms import GFManager
 from gf3d.process import process_stream, select_pairs
@@ -75,11 +75,11 @@ plotsection_aligned(
 ax.axis('off')
 ax.set_ylim(-0.2, 1.75)
 cmt.axbeach(ax, 0.0, 0.45, width=200/np.sqrt(2), facecolor=ORANGE, edgecolor=GRAY,
-            bgcolor=[_g*0.75 for _g in GRAY], linewidth=0.5)
+            bgcolor=DARKGRAY, linewidth=0.5)
 
 ax = fig.add_subplot(gs[1:], zorder=0)
 ax.axis('off')
-plot_label(ax, 'GF3D', location=0, box=False, fontsize=44, color=GRAY)
+plot_label(ax, 'GF3D', location=0, box=False, fontsize=44, color=DARKGRAY)
 plt.subplots_adjust(left=0.0, right=1.0, bottom=0.0, top=1.0, wspace=0.00)
 plt.savefig('logo.png', dpi=600, transparent=True)
 

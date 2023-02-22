@@ -167,9 +167,6 @@ def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
                         obsc='k', sync='r', newsync='b',
                         **kwargs):
 
-    plt.rcParams["font.family"] = "monospace"
-    plt.rcParams["axes.edgecolor"] = obsc
-
     if ax is None:
         plt.figure(figsize=(9, 6))
         ax = plt.axes()

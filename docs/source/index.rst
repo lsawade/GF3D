@@ -9,43 +9,26 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-########################################
+
 Green Functions 3D Generator & Extractor
 ########################################
 
+``GF3D`` is a library of function to create and query station-specific Green
+Functions on the basis of `specfem3d_globe`_.
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :hidden:
 
-   tabs/gf-generation
-   tabs/gf-extraction
+    parts/gf-generation/index
+    parts/gf-extraction/index
 
-*************
+
 Quick-Install
 *************
 
-This is only interesting if you want to extract from an existing database.
-for the generation of a database you will need to manually install
-``specfem3d_globe``, ``Parallel HDF5`` and ``ADIOS``.
+.. card:: From Github & ``environment.yml``
 
-
-.. card:: Install only
-
-    **Pypi**
-
-    .. code-block:: bash
-
-        pip install gf3d
-
-    **Conda** (Coming soon):
-
-    .. code-block:: bash
-
-        conda install -c conda-forge gf3d
-
-.. card:: From ``environment.yml``
-
-    Download github repo
+    Current way to go!
 
     .. code-block:: bash
 
@@ -54,50 +37,35 @@ for the generation of a database you will need to manually install
         conda env create -n gf3d -f environment.yml
 
 
-Installation
+.. card:: Package Managers (Coming soon)
 
-.. grid:: 1 1 2 2
+    .. grid:: 1 1 2 2
 
-    .. grid-item::
+        .. grid-item::
 
-        Make environment
+            **Pypi**
 
-        .. code-block:: bash
+            .. code-block:: bash
 
-            conda create -n gf "python=3.10" numpy scipy matplotlib h5py
+                pip install gf3d
 
-        activate
+        .. grid-item::
 
-        .. code-block:: bash
+            **Conda**:
 
-            conda activate gf
+            .. code-block:: bash
 
-        and install
-
-        .. code-block:: bash
-
-            cd path/to/GF3D
-            pip install -e .
+                conda install -c conda-forge gf3d
 
 
-    .. grid-item::
 
-        Install using `pip <https://pypi.org/project/matplotlib>`__:
+Custom Installation for Database Creation
+*****************************************
 
-        .. code-block:: bash
-
-            pip install gf3d
-
-    .. grid-item::
-
-        COMING SOON! Install using `conda <https://docs.continuum.io/anaconda/>`__:
-
-        .. code-block:: bash
-
-            conda install -c conda-forge gf3d
-
-.. Further details are available in the :doc:`Installation Guide <users/installing/index>`.
-
+This is only interesting if you want to extract from an existing database.
+for the generation of a database you will need to manually install
+``specfem3d_globe``, ``Parallel HDF5`` and ``ADIOS``. See
+:ref:`custom-installation`.
 
 Indices and tables
 ==================
@@ -105,3 +73,6 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+.. _specfem3d_globe: https://github.com/SPECFEM/specfem3d_globe

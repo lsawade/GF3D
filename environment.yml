@@ -19,5 +19,6 @@ dependencies:
     - pydata-sphinx-theme
     - sphinx-design
     - sphinx_togglebutton
+    - sphinc_gallery
     - numpydoc
     - -e .

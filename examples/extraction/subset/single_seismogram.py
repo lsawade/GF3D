@@ -14,16 +14,15 @@ Loading all modules
 # sphinx_gallery_thumbnail_number = 1
 # sphinx_gallery_dummy_images = 1
 
-# %%
 
 # External
 import matplotlib.pyplot as plt
-from obspy import read, read_inventory, Stream
+from obspy import read, read_inventory
 
 # Internal
 from gf3d.source import CMTSOLUTION
 from gf3d.seismograms import GFManager
-from gf3d.process import process_stream, select_pairs
+from gf3d.process import process_stream
 from gf3d.plot.seismogram import plotseismogram
 
 # %%

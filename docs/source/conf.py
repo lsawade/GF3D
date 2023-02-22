@@ -17,6 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
+from sphinx_gallery.scrapers import matplotlib_scraper
 project = 'GF3D'
 copyright = '2023, Lucas Sawade'
 author = 'Lucas Sawade'
@@ -65,6 +66,8 @@ html_theme = 'pydata_sphinx_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_css_files = ['css/custom.css']
+
 # html_logo = '_static/logo.png'
 
 html_theme_options = {
@@ -111,15 +114,25 @@ def reset_mpl(gallery_conf, fname):
     """Function to set default look of the figures.
     """
     import matplotlib as mpl
-    from gf3d.constants import DARKGRAY
-    COLOR = DARKGRAY
+    COLOR = 'k'
     mpl.rcParams["font.family"] = "monospace"
     mpl.rcParams["savefig.transparent"] = True
+    mpl.rcParams["savefig.dpi"] = 300
+    mpl.rcParams["savefig.format"] = 'svg'
     mpl.rcParams['axes.edgecolor'] = COLOR
     mpl.rcParams['text.color'] = COLOR
     mpl.rcParams['axes.labelcolor'] = COLOR
     mpl.rcParams['xtick.color'] = COLOR
     mpl.rcParams['ytick.color'] = COLOR
+
+
+class matplotlib_svg_scraper(object):
+
+    def __repr__(self):
+        return self.__class__.__name__
+
+    def __call__(self, *args, **kwargs):
+        return matplotlib_scraper(*args, format='svg', **kwargs)
 
 
 # Sphinx Gallery config
@@ -135,9 +148,11 @@ sphinx_gallery_conf = {
         "examples/extraction/database",
         "examples/generation"],
     # Checks matplotlib for figure creation
-    'image_scrapers': ('matplotlib'),
+    'image_scrapers': (matplotlib_svg_scraper(),),
     # Which files to include
     'filename_pattern': r"\.py",
 
     'reset_modules': (reset_mpl, ),
+
+    'remove_config_comments': True,
 }

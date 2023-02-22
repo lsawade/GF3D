@@ -1,5 +1,4 @@
-
-.. _mpi4py-install:
+.. _mpi4py install:
 
 `mpi4py`
 --------

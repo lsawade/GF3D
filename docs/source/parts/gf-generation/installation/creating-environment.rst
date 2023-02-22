@@ -1,7 +1,6 @@
 
 .. _creating-environment:
 
-
 Creating an environment
 -----------------------
 

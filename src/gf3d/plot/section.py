@@ -17,12 +17,11 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
                 limits: tp.Tuple[UTCDateTime] | None = None,
                 newsyn: Stream or None = None,
                 newcmt: CMTSOLUTION or None = None, scale: float = 1.0,
+                obsc='k', sync='r', newsync='b',
                 **kwargs):
 
-    plt.rcParams["font.family"] = "monospace"
-
     if ax is None:
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(6, 4))
         ax = plt.axes()
         plottitle = True
     else:
@@ -113,18 +112,18 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
 
         plt.plot(
             _obs.times('matplotlib'),
-            _obs.data / absmax * scale + _y, 'k',
-            *args, **kwargs)
+            _obs.data / absmax * scale + _y, '-',
+            *args, c=obsc, **kwargs)
         plt.plot(
             _syn.times('matplotlib'),
-            _syn.data / absmax * scale + _y, 'r',
-            *args, **kwargs)
+            _syn.data / absmax * scale + _y, '-',
+            *args,  c=sync, **kwargs)
 
         if pnewsyn:
             plt.plot(
                 pnewsyn[_i].times('matplotlib'),
-                pnewsyn[_i].data / absmax * scale + _y, 'b',
-                *args, **kwargs)
+                pnewsyn[_i].data / absmax * scale + _y, '-',
+                *args,  c=newsync, **kwargs)
 
     # Remove all spines
     ax.spines.top.set_visible(False)
@@ -153,6 +152,6 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
             title = (
                 f"{cmt.cmt_time.ctime()} Loc: {cmt.latitude:.2f}dg, {cmt.longitude:.2f}dg, {cmt.depth:.1f}km - BP: [20s, 50s]")
         ax.set_title(title, loc='left', ha='left', fontsize='small')
-        plt.subplots_adjust(left=0.1, right=0.85, top=0.925)
+        plt.subplots_adjust(left=0.125, right=0.8, top=0.925)
 
         return ax

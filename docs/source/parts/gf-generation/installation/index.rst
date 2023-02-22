@@ -17,6 +17,8 @@ There are a requirements to create a Database
 Most of the steps are explained below, but not everything is a one fits all.
 Especially the installation of parallel `HDF5` can sometimes be ... annoying.
 
+Talk about setting up your compilers and Environement variables.
+
 .. toctree::
 
     creating-environment

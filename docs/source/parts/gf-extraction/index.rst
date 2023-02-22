@@ -8,7 +8,15 @@
 -----------------------------
 
 This page goes over some examples on how to extract seismograms from the
-database as well as from subset
+database as well as from subset.
+
+The examples at the bottom show advanced use cases including some plotting
+tools. The two main tools that you are going to need are the command-line tool
+which is automatically installed when you
+
+
+Examples
+++++++++
 
 .. toctree::
 

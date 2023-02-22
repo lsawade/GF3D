@@ -1,7 +1,6 @@
 
 .. _adios-install:
 
-
 `adios2`
 --------
 

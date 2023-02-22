@@ -17,10 +17,10 @@ def plotseismogram(
         ax: matplotlib.axes.Axes | None = None,
         limits: tp.Tuple[UTCDateTime] | None = None,
         newsyn: Stream or None = None,
+        obsc='k', sync='r', newsync='b',
         **kwargs):
 
     if ax is None:
-        plt.rcParams["font.family"] = "monospace"
         plt.close('all')
         fig = plt.figure(figsize=(7, 4))
         ax = plt.axes()
@@ -56,13 +56,14 @@ def plotseismogram(
 
         ax = plt.subplot(3, 1, _i+1)
         plt.plot(observed.times("matplotlib"), observed.data+absmax_off,
-                 'k-', *args, lw=lw, label='Observed', **kwargs)
+                 '-', *args, c=obsc, lw=lw, label='Observed', **kwargs)
         plt.plot(synthetic.times("matplotlib"), synthetic.data-absmax_off,
-                 'r-', *args, lw=lw, label='Synthetic', **kwargs)
+                 '-', *args, c=sync, lw=lw, label='Synthetic', **kwargs)
 
         if newsyn is not None:
             plt.plot(newsynthetic.times("matplotlib"), newsynthetic.data,
-                     'r-', *args, lw=lw, label='New Synthetic', **kwargs)
+                     'b-', *args, c=newsync, lw=lw, label='New Synthetic',
+                     **kwargs)
 
         # Ylabel
         # plt.ylabel(f'{comp}  ')

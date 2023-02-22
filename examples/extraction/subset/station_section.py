@@ -15,7 +15,6 @@ Loading all modules
 # sphinx_gallery_thumbnail_number = 1
 # sphinx_gallery_dummy_images = 1
 
-# %%
 # External
 import matplotlib.pyplot as plt
 from obspy import read, read_inventory, Stream

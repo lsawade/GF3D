@@ -15,13 +15,11 @@ Loading all modules
 # sphinx_gallery_thumbnail_number = 1
 # sphinx_gallery_dummy_images = 1
 
-# %%
 # External
 import matplotlib.pyplot as plt
 from obspy import read, read_inventory, Stream
 
 # Internal
-from gf3d.constants import DARKGRAY, ORANGE  # Dark/light mode colors.
 from gf3d.source import CMTSOLUTION
 from gf3d.seismograms import GFManager
 from gf3d.process import process_stream, select_pairs
@@ -29,7 +27,7 @@ from gf3d.plot.util import set_default_color
 from gf3d.plot.section_aligned import plotsection_aligned, get_azimuth_distance_traveltime, filter_stations
 
 # %%
-#
+# Load CMTSOLUTION, observed data, and Green functions
 
 # CMTSOLUTION
 cmt = CMTSOLUTION.read('../../DATA/single_element_read/CMTSOLUTION')
@@ -79,22 +77,27 @@ Ssyn = Stream([Ssyn[_i] for _i in selection])
 
 
 # Plots a section of observed and synthetic
-fig = plt.figure(figsize=(8, 5))
+fig = plt.figure(figsize=(6, 4))
+
+# Plot Arrivals around ak135 P arrival
 ax = plt.subplot(1, 2, 1)
 plotsection_aligned(
     Pobs, Psyn, cmt, comp='Z', lw=1.0, ax=ax,
-    traveltime_window=('P', windowP), labelright=False,
-    obsc=DARKGRAY, sync=ORANGE)
+    traveltime_window=('P', windowP), labelright=False)
 
+# Plot Arrivals around ak135 S arrival
 ax = plt.subplot(1, 2, 2)
 plotsection_aligned(
     Sobs, Ssyn, cmt, comp='Z', lw=1.0, ax=ax,
-    traveltime_window=('S', windowS), labelleft=False,
-    obsc=DARKGRAY, sync=ORANGE)
+    traveltime_window=('S', windowS), labelleft=False)
+
+# Set Title
 title = (f"{cmt.cmt_time.ctime()} "
          f"Loc: {cmt.latitude:.2f}dg, {cmt.longitude:.2f}dg, {cmt.depth:.1f}km"
          f" - BP: [40s, 300s]")
 fig.suptitle(title, fontsize='small')
-plt.subplots_adjust(left=0.1, right=0.9, bottom=0.1, top=0.9, wspace=0.1)
+
+# Adjust plot
+plt.subplots_adjust(left=0.1, right=0.85, bottom=0.1, top=0.9, wspace=0.1)
 
 plt.show()

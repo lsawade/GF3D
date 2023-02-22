@@ -125,9 +125,15 @@ def reset_mpl(gallery_conf, fname):
 # Sphinx Gallery config
 sphinx_gallery_conf = {
     # path to your example scripts
-    'examples_dirs': ['../../examples/extraction/subset', '../../examples/generation'],
+    'examples_dirs': [
+        '../../examples/extraction/subset',
+        '../../examples/extraction/database',
+        '../../examples/generation'],
     # path to where to save gallery generated output
-    'gallery_dirs': ["examples/extraction/subset", "examples/generation"],
+    'gallery_dirs': [
+        "examples/extraction/subset",
+        "examples/extraction/database",
+        "examples/generation"],
     # Checks matplotlib for figure creation
     'image_scrapers': ('matplotlib'),
     # Which files to include

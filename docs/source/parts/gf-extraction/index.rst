@@ -10,9 +10,9 @@
 This page goes over some examples on how to extract seismograms from the
 database as well as from subset
 
+.. toctree::
 
-.. include:: ../../examples/extraction/database/index.rst
-
-.. include:: ../../examples/extraction/subset/index.rst
+    ../../examples/extraction/database/index.rst
+    ../../examples/extraction/subset/index.rst
 
 

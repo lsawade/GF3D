@@ -1,0 +1,1081 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Station Section &#8212; GF3D 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/extraction/subset/station_section';</script>
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Single Seismogram" href="single_seismogram.html" />
+    <link rel="prev" title="Subset Extraction Tutorials" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="dark">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image">
+    <img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image">
+  
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../parts/gf-generation/index.html">
+                        3D Green Function Generation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../../parts/gf-extraction/index.html">
+                        3D Green Function Extraction
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lsawade/GF3D" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../parts/gf-generation/index.html">
+                        3D Green Function Generation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../../parts/gf-extraction/index.html">
+                        3D Green Function Extraction
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lsawade/GF3D" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item"><nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
+    <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../database/index.html">Database Extraction Tutorials</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Subset Extraction Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Station Section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single_seismogram.html">Single Seismogram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aligned_stations.html">Aligned Station Section</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+</nav>
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-extraction-subset-station-section-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="station-section">
+<span id="sphx-glr-examples-extraction-subset-station-section-py"></span><h1>Station Section<a class="headerlink" href="#station-section" title="Permalink to this heading">#</a></h1>
+<p>The tutorial will go over the reading of a subset file by loading one that is
+included in the directory. At the end we plot a station section of waveforms
+using built-in plotting tools.</p>
+<section id="loading-all-modules">
+<h2>Loading all modules<a class="headerlink" href="#loading-all-modules" title="Permalink to this heading">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># External</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">read</span><span class="p">,</span> <span class="n">read_inventory</span><span class="p">,</span> <span class="n">Stream</span>
+
+<span class="c1"># Internal</span>
+<span class="kn">from</span> <span class="nn">gf3d.source</span> <span class="kn">import</span> <span class="n">CMTSOLUTION</span>
+<span class="kn">from</span> <span class="nn">gf3d.seismograms</span> <span class="kn">import</span> <span class="n">GFManager</span>
+<span class="kn">from</span> <span class="nn">gf3d.process</span> <span class="kn">import</span> <span class="n">process_stream</span><span class="p">,</span> <span class="n">select_pairs</span>
+<span class="kn">from</span> <span class="nn">gf3d.plot.section</span> <span class="kn">import</span> <span class="n">plotsection</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># CMTSOLUTION</span>
+<span class="n">cmt</span> <span class="o">=</span> <span class="n">CMTSOLUTION</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;../../DATA/single_element_read/CMTSOLUTION&#39;</span><span class="p">)</span>
+
+<span class="c1"># Load subset</span>
+<span class="n">gfsub</span> <span class="o">=</span> <span class="n">GFManager</span><span class="p">(</span><span class="s2">&quot;../../DATA/single_element_read/single_element.h5&quot;</span><span class="p">)</span>
+<span class="n">gfsub</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+<span class="c1"># Load Observed Data</span>
+<span class="n">raw</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="s2">&quot;../../DATA/single_element_read/traces/*.sac&quot;</span><span class="p">)</span>
+<span class="n">inv</span> <span class="o">=</span> <span class="n">read_inventory</span><span class="p">(</span><span class="s2">&quot;../../DATA/single_element_read/station.xml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>DEBUG:h5py._conv:Creating converter from 3 to 5
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rp</span> <span class="o">=</span> <span class="n">gfsub</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">cmt</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>DEBUG:GF:lat  -31.13, lon 287.90999999999997
+DEBUG:GF:theta 2.111164801823484, phi 5.024977449416873
+DEBUG:GF:depth  17350.0
+DEBUG:GF:RPLANET 6371000.0
+DEBUG:GF:elevation: -3413.2975000002125
+DEBUG:GF:ELL: 0.0033072689777778027, p20: -0.10300870804117834
+DEBUG:GF:rsource: {r0_source}
+DEBUG:GF:DOING ADJACENCY SEARCH
+DEBUG:GF:    Querying KDTree...
+DEBUG:GF:    ...Done
+DEBUG:GF:    Finding local coordinates...
+DEBUG:GF:Anchors
+DEBUG:GF:[0 0 2 2 0 0 2 2 0 1 2 1 0 0 2 2 0 1 2 1 1 0 1 2 1 1 1]
+DEBUG:GF:Element coordinates
+DEBUG:GF:x
+DEBUG:GF:[0.26720187 0.26908711 0.2588748  0.25702941 0.26813519 0.27003714
+ 0.25967503 0.25782475 0.26816329 0.26403755 0.25795895 0.26216379
+ 0.26766852 0.26956213 0.25927493 0.2574271  0.26910013 0.26487032
+ 0.25875697 0.2629908  0.26310906 0.26863173 0.26445395 0.25835794
+ 0.2625773  0.26393914 0.26352412]
+DEBUG:GF:y
+DEBUG:GF:[-0.80883157 -0.8145383  -0.81715912 -0.81133401 -0.81165677 -0.8174141
+ -0.8196851  -0.81384456 -0.81174189 -0.81603009 -0.81426817 -0.81023908
+ -0.8102442  -0.8159762  -0.81842214 -0.81258929 -0.81457776 -0.81860387
+ -0.81678712 -0.81279504 -0.81316048 -0.81315982 -0.81731701 -0.81552762
+ -0.81151706 -0.81572598 -0.81444323]
+DEBUG:GF:z
+DEBUG:GF:[-0.51218694 -0.50190377 -0.5035187  -0.51377159 -0.51397598 -0.50367582
+ -0.50507516 -0.51536137 -0.50707871 -0.502823   -0.50865686 -0.51307821
+ -0.51308149 -0.5027898  -0.5042969  -0.51456648 -0.50885028 -0.5044089
+ -0.51023036 -0.51469678 -0.50796491 -0.50796449 -0.50361598 -0.50944364
+ -0.51388752 -0.5095675  -0.50876623]
+DEBUG:GF:
+DEBUG:GF:Initial Guess
+DEBUG:GF:-1.0, 0.0, 1.0
+DEBUG:GF:
+DEBUG:GF:START: 0.2629070426208585, -0.813490403263229, -0.51289216395054
+DEBUG:GF:       -1.0, 0.0, 1.0
+DEBUG:GF:    iter 0: 0.262990802526474, -0.8127950429916382, -0.5146967768669128
+DEBUG:GF:                      -0.6787138520392472, 0.056043351792607346, 0.7526280383847199
+DEBUG:GF:    iter 1: 0.2629061241018552, -0.8134882435907334, -0.5128917212398123
+DEBUG:GF:                      -0.6785821307171366, 0.05600333384400605, 0.7540525490126836
+DEBUG:GF:    iter 2: 0.26290704262289866, -0.813490403267678, -0.5128921639513074
+DEBUG:GF:                      -0.6785821310092165, 0.05600333395328537, 0.7540525461026191
+DEBUG:GF:    iter 3: 0.2629070426208585, -0.8134904032632291, -0.51289216395054
+DEBUG:GF:                      -0.6785821310092265, 0.05600333395327886, 0.7540525461025608
+DEBUG:GF:    iter 4: 0.2629070426208585, -0.813490403263229, -0.51289216395054
+DEBUG:GF:                      -0.6785821310092265, 0.05600333395327886, 0.7540525461025608
+DEBUG:GF:    ...Done
+DEBUG:GF:    REALYY DOING THE ADJACENCY SEARCH
+DEBUG:GF:SEISUM: 0.0018361519527975096
+DEBUG:GF:HELOHLOHOPHEIHRLIHR
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">=</span> <span class="n">process_stream</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">inv</span><span class="o">=</span><span class="n">inv</span><span class="p">,</span> <span class="n">cmt</span><span class="o">=</span><span class="n">cmt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<span class="n">syn</span> <span class="o">=</span> <span class="n">process_stream</span><span class="p">(</span><span class="n">rp</span><span class="p">,</span> <span class="n">cmt</span><span class="o">=</span><span class="n">cmt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span> <span class="o">=</span> <span class="n">select_pairs</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">syn</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">starttime</span> <span class="o">=</span> <span class="n">psyn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span> <span class="o">+</span> <span class="mi">0</span>
+<span class="n">endtime</span> <span class="o">=</span> <span class="n">starttime</span> <span class="o">+</span> <span class="mi">3600</span>
+<span class="n">limits</span> <span class="o">=</span> <span class="p">(</span><span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">)</span>
+
+<span class="c1"># Plots a section of observed and synthetic</span>
+<span class="n">plotsection</span><span class="p">(</span><span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span><span class="p">,</span> <span class="n">cmt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="n">limits</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../../_images/sphx_glr_station_section_001.svg" srcset="../../../_images/sphx_glr_station_section_001.svg" alt="Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km - BP: [20s, 50s]" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>DEBUG:matplotlib.pyplot:Loaded backend agg version v2.2.
+DEBUG:matplotlib.font_manager:findfont: Matching monospace:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0.
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmtt10.ttf&#39;, name=&#39;cmtt10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizThreeSymBol.ttf&#39;, name=&#39;STIXSizeThreeSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralItalic.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFourSymBol.ttf&#39;, name=&#39;STIXSizeFourSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-Oblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralBolIta.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerifDisplay.ttf&#39;, name=&#39;DejaVu Serif Display&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniIta.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmb10.ttf&#39;, name=&#39;cmb10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmr10.ttf&#39;, name=&#39;cmr10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizOneSymBol.ttf&#39;, name=&#39;STIXSizeOneSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizTwoSymBol.ttf&#39;, name=&#39;STIXSizeTwoSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizThreeSymReg.ttf&#39;, name=&#39;STIXSizeThreeSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFiveSymReg.ttf&#39;, name=&#39;STIXSizeFiveSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmex10.ttf&#39;, name=&#39;cmex10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralBol.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFourSymReg.ttf&#39;, name=&#39;STIXSizeFourSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizTwoSymReg.ttf&#39;, name=&#39;STIXSizeTwoSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansDisplay.ttf&#39;, name=&#39;DejaVu Sans Display&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneral.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmss10.ttf&#39;, name=&#39;cmss10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUni.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmmi10.ttf&#39;, name=&#39;cmmi10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmsy10.ttf&#39;, name=&#39;cmsy10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizOneSymReg.ttf&#39;, name=&#39;STIXSizeOneSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniBol.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-Bold.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.33499999999999996
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniBolIta.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-BlackIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-R.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Italic.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Bold.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.33499999999999996
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Medium.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Light.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-ExtraLight.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-SemiboldItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-It.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Black.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-ExtraLightIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Light.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Semibold.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Inconsolata-Bold.ttf&#39;, name=&#39;Inconsolata&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-C.ttf&#39;, name=&#39;Ubuntu Condensed&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Regular.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-HeavyItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=800, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-BoldItalic.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Regular.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-B.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Black.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-MediumIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-ExtraLight.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-BoldItalic.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-BoldItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Bold.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Inconsolata-Regular.ttf&#39;, name=&#39;Inconsolata&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-Th.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=250, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.1925
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Hairline.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=100, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-HairlineItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=100, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Italic.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Italic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-SemiboldIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-BI.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-M.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-RI.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-LightItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-BoldIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Medium.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-L.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-MI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Regular.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Oblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-BlackItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuMathTeXGyre.ttf&#39;, name=&#39;DejaVu Math TeX Gyre&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Semibold.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Bold.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-B.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-LI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Heavy.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=800, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-R.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-LightIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-MediumItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-ThinItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-BoldItalic.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Thin.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-RI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-BI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: Matching monospace:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans Mono (&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono.ttf&#39;) with score of 0.050000.
+DEBUG:matplotlib.font_manager:findfont: Matching monospace:style=normal:variant=normal:weight=normal:stretch=normal:size=8.33.
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmtt10.ttf&#39;, name=&#39;cmtt10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizThreeSymBol.ttf&#39;, name=&#39;STIXSizeThreeSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralItalic.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFourSymBol.ttf&#39;, name=&#39;STIXSizeFourSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-Oblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralBolIta.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerifDisplay.ttf&#39;, name=&#39;DejaVu Serif Display&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniIta.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmb10.ttf&#39;, name=&#39;cmb10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmr10.ttf&#39;, name=&#39;cmr10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizOneSymBol.ttf&#39;, name=&#39;STIXSizeOneSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizTwoSymBol.ttf&#39;, name=&#39;STIXSizeTwoSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizThreeSymReg.ttf&#39;, name=&#39;STIXSizeThreeSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFiveSymReg.ttf&#39;, name=&#39;STIXSizeFiveSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmex10.ttf&#39;, name=&#39;cmex10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralBol.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFourSymReg.ttf&#39;, name=&#39;STIXSizeFourSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizTwoSymReg.ttf&#39;, name=&#39;STIXSizeTwoSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansDisplay.ttf&#39;, name=&#39;DejaVu Sans Display&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneral.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmss10.ttf&#39;, name=&#39;cmss10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUni.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmmi10.ttf&#39;, name=&#39;cmmi10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmsy10.ttf&#39;, name=&#39;cmsy10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizOneSymReg.ttf&#39;, name=&#39;STIXSizeOneSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniBol.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-Bold.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.33499999999999996
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniBolIta.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-BlackIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-R.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Italic.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Bold.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.33499999999999996
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Medium.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Light.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-ExtraLight.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-SemiboldItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-It.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Black.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-ExtraLightIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Light.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Semibold.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Inconsolata-Bold.ttf&#39;, name=&#39;Inconsolata&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-C.ttf&#39;, name=&#39;Ubuntu Condensed&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Regular.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-HeavyItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=800, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-BoldItalic.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Regular.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-B.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Black.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-MediumIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-ExtraLight.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-BoldItalic.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-BoldItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Bold.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Inconsolata-Regular.ttf&#39;, name=&#39;Inconsolata&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-Th.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=250, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.1925
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Hairline.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=100, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-HairlineItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=100, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Italic.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Italic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-SemiboldIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-BI.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-M.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-RI.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-LightItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-BoldIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Medium.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-L.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-MI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Regular.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Oblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-BlackItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuMathTeXGyre.ttf&#39;, name=&#39;DejaVu Math TeX Gyre&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Semibold.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Bold.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-B.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-LI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Heavy.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=800, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-R.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-LightIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-MediumItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-ThinItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-BoldItalic.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Thin.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-RI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-BI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: Matching monospace:style=normal:variant=normal:weight=normal:stretch=normal:size=8.33 to DejaVu Sans Mono (&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono.ttf&#39;) with score of 0.050000.
+DEBUG:matplotlib.font_manager:findfont: Matching monospace:style=normal:variant=normal:weight=normal:stretch=normal:size=6.9399999999999995.
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmtt10.ttf&#39;, name=&#39;cmtt10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizThreeSymBol.ttf&#39;, name=&#39;STIXSizeThreeSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralItalic.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFourSymBol.ttf&#39;, name=&#39;STIXSizeFourSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-Oblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralBolIta.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerifDisplay.ttf&#39;, name=&#39;DejaVu Serif Display&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniIta.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmb10.ttf&#39;, name=&#39;cmb10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmr10.ttf&#39;, name=&#39;cmr10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizOneSymBol.ttf&#39;, name=&#39;STIXSizeOneSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizTwoSymBol.ttf&#39;, name=&#39;STIXSizeTwoSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizThreeSymReg.ttf&#39;, name=&#39;STIXSizeThreeSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFiveSymReg.ttf&#39;, name=&#39;STIXSizeFiveSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmex10.ttf&#39;, name=&#39;cmex10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralBol.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFourSymReg.ttf&#39;, name=&#39;STIXSizeFourSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizTwoSymReg.ttf&#39;, name=&#39;STIXSizeTwoSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansDisplay.ttf&#39;, name=&#39;DejaVu Sans Display&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneral.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmss10.ttf&#39;, name=&#39;cmss10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUni.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmmi10.ttf&#39;, name=&#39;cmmi10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmsy10.ttf&#39;, name=&#39;cmsy10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizOneSymReg.ttf&#39;, name=&#39;STIXSizeOneSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniBol.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-Bold.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.33499999999999996
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniBolIta.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-BlackIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-R.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Italic.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Bold.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.33499999999999996
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Medium.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Light.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-ExtraLight.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-SemiboldItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-It.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Black.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-ExtraLightIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Light.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Semibold.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Inconsolata-Bold.ttf&#39;, name=&#39;Inconsolata&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-C.ttf&#39;, name=&#39;Ubuntu Condensed&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Regular.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-HeavyItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=800, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-BoldItalic.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Regular.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-B.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Black.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-MediumIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-ExtraLight.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-BoldItalic.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-BoldItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Bold.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Inconsolata-Regular.ttf&#39;, name=&#39;Inconsolata&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-Th.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=250, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.1925
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Hairline.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=100, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-HairlineItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=100, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Italic.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Italic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-SemiboldIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-BI.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-M.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-RI.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-LightItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-BoldIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Medium.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-L.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-MI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Regular.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Oblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-BlackItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuMathTeXGyre.ttf&#39;, name=&#39;DejaVu Math TeX Gyre&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Semibold.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Bold.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-B.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-LI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Heavy.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=800, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-R.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-LightIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-MediumItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-ThinItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-BoldItalic.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Thin.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-RI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-BI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: Matching monospace:style=normal:variant=normal:weight=normal:stretch=normal:size=6.9399999999999995 to DejaVu Sans Mono (&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono.ttf&#39;) with score of 0.050000.
+DEBUG:matplotlib.font_manager:findfont: Matching monospace:style=normal:variant=normal:weight=bold:stretch=normal:size=10.0.
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmtt10.ttf&#39;, name=&#39;cmtt10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizThreeSymBol.ttf&#39;, name=&#39;STIXSizeThreeSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralItalic.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFourSymBol.ttf&#39;, name=&#39;STIXSizeFourSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-Oblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.33499999999999996
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralBolIta.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerifDisplay.ttf&#39;, name=&#39;DejaVu Serif Display&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniIta.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmb10.ttf&#39;, name=&#39;cmb10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmr10.ttf&#39;, name=&#39;cmr10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizOneSymBol.ttf&#39;, name=&#39;STIXSizeOneSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizTwoSymBol.ttf&#39;, name=&#39;STIXSizeTwoSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizThreeSymReg.ttf&#39;, name=&#39;STIXSizeThreeSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFiveSymReg.ttf&#39;, name=&#39;STIXSizeFiveSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmex10.ttf&#39;, name=&#39;cmex10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneralBol.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizFourSymReg.ttf&#39;, name=&#39;STIXSizeFourSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizTwoSymReg.ttf&#39;, name=&#39;STIXSizeTwoSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansDisplay.ttf&#39;, name=&#39;DejaVu Sans Display&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXGeneral.ttf&#39;, name=&#39;STIXGeneral&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmss10.ttf&#39;, name=&#39;cmss10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUni.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmmi10.ttf&#39;, name=&#39;cmmi10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/cmsy10.ttf&#39;, name=&#39;cmsy10&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXSizOneSymReg.ttf&#39;, name=&#39;STIXSizeOneSym&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniBol.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSerif.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-Bold.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/STIXNonUniBolIta.ttf&#39;, name=&#39;STIXNonUnicode&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-BlackIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-R.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Italic.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.33499999999999996
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Bold.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 0.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Medium.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Light.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-ExtraLight.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-SemiboldItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-It.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Black.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-ExtraLightIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Light.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Semibold.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Inconsolata-Bold.ttf&#39;, name=&#39;Inconsolata&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-C.ttf&#39;, name=&#39;Ubuntu Condensed&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Regular.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-HeavyItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=800, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-BoldItalic.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Regular.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-B.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Black.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-MediumIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-ExtraLight.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-BoldItalic.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-BoldItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Bold.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Inconsolata-Regular.ttf&#39;, name=&#39;Inconsolata&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-Th.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=250, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.4775
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Hairline.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=100, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.62
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-HairlineItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=100, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.62
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Italic.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Italic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-SemiboldIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-BI.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-M.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/UbuntuMono-RI.ttf&#39;, name=&#39;Ubuntu Mono&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-LightItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-BoldIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Medium.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-L.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-MI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Regular.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Oblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-BlackItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=900, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuMathTeXGyre.ttf&#39;, name=&#39;DejaVu Math TeX Gyre&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansMono-BoldOblique.ttf&#39;, name=&#39;DejaVu Sans Mono&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 1.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-Semibold.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=600, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-Bold.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Oblique.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;oblique&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-B.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-LI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Heavy.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=800, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.145
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-R.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/SourceCodePro-LightIt.ttf&#39;, name=&#39;Source Code Pro&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=300, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.43
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf&#39;, name=&#39;Liberation Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf&#39;, name=&#39;Liberation Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-MediumItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=500, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.24
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-ThinItalic.ttf&#39;, name=&#39;Lato&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationSansNarrow-BoldItalic.ttf&#39;, name=&#39;Liberation Sans Narrow&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-BoldItalic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.25
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/lato/Lato-Thin.ttf&#39;, name=&#39;Lato&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=200, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.525
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-RI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/miniconda/envs/gf/fonts/Ubuntu-BI.ttf&#39;, name=&#39;Ubuntu&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=700, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 11.05
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSerifCondensed-Italic.ttf&#39;, name=&#39;DejaVu Serif&#39;, style=&#39;italic&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 11.535
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf&#39;, name=&#39;Liberation Mono&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;normal&#39;, size=&#39;scalable&#39;)) = 10.335
+DEBUG:matplotlib.font_manager:findfont: score(FontEntry(fname=&#39;/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed.ttf&#39;, name=&#39;DejaVu Sans&#39;, style=&#39;normal&#39;, variant=&#39;normal&#39;, weight=400, stretch=&#39;condensed&#39;, size=&#39;scalable&#39;)) = 10.535
+DEBUG:matplotlib.font_manager:findfont: Matching monospace:style=normal:variant=normal:weight=bold:stretch=normal:size=10.0 to DejaVu Sans Mono (&#39;/usr/share/miniconda/envs/gf/lib/python3.11/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSansMono-Bold.ttf&#39;) with score of 0.050000.
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.779 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-extraction-subset-station-section-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../../_downloads/da1c8bf4343700f020206a49dd015f70/station_section.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">station_section.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../../_downloads/bca83c3cefd1f323359ddd563f26cb6a/station_section.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">station_section.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Subset Extraction Tutorials</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="single_seismogram.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Single Seismogram</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#loading-all-modules">
+   Loading all modules
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="../../../_sources/examples/extraction/subset/station_section.rst.txt">
+        <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2023, Lucas Sawade.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

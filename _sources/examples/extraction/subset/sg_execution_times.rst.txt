@@ -1,0 +1,16 @@
+
+:orphan:
+
+.. _sphx_glr_examples_extraction_subset_sg_execution_times:
+
+Computation times
+=================
+**00:05.454** total execution time for **examples_extraction_subset** files:
+
++--------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_examples_extraction_subset_station_section.py` (``station_section.py``)     | 00:02.779 | 0.0 MB |
++--------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_examples_extraction_subset_aligned_stations.py` (``aligned_stations.py``)   | 00:02.158 | 0.0 MB |
++--------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_examples_extraction_subset_single_seismogram.py` (``single_seismogram.py``) | 00:00.516 | 0.0 MB |
++--------------------------------------------------------------------------------------------+-----------+--------+

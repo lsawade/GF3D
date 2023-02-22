@@ -10,7 +10,7 @@
   
   
   <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
   
@@ -28,6 +28,11 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
@@ -54,7 +59,7 @@
   </head>
   
   
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="dark">
 
   
   
@@ -123,15 +128,15 @@
     <ul id="navbar-main-elements" class="navbar-nav">
         
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="tabs/gf-generation.html">
+                      <a class="nav-link nav-internal" href="parts/gf-generation/index.html">
                         3D Green Function Generation
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="tabs/gf-extraction.html">
-                        Green Function  Extraction
+                      <a class="nav-link nav-internal" href="parts/gf-extraction/index.html">
+                        3D Green Function Extraction
                       </a>
                     </li>
                 
@@ -217,15 +222,15 @@
     <ul id="navbar-main-elements" class="navbar-nav">
         
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="tabs/gf-generation.html">
+                      <a class="nav-link nav-internal" href="parts/gf-generation/index.html">
                         3D Green Function Generation
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="tabs/gf-extraction.html">
-                        Green Function  Extraction
+                      <a class="nav-link nav-internal" href="parts/gf-extraction/index.html">
+                        3D Green Function Extraction
                       </a>
                     </li>
                 
@@ -308,14 +313,14 @@
     gf-extraction
 
       <ul>
-        <li><a href="tabs/gf-extraction.html#module-gf-extraction">module</a>
+        <li><a href="parts/gf-extraction/index.html#module-gf-extraction">module</a>
 </li>
       </ul></li>
       <li>
     gf-generation
 
       <ul>
-        <li><a href="tabs/gf-generation.html#module-gf-generation">module</a>
+        <li><a href="parts/gf-generation/index.html#module-gf-generation">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -337,9 +342,9 @@
     module
 
       <ul>
-        <li><a href="tabs/gf-extraction.html#module-gf-extraction">gf-extraction</a>
+        <li><a href="parts/gf-extraction/index.html#module-gf-extraction">gf-extraction</a>
 </li>
-        <li><a href="tabs/gf-generation.html#module-gf-generation">gf-generation</a>
+        <li><a href="parts/gf-generation/index.html#module-gf-generation">gf-generation</a>
 </li>
         <li><a href="index.html#module-gf-index">gf-index</a>
 </li>

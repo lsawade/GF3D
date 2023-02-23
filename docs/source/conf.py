@@ -54,6 +54,10 @@ exclude_patterns = ["_build", "Thumbs.db",
                     ".DS_Store", "**.ipynb_checkpoints", "build"]
 
 
+add_module_names = False
+autoclass_content = 'both'
+autosummary_generate = True
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

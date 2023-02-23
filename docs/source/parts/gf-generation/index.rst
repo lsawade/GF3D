@@ -2,7 +2,7 @@
 
 .. title:: GF Generation
 
-.. module:: gf-generation
+.. module:: gf3d.simulation
 
 3D Green Function Generation
 ----------------------------

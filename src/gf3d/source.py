@@ -211,25 +211,68 @@ class CMTSOLUTION:
     def __init__(
         self,
         origin_time: UTCDateTime = UTCDateTime(2000, 1, 1, 0, 0, 0),
-        pde_lat: float = 0.0,     # deg
-        pde_lon: float = 0.0,     # deg
-        pde_depth: float = 0.0,   # km
-        mb: float = 0.0,          # magnitude scale
-        ms: float = 0.0,          # magnitude scale
-        region_tag: str = '',     # string
-        eventname: str = '',      # GCMT id
-        time_shift: float = 0.0,  # in s
-        hdur: float = 0.0,        # in s
-        latitude: float = 0.0,    # in deg
-        longitude: float = 0.0,   # in deg
-        depth: float = 0.0,       # in km
-        Mrr: float = 0.0,         # dyn*cm
-        Mtt: float = 0.0,         # dyn*cm
-        Mpp: float = 0.0,         # dyn*cm
-        Mrt: float = 0.0,         # dyn*cm
-        Mrp: float = 0.0,         # dyn*cm
-        Mtp: float = 0.0          # dyn*cm
+        pde_lat: float = 0.0,
+        pde_lon: float = 0.0,
+        pde_depth: float = 0.0,
+        mb: float = 0.0,
+        ms: float = 0.0,
+        region_tag: str = '',
+        eventname: str = '',
+        time_shift: float = 0.0,
+        hdur: float = 0.0,
+        latitude: float = 0.0,
+        longitude: float = 0.0,
+        depth: float = 0.0,
+        Mrr: float = 0.0,
+        Mtt: float = 0.0,
+        Mpp: float = 0.0,
+        Mrt: float = 0.0,
+        Mrp: float = 0.0,
+        Mtp: float = 0.0
     ) -> None:
+        """Class that represents the classic CMTSOLUTION format and implements methods to read, write, and perturb a CMTSOLUTION.
+
+        Parameters
+        ----------
+        origin_time : UTCDateTime, optional
+            Event origin time, by default UTCDateTime(2000, 1, 1, 0, 0, 0)
+        pde_lat : float, optional
+            PDE latitude [deg], by default 0.0
+        pde_lon : float, optional
+            PDE longitude [deg], by default 0.0
+        pde_depth : float, optional
+            PDE depth [deg], by default 0.0
+        mb : float, optional
+            body wave magnitude, by default 0.0
+        ms : float, optional
+            surface wave magnitude, by default 0.0
+        region_tag : str, optional
+            region tag, by default ''
+        eventname : str, optional
+            event id, by default ''
+        time_shift : float, optional
+            timeshift of origin to centroid [s], by default 0.0
+        hdur : float, optional
+            centroid half duration [s], by default 0.0
+        latitude : float, optional
+            centroid latitude [deg], by default 0.0
+        longitude : float, optional
+            centroid longitude [deg], by default 0.0
+        depth : float, optional
+            centroid depth [km], by default 0.0
+        Mrr : float, optional
+            moment tensor element [dyn * s], by default 0.0
+        Mtt : float, optional
+            moment tensor element [dyn * s], by default 0.0
+        Mpp : float, optional
+            moment tensor element [dyn * s], by default 0.0
+        Mrt : float, optional
+            moment tensor element [dyn * s], by default 0.0
+        Mrp : float, optional
+            moment tensor element [dyn * s], by default 0.0
+        Mtp : float, optional
+            moment tensor element [dyn * s], by default 0.0
+        """
 
         # Define
         self.origin_time = origin_time
@@ -345,32 +388,30 @@ class CMTSOLUTION:
 
     @property
     def tensor(self):
+        """6 element moment tensor"""
         return np.array([self.Mrr, self.Mtt, self.Mpp, self.Mrt, self.Mrp, self.Mtp])
 
     @property
     def fulltensor(self):
+        """Full 3x3 moment tensor"""
         return np.array([[self.Mrr, self.Mrt, self.Mrp],
                          [self.Mrt, self.Mtt, self.Mtp],
                          [self.Mrp, self.Mtp, self.Mpp]])
 
     @property
     def cmt_time(self):
+        """UTC Origin + Timeshift"""
         return self.origin_time + self.time_shift
 
     @property
     def M0(self):
-        """
-        Scalar Moment M0 in Nm
-        """
+        """Scalar Moment M0 in Nm"""
         return (self.Mrr ** 2 + self.Mtt ** 2 + self.Mpp ** 2
                 + 2 * self.Mrt ** 2 + 2 * self.Mrp ** 2
                 + 2 * self.Mtp ** 2) ** 0.5 * 0.5 ** 0.5
 
     @M0.setter
     def M0(self, M0):
-        """
-        Scalar Moment M0 in Nm
-        """
         iM0 = self.M0
         fM0 = M0
         factor = fM0/iM0
@@ -385,12 +426,24 @@ class CMTSOLUTION:
 
     @property
     def Mw(self):
-        """
-        Moment magnitude M_w
-        """
+        """Moment magnitude M_w"""
         return 2/3 * np.log10(7 + self.M0) - 10.73
 
     def pert(self, param: str, pert: float):
+        """Perturb the CMTSOLUTION. `NOT` in-place. CMT is copied.
+
+        Parameters
+        ----------
+        param : str
+            parameter to perturb
+        pert : float
+            perturbation value
+
+        Returns
+        -------
+        CMTSOLUTION
+            perturbed copy of the original cmtsolution
+        """
 
         outcmt = deepcopy(self)
 
@@ -399,6 +452,7 @@ class CMTSOLUTION:
         return outcmt
 
     def update_hdur(self):
+        """Updates the halfduration if M0 is was reset."""
         # Updates the half duration
         Nm_conv = 1 / 1e7
         self.half_duration = np.round(
@@ -406,6 +460,7 @@ class CMTSOLUTION:
 
     @staticmethod
     def float_to_str(x: float, N: int):
+        """Makes fortran style float."""
 
         # Check whether g formatting removes decimal points
         out = f'{x:{N}g}'
@@ -452,11 +507,13 @@ class CMTSOLUTION:
         ax.add_collection(bb)
 
     def write(self, outfile: str):
+        """Writes classic CMTSOLUTION in classic format."""
 
         with open(outfile, 'w') as f:
             f.write(self.__str__())
 
     def __str__(self):
+        """Returns a string in classic CMTSOLUTION format."""
 
         # Reconstruct the first line as well as possible. All
         # hypocentral information is missing.

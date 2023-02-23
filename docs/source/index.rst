@@ -21,7 +21,7 @@ Functions on the basis of `specfem3d_globe`_.
 
     parts/gf-generation/index
     parts/gf-extraction/index
-
+    parts/api/index
 
 Quick-Install
 *************

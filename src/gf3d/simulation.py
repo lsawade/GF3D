@@ -31,6 +31,8 @@ class Simulation:
             target_latitude: float | np.ndarray | tp.Iterable | None = None,
             target_longitude: float | np.ndarray | tp.Iterable | None = None,
             target_depth: float | np.ndarray | tp.Iterable | None = None,
+            par_file: str | None = None,
+            element_buffer: int | None = None,
             force_factor: float = 1e14,
             t0: float = 0.0,
             tc: float = 0.0,
@@ -38,26 +40,103 @@ class Simulation:
             nstep: None | int = None,
             subsample: bool = True,
             ndt: None | float = None,
-            lpfilter: str = 'bessel',
+            lpfilter: str = 'butter',
             forward_test: bool = False,
             forwardoutdir: str | None = None,
             broadcast_mesh_model: bool = False,
             simultaneous_runs: bool = False,
             cmtsolutionfile: str | None = None,
-            par_file: str | None = None,
-            element_buffer: int | None = None,
             overwrite: bool = False) -> None:
-        """Makes specfem directory into SGT database simulator.
+        """
 
-        Note that the specfem Par_file should be written in the same way you
-        would do a forward simulation. That is, set flags such as
+        Makes specfem directory into Green function database simulator.
 
-        .. literal::
 
-            NEX_??, NPROC_?? NCHUNKS -> Only 6 has been tested so far. MODEL
-            ROTATION TOPOGRAPHY ELLIPTICITY GRAVITY ATTENUATION USE_ADIOS ->
-            TRUE !!!
+        Parameters
+        ----------
+        specfemdir : _type_
+            base specfem directory
+        stationdir : str | None, optional
+            base directory for station simulations and GF files, by default None
+        station_latitude : float | None, optional
+            station latitude, by default None
+        station_longitude : float | None, optional
+            station longitude, by default None
+        station_burial : float | None, optional
+            station burial, by default None
+        network : str | None, optional
+            network, by default None
+        station : str | None, optional
+            station, by default None
+        target_file : str | None, optional
+            target file ``GF_LOCATIONS``, by default None
+        target_latitude : float | np.ndarray | tp.Iterable | None, optional
+            target latitude, only relevant if ``target_file`` not set,
+            by default None
+        target_longitude : float | np.ndarray | tp.Iterable | None, optional
+            target longitude, only relevant if ``target_file`` not set,
+            by default None
+        target_depth : float | np.ndarray | tp.Iterable | None, optional
+            target depth, only relevant if ``target_file`` not set,
+            by default None
+        par_file : str | None, optional
+            needed to set up specfem, by default None
+        element_buffer : int | None, optional
+            how many buffer elements to set around tagged elements, by default None
+        force_factor : float, optional
+            factor to simulate the reciprocal forces with, by default 1e14
+        t0 : float, optional
+            starttime, by default 0.0
+        tc : float, optional
+            center of green function centroid, by default 0.0
+        duration_in_min : float, optional
+            duration in minutes, by default 20.0
+        nstep : None | int, optional
+            number of timesteps if you want to hardset a number of timestep,
+            by default None
+        subsample : bool, optional
+            flag to turn on/off subsampling during the simulation,
+            by default True
+        ndt : None | float, optional
+            requested new sampling rate, by default None
+        lpfilter : str, optional
+            type of low-pass filter, by default 'butter'
+        forward_test : bool, optional
+            flag to check whether you want to perform a test with
+            a separate specfem directory to compute a
+            specific event to test the green function extraction,
+            by default False
+        forwardoutdir : str | None, optional
+            forward specfem directory (auto-generated), by default None
+        broadcast_mesh_model : bool, optional
+            flag to set in specfem [not necessary, anymore], by default False
+        simultaneous_runs : bool, optional
+            flag to set in specfem [not necessary, anymore], by default False
+        cmtsolutionfile : str | None, optional
+            if forward test a cmtsolution is required, by default None
+        overwrite : bool, optional
+            flag to overwrite certain direcories, by default False
 
+        Notes
+        -----
+
+        The `specfem3D_globe` `Par_file` should be written in the same way
+        you would do a normal forward simulation. That is, set flags such as
+
+        ::
+
+            NEX_*
+            NPROC_*
+            NCHUNKS
+            MODEL
+            ROTATION
+            TOPOGRAPHY
+            ELLIPTICITY
+            GRAVITY
+            ATTENUATION
+
+            # IMPORTANT
+            USE_ADIOS = .true.
 
 
         Before Running the manager, check the DT that the mesher outputs. If
@@ -68,19 +147,22 @@ class Simulation:
 
         What does the simulation manager do?
 
-        1. Edits Par_file for SGT saving
-        2. Edits constants.h.in -> reverses rotation if ROTATION=True in
-           Par_file
-        3. Adds rundirs 0, 1, 2; one for each force E, N, Z.
-            a. at the station adds force solution
-            b. write GF_LOCATIONS for each directory
-            c.
+        1. Edits ``Par_file`` for reciprocal simulations
+        2. Edits ``constants.h.in`` -> reverses rotation if ``ROTATION = .true``
+           in ``Par_file``
+        3. Now, now mesh specfem (class not required)
+        4. Creates simulation directories from the specfem directory
+            a. Writes ``FORCESOLUTION`` to ``DATA`` directory
+            b. Writes ``GF_LOCATIONS`` to ``DATA`` directory
+            c. Writes source time function to ``DATA`` directory
+            d. Writes ``Par_file`` with correct parameters to ``DATA`` directory
+                - Length of simulation ``NT``
+                - starttime ``T0``
 
         What does the simulation manager not do?
-
-        - Postprocessing of the SGT files, such as, combine an simulated SGT set
-          to a single SGT file for each station.
-        - Querying of the SGT
+        - Postprocessing of the Green function files, such as, combine an
+          simulated Green function set to a single SGT file for each station.
+        - Querying the Green function database
 
         """
 
@@ -163,7 +245,10 @@ class Simulation:
                     'For forward test CMTSOLUTION must be provided')
 
     def create_specfem(self):
-        """Actually creates all necessary directories, after .setup() is run."""
+        """Only sets up specfem with the provided settings. You can mesh specfem
+        after running this function. Use
+        :func:`gf3d.simulation.Simulation.create` to create actual database
+        directories."""
 
         # Specfem not updated
         if self.forward_test:

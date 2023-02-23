@@ -880,7 +880,7 @@ class GFManager(object):
                     Parallel()(delayed(read_stuff)(i)
                                for i in zip(range(self.Ndb), dbs))
 
-    def get_seismograms(self, cmt: CMTSOLUTION):
+    def get_seismograms(self, cmt: CMTSOLUTION) -> Stream:
 
         # Get moment tensor
         x_target, y_target, z_target, Mx = source2xyz(
@@ -1012,10 +1012,12 @@ class GFManager(object):
         logger.debug('HELOHLOHOPHEIHRLIHR')
         return Stream(traces)
 
-    def get_frechet(self, cmt: CMTSOLUTION):
+    def get_frechet(self, cmt: CMTSOLUTION, rtype=3):
         """Computes centered finite difference using 10m perturbations"""
 
         mtpar = ['Mrr', 'Mtt', 'Mpp', 'Mrt', 'Mrp', 'Mtp']
+
+        # Define base frechet derivative dictionary
         pertdict = dict(
             Mrr=1e23,
             Mtt=1e23,
@@ -1023,12 +1025,22 @@ class GFManager(object):
             Mrt=1e23,
             Mrp=1e23,
             Mtp=1e23,
-            latitude=0.0001,
-            longitude=0.0001,
-            depth=0.01,
-            time_shift=-1.0,
-            hdur=0.001,
         )
+
+        # Add centroid location
+        if rtype >= 2:
+            pertdict.update(
+                latitude=0.0001,
+                longitude=0.0001,
+                depth=0.01,
+                time_shift=-1.0,
+            )
+
+        # Add frechet derivative for half duration
+        if rtype >= 3:
+            pertdict.update(
+                hdur=0.001
+            )
 
         frechets = dict()
 

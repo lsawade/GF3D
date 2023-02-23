@@ -143,6 +143,13 @@
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
     </ul>
 </nav>
       </div>
@@ -237,6 +244,13 @@
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
     </ul>
 </nav>
       </div>
@@ -322,13 +336,71 @@
             
             <article class="bd-article" role="main">
               
-  <span class="target" id="module-gf-extraction"></span><section id="d-green-function-extraction">
+  <span class="target" id="module-gf3d.seismograms"></span><section id="d-green-function-extraction">
 <span id="green-function-extraction"></span><h1>3D Green Function Extraction<a class="headerlink" href="#d-green-function-extraction" title="Permalink to this heading">#</a></h1>
 <p>This page goes over some examples on how to extract seismograms from the
 database as well as from subset.</p>
 <p>The examples at the bottom show advanced use cases including some plotting
-tools. The two main tools that you are going to need are the command-line tool
-which is automatically installed when you</p>
+tools. The two main tools that you are going to need are the python <code class="docutils literal notranslate"><span class="pre">Class</span></code>
+<a class="reference internal" href="../api/index.html#gf3d.seismograms.GFManager" title="gf3d.seismograms.GFManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">gf3d.seismograms.GFManager</span></code></a>, which loads the subset file into memory,
+and subsequently can be queried, for cmt locations. The use of the
+<a class="reference internal" href="../api/index.html#gf3d.seismograms.GFManager" title="gf3d.seismograms.GFManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">gf3d.seismograms.GFManager</span></code></a> is extensively demonstrated in the gallery
+below.</p>
+<p>The other tool that is immensely powerful is the command-line tool to query a
+specific subset file for a specific moment tensor. The command-line tool
+is automatically installed when you install <code class="docutils literal notranslate"><span class="pre">GF3D</span></code> and can be called using
+standard <code class="docutils literal notranslate"><span class="pre">CMTSOLUTION</span></code> parameters. The standard call signature is</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gf</span><span class="o">-</span><span class="n">get</span><span class="o">-</span><span class="n">synthetics</span> <span class="o">&lt;</span><span class="n">subsetfile</span><span class="o">&gt;</span> \
+    <span class="o">&lt;</span><span class="n">yyyy</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">mm</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">dd</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">HH</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">MM</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">SS</span><span class="o">.</span><span class="n">SSSS</span><span class="o">&gt;</span> \
+    <span class="o">&lt;</span><span class="n">Mrr</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">Mtt</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">Mpp</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">Mrt</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">Mrp</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">Mtp</span><span class="o">&gt;</span> \
+    <span class="o">&lt;</span><span class="n">latitude</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">longitude</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">depth</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">tshift</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">hdur</span><span class="o">&gt;</span> \
+    <span class="o">&lt;</span><span class="n">tfir</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">spsam</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">it1smp</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">it2smp</span><span class="o">&gt;</span> \
+    <span class="o">&lt;</span><span class="n">pminswrays</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">pmaxswrays</span><span class="o">&gt;</span> \
+    <span class="o">&lt;</span><span class="n">itypsokern</span><span class="o">&gt;</span> \
+    <span class="o">&lt;</span><span class="n">outdir</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The call signature is quite long, but every parameter is essential. The parameters are as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">subset_file</span> <span class="o">=</span> <span class="n">file</span> <span class="n">containing</span> <span class="n">Green</span> <span class="n">functions</span> <span class="n">of</span> <span class="n">a</span> <span class="n">subset</span> <span class="n">of</span> <span class="n">elements</span>
+<span class="n">yyyy</span>        <span class="o">=</span> <span class="n">origin</span> <span class="n">year</span>
+<span class="n">mm</span>          <span class="o">=</span> <span class="n">origin</span> <span class="n">month</span>
+<span class="n">dd</span>          <span class="o">=</span> <span class="n">origin</span> <span class="n">day</span>
+<span class="n">HH</span>          <span class="o">=</span> <span class="n">origin</span> <span class="n">hour</span>
+<span class="n">MM</span>          <span class="o">=</span> <span class="n">origin</span> <span class="n">minute</span>
+<span class="n">SS</span><span class="o">.</span><span class="n">S</span>        <span class="o">=</span> <span class="n">origin</span> <span class="n">seconds</span>
+<span class="n">Mrr</span>         <span class="o">=</span> <span class="n">Moment</span> <span class="n">tensor</span> <span class="n">element</span>  <span class="p">[</span><span class="n">dyn</span> <span class="o">*</span> <span class="n">cm</span><span class="p">]</span>
+<span class="n">Mtt</span>         <span class="o">=</span> <span class="o">---//---</span>
+<span class="n">Mpp</span>         <span class="o">=</span> <span class="o">---//---</span>
+<span class="n">Mrt</span>         <span class="o">=</span> <span class="o">---//---</span>
+<span class="n">Mrp</span>         <span class="o">=</span> <span class="o">---//---</span>
+<span class="n">Mtp</span>         <span class="o">=</span> <span class="o">---//---</span>
+<span class="n">latitude</span>    <span class="o">=</span> <span class="n">centroid</span> <span class="n">latitude</span>      <span class="p">[</span><span class="n">deg</span><span class="p">]</span>
+<span class="n">longitude</span>   <span class="o">=</span> <span class="n">centroid</span> <span class="n">longitude</span>     <span class="p">[</span><span class="n">deg</span><span class="p">]</span>
+<span class="n">depth</span>       <span class="o">=</span> <span class="n">centroid</span> <span class="n">depth</span>         <span class="p">[</span><span class="n">km</span><span class="p">]</span>
+<span class="n">tshift</span>      <span class="o">=</span> <span class="n">centroid</span> <span class="n">time</span> <span class="n">shift</span>    <span class="p">[</span><span class="n">s</span><span class="p">]</span>
+<span class="n">hdur</span>        <span class="o">=</span> <span class="n">centroid</span> <span class="n">half_duration</span> <span class="p">[</span><span class="n">s</span><span class="p">]</span>
+<span class="n">tfir</span>        <span class="o">=</span> <span class="n">start</span> <span class="n">time</span> <span class="n">of</span> <span class="n">first</span> <span class="n">sample</span> <span class="n">w</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">t</span><span class="o">.</span> <span class="n">origin</span> <span class="n">time</span>
+<span class="n">spsam</span>       <span class="o">=</span> <span class="n">seconds</span> <span class="n">per</span> <span class="n">sample</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">sample</span> <span class="n">rate</span><span class="p">)</span>
+<span class="n">it1smp</span>      <span class="o">=</span> <span class="n">index</span> <span class="n">of</span> <span class="n">first</span> <span class="n">sample</span> <span class="n">wanted</span> <span class="p">[</span><span class="n">compute</span> <span class="n">starttime</span> <span class="k">for</span> <span class="n">interpolation</span><span class="p">]</span>
+<span class="n">it2smp</span>      <span class="o">=</span> <span class="n">index</span> <span class="n">of</span> <span class="n">last</span> <span class="n">sample</span> <span class="n">wanted</span>  <span class="p">[</span><span class="n">compute</span> <span class="n">npts</span><span class="p">]</span>
+<span class="n">pminswrays</span>  <span class="o">=</span> <span class="n">minimum</span> <span class="n">period</span> <span class="n">wanted</span> <span class="p">[</span><span class="n">band</span><span class="o">-</span><span class="k">pass</span><span class="p">]</span>
+<span class="n">pmaxswrays</span>  <span class="o">=</span> <span class="n">maximum</span> <span class="n">period</span> <span class="n">wanted</span>
+<span class="n">itypsokern</span>  <span class="o">=</span> <span class="n">code</span> <span class="k">for</span> <span class="nb">type</span> <span class="n">of</span> <span class="n">kernels</span> <span class="n">desired</span> <span class="p">(</span><span class="n">see</span> <span class="n">below</span><span class="p">)</span>
+<span class="n">outdir</span>      <span class="o">=</span> <span class="n">directory</span> <span class="n">to</span> <span class="n">write</span> <span class="n">synthetics</span> <span class="n">to</span>
+</pre></div>
+</div>
+<p>Most of the parameters are self-explanatory with the description. If</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">itypsokern=0</span></code>, the subroutine only computes the synthetic seismogram</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">itypsokern=1</span></code>, the subroutine computes the synthetic seismogram, and the 6
+moment-tensor kernels</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">itypsokern=2</span></code>, the subroutine computes the synthetic seismogram in synt, 6
+moment-tensor kernels and 4 centroid kernels (latitude, longitude, depth,
+tshift)</p></li>
+</ul>
+<p>The synthetic seismograms are then stored in <code class="docutils literal notranslate"><span class="pre">&lt;outdir&gt;</span></code>. The synthetics traces
+are stored in <code class="docutils literal notranslate"><span class="pre">&lt;outdir&gt;/synt</span></code>, and the kernels are stored in the
+<code class="docutils literal notranslate"><span class="pre">&lt;outdir&gt;/[par]</span></code></p>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">#</a></h2>
 <div class="toctree-wrapper compound">

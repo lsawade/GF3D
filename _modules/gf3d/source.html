@@ -1,0 +1,956 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gf3d.source &#8212; GF3D 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "dark";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/gf3d/source';</script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="dark">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Logo image">
+    <img src="../../_static/logo.png" class="logo__image only-dark" alt="Logo image">
+  
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../parts/gf-generation/index.html">
+                        3D Green Function Generation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../parts/gf-extraction/index.html">
+                        3D Green Function Extraction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../parts/api/index.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lsawade/GF3D" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../parts/gf-generation/index.html">
+                        3D Green Function Generation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../parts/gf-extraction/index.html">
+                        3D Green Function Extraction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../parts/api/index.html">
+                        API Documentation
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lsawade/GF3D" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <h1>Source code for gf3d.source</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Readers and writers for FORCESOLUTION and CMTSOLUTION for specfem.</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">UTCDateTime</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">obspy.imaging.mopad_wrapper</span> <span class="kn">import</span> <span class="n">beach</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">transforms</span>  <span class="c1"># For beachball fix</span>
+
+
+<div class="viewcode-block" id="FORCESOLUTION"><a class="viewcode-back" href="../../parts/api/index.html#gf3d.source.FORCESOLUTION">[docs]</a><span class="k">class</span> <span class="nc">FORCESOLUTION</span><span class="p">:</span>
+
+    <span class="n">time_shift</span><span class="p">:</span> <span class="nb">float</span>    <span class="c1"># in s</span>
+    <span class="n">hdur</span><span class="p">:</span> <span class="nb">float</span>         <span class="c1"># in s</span>
+    <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span>     <span class="c1"># in deg</span>
+    <span class="n">longitude</span><span class="p">:</span> <span class="nb">float</span>    <span class="c1"># in deg</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">float</span>        <span class="c1"># in km</span>
+    <span class="n">stf</span><span class="p">:</span> <span class="nb">int</span>            <span class="c1"># 0=Gaussian function, 1=Ricker wavelet, 2=Step function</span>
+    <span class="n">forcefactor</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># Newton</span>
+    <span class="n">vector_E</span><span class="p">:</span> <span class="nb">float</span>     <span class="c1"># East force vector</span>
+    <span class="n">vector_N</span><span class="p">:</span> <span class="nb">float</span>     <span class="c1"># North force vector</span>
+    <span class="n">vector_Z_UP</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># Vertical UP(!) force vector</span>
+    <span class="n">force_no</span><span class="p">:</span> <span class="nb">int</span>       <span class="c1"># Force number</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">time_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>       <span class="c1"># in s</span>
+        <span class="n">hdur</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3.1</span><span class="p">,</span>          <span class="c1"># in s</span>
+        <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">48.3319</span><span class="p">,</span>  <span class="c1"># in deg</span>
+        <span class="n">longitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">8.3311</span><span class="p">,</span>  <span class="c1"># in deg</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>         <span class="c1"># in km</span>
+        <span class="n">stf</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>               <span class="c1"># 0=Gaussian function, 1=Ricker wavelet, 2=Step function</span>
+        <span class="n">forcefactor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e14</span><span class="p">,</span>  <span class="c1"># Newton</span>
+        <span class="n">vector_E</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>        <span class="c1"># East force vector</span>
+        <span class="n">vector_N</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>        <span class="c1"># North force vector</span>
+        <span class="n">vector_Z_UP</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>     <span class="c1"># Vertical UP(!) force vector</span>
+        <span class="n">force_no</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>           <span class="c1"># Number of the force (for header)</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1"># Define</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdur</span> <span class="o">=</span> <span class="n">hdur</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">=</span> <span class="n">latitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">longitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stf</span> <span class="o">=</span> <span class="n">stf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">forcefactor</span> <span class="o">=</span> <span class="n">forcefactor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vector_N</span> <span class="o">=</span> <span class="n">vector_N</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vector_E</span> <span class="o">=</span> <span class="n">vector_E</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vector_Z_UP</span> <span class="o">=</span> <span class="n">vector_Z_UP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force_no</span> <span class="o">=</span> <span class="n">force_no</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">BFO</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+
+        <span class="n">N</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+
+        <span class="k">if</span> <span class="n">comp</span> <span class="o">==</span> <span class="s1">&#39;Z&#39;</span><span class="p">:</span>
+            <span class="n">Z</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">:</span>
+            <span class="n">E</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">comp</span> <span class="o">==</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Component must be N, E, or Z&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">time_shift</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">hdur</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="mf">48.3319</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="mf">8.3311</span><span class="p">,</span>
+            <span class="n">depth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">stf</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">forcefactor</span><span class="o">=</span><span class="mf">1e14</span><span class="p">,</span> <span class="n">vector_E</span><span class="o">=</span><span class="n">E</span><span class="p">,</span> <span class="n">vector_N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+            <span class="n">vector_Z_UP</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">force_no</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads FORCESOLUTION file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        infile : str</span>
+<span class="sd">            FORCESOLUTION file</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        FORCESOLUTION class</span>
+<span class="sd">            A class that contains all the tensor info</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="c1"># Convert first line</span>
+        <span class="n">force_no</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Reading second line</span>
+        <span class="n">time_shift</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Reading third line</span>
+        <span class="n">half_duration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Reading fourth line</span>
+        <span class="n">latitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Reading fifth line</span>
+        <span class="n">longitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Reading sixth line</span>
+        <span class="n">depth</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Reading seventh line</span>
+        <span class="n">stf</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Reading eigth line</span>
+        <span class="n">forcefactor</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Reading lines 9-11</span>
+        <span class="n">compE</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">compN</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">compZ_UP</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">time_shift</span><span class="o">=</span><span class="n">time_shift</span><span class="p">,</span> <span class="n">hdur</span><span class="o">=</span><span class="n">half_duration</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">stf</span><span class="o">=</span><span class="n">stf</span><span class="p">,</span> <span class="n">forcefactor</span><span class="o">=</span><span class="n">forcefactor</span><span class="p">,</span> <span class="n">vector_E</span><span class="o">=</span><span class="n">compE</span><span class="p">,</span> <span class="n">vector_N</span><span class="o">=</span><span class="n">compN</span><span class="p">,</span> <span class="n">vector_Z_UP</span><span class="o">=</span><span class="n">compZ_UP</span><span class="p">,</span> <span class="n">force_no</span><span class="o">=</span><span class="n">force_no</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">float_to_str</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+        <span class="c1"># Check whether g formatting removes decimal points</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:{</span><span class="n">N</span><span class="si">}</span><span class="s1">g</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="c1"># Fix to fortran formatting of doubles</span>
+        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;d0&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;.d&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;.d0&#39;</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">str2float</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+        <span class="c1"># Fix to fortran formatting of doubles</span>
+        <span class="k">if</span> <span class="s2">&quot;d+&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d+&#39;</span><span class="p">,</span> <span class="s1">&#39;e+&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;d-&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d-&#39;</span><span class="p">,</span> <span class="s1">&#39;e-&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;d&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+        <span class="n">N</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">force_no</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">rstr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;FORCE  </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;time shift:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span><span class="si">:</span><span class="s2">15.4f</span><span class="si">}</span><span class="s2">    ! s</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;half duration:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">hdur</span><span class="si">:</span><span class="s2">9.1f</span><span class="si">}</span><span class="s2">       ! Half duration (s) for Gaussian/Step function, frequency (Hz) for Ricker</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;latitude:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="si">:</span><span class="s2">17.4f</span><span class="si">}</span><span class="s2">    ! Degree </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;longitude:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="si">:</span><span class="s2">16.4f</span><span class="si">}</span><span class="s2">    ! Degree</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;depth:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="si">:</span><span class="s2">20.4f</span><span class="si">}</span><span class="s2">    ! km</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;source time function:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">stf</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">       ! 0=Gaussian function, 1=Ricker wavelet, 2=Step function</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">FF</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forcefactor</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_E</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_N</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_Z_UP</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;factor force source: </span><span class="si">{</span><span class="n">FF</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> ! Newton</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;component dir vect source E: </span><span class="si">{</span><span class="n">E</span><span class="si">:</span><span class="s2">&gt;9</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;component dir vect source N: </span><span class="si">{</span><span class="n">N</span><span class="si">:</span><span class="s2">&gt;9</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;component dir vect source Z_UP: </span><span class="si">{</span><span class="n">Z</span><span class="si">:</span><span class="s2">&gt;5</span><span class="si">}</span><span class="s2">  ! Upward force</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">rstr</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CMTSOLUTION"><a class="viewcode-back" href="../../parts/api/index.html#gf3d.source.CMTSOLUTION">[docs]</a><span class="k">class</span> <span class="nc">CMTSOLUTION</span><span class="p">:</span>
+
+    <span class="n">origin_time</span><span class="p">:</span> <span class="n">UTCDateTime</span>  <span class="c1"># Timestamp</span>
+    <span class="n">pde_lat</span><span class="p">:</span> <span class="nb">float</span>   <span class="c1"># deg</span>
+    <span class="n">pde_lon</span><span class="p">:</span> <span class="nb">float</span>   <span class="c1"># deg</span>
+    <span class="n">pde_depth</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># km</span>
+    <span class="n">mb</span><span class="p">:</span> <span class="nb">float</span>        <span class="c1"># magnitude scale</span>
+    <span class="n">ms</span><span class="p">:</span> <span class="nb">float</span>        <span class="c1"># magnitude scale</span>
+    <span class="n">region_tag</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># string</span>
+    <span class="n">eventname</span><span class="p">:</span> <span class="nb">str</span>   <span class="c1"># event id -&gt; GCMT</span>
+    <span class="n">time_shift</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># in s</span>
+    <span class="n">hdur</span><span class="p">:</span> <span class="nb">float</span>      <span class="c1"># in s</span>
+    <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># in deg</span>
+    <span class="n">longitude</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># in deg</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">float</span>     <span class="c1"># in m</span>
+    <span class="n">Mrr</span><span class="p">:</span> <span class="nb">float</span>       <span class="c1"># dyn*cm</span>
+    <span class="n">Mtt</span><span class="p">:</span> <span class="nb">float</span>       <span class="c1"># dyn*cm</span>
+    <span class="n">Mpp</span><span class="p">:</span> <span class="nb">float</span>       <span class="c1"># dyn*cm</span>
+    <span class="n">Mrt</span><span class="p">:</span> <span class="nb">float</span>       <span class="c1"># dyn*cm</span>
+    <span class="n">Mrp</span><span class="p">:</span> <span class="nb">float</span>       <span class="c1"># dyn*cm</span>
+    <span class="n">Mtp</span><span class="p">:</span> <span class="nb">float</span>       <span class="c1"># dyn*cm</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">origin_time</span><span class="p">:</span> <span class="n">UTCDateTime</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">pde_lat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">pde_lon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">pde_depth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">mb</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">region_tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="n">eventname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="n">time_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">hdur</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">latitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">longitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">Mrr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">Mtt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">Mpp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">Mrt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">Mrp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">Mtp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Class that represents the classic CMTSOLUTION format and implements methods to read, write, and perturb a CMTSOLUTION.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        origin_time : UTCDateTime, optional</span>
+<span class="sd">            Event origin time, by default UTCDateTime(2000, 1, 1, 0, 0, 0)</span>
+<span class="sd">        pde_lat : float, optional</span>
+<span class="sd">            PDE latitude [deg], by default 0.0</span>
+<span class="sd">        pde_lon : float, optional</span>
+<span class="sd">            PDE longitude [deg], by default 0.0</span>
+<span class="sd">        pde_depth : float, optional</span>
+<span class="sd">            PDE depth [deg], by default 0.0</span>
+<span class="sd">        mb : float, optional</span>
+<span class="sd">            body wave magnitude, by default 0.0</span>
+<span class="sd">        ms : float, optional</span>
+<span class="sd">            surface wave magnitude, by default 0.0</span>
+<span class="sd">        region_tag : str, optional</span>
+<span class="sd">            region tag, by default &#39;&#39;</span>
+<span class="sd">        eventname : str, optional</span>
+<span class="sd">            event id, by default &#39;&#39;</span>
+<span class="sd">        time_shift : float, optional</span>
+<span class="sd">            timeshift of origin to centroid [s], by default 0.0</span>
+<span class="sd">        hdur : float, optional</span>
+<span class="sd">            centroid half duration [s], by default 0.0</span>
+<span class="sd">        latitude : float, optional</span>
+<span class="sd">            centroid latitude [deg], by default 0.0</span>
+<span class="sd">        longitude : float, optional</span>
+<span class="sd">            centroid longitude [deg], by default 0.0</span>
+<span class="sd">        depth : float, optional</span>
+<span class="sd">            centroid depth [km], by default 0.0</span>
+<span class="sd">        Mrr : float, optional</span>
+<span class="sd">            moment tensor element [dyn * s], by default 0.0</span>
+<span class="sd">        Mtt : float, optional</span>
+<span class="sd">            moment tensor element [dyn * s], by default 0.0</span>
+<span class="sd">        Mpp : float, optional</span>
+<span class="sd">            moment tensor element [dyn * s], by default 0.0</span>
+<span class="sd">        Mrt : float, optional</span>
+<span class="sd">            moment tensor element [dyn * s], by default 0.0</span>
+<span class="sd">        Mrp : float, optional</span>
+<span class="sd">            moment tensor element [dyn * s], by default 0.0</span>
+<span class="sd">        Mtp : float, optional</span>
+<span class="sd">            moment tensor element [dyn * s], by default 0.0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Define</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">=</span> <span class="n">origin_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pde_lat</span> <span class="o">=</span> <span class="n">pde_lat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pde_lon</span> <span class="o">=</span> <span class="n">pde_lon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pde_depth</span> <span class="o">=</span> <span class="n">pde_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mb</span> <span class="o">=</span> <span class="n">mb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ms</span> <span class="o">=</span> <span class="n">ms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_tag</span> <span class="o">=</span> <span class="n">region_tag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eventname</span> <span class="o">=</span> <span class="n">eventname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">=</span> <span class="n">time_shift</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdur</span> <span class="o">=</span> <span class="n">hdur</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">=</span> <span class="n">latitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">longitude</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mrr</span> <span class="o">=</span> <span class="n">Mrr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mtt</span> <span class="o">=</span> <span class="n">Mtt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mpp</span> <span class="o">=</span> <span class="n">Mpp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mrt</span> <span class="o">=</span> <span class="n">Mrt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mrp</span> <span class="o">=</span> <span class="n">Mrp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span> <span class="o">=</span> <span class="n">Mtp</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads CMT solution file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        infile : str</span>
+<span class="sd">            CMTSOLUTION file</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        CMTSOLUTION class</span>
+<span class="sd">            A class that contains all the tensor info</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="c1"># Convert first line</span>
+        <span class="n">line0</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Split up origin time values</span>
+        <span class="n">origin_time</span> <span class="o">=</span> <span class="n">line0</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
+
+        <span class="c1"># Create datetime values</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">origin_time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">+</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">origin_time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
+
+        <span class="c1"># Create datetime stamp</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">origin_time</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not determine origin time from line: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                          <span class="o">%</span> <span class="n">line0</span><span class="p">)</span>
+            <span class="n">origin_time</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">otherinfo</span> <span class="o">=</span> <span class="n">line0</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">6</span><span class="p">:]</span>
+        <span class="n">pde_lat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">otherinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">pde_lon</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">otherinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">pde_depth</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">otherinfo</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">mb</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">otherinfo</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">ms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">otherinfo</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">region_tag</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">otherinfo</span><span class="p">[</span><span class="mi">5</span><span class="p">:])</span>
+
+        <span class="c1"># Reading second line</span>
+        <span class="n">eventname</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Reading third line</span>
+        <span class="n">time_shift</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Reading fourth line</span>
+        <span class="n">half_duration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Reading fifth line</span>
+        <span class="n">latitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Reading sixth line</span>
+        <span class="n">longitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Reading seventh line</span>
+        <span class="n">depth</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Reading lines 8-13</span>
+        <span class="n">Mrr</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">Mtt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">Mpp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">Mrt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">Mrp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">Mtp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">,</span>
+            <span class="n">pde_lat</span><span class="o">=</span><span class="n">pde_lat</span><span class="p">,</span>
+            <span class="n">pde_lon</span><span class="o">=</span><span class="n">pde_lon</span><span class="p">,</span>
+            <span class="n">pde_depth</span><span class="o">=</span><span class="n">pde_depth</span><span class="p">,</span>
+            <span class="n">mb</span><span class="o">=</span><span class="n">mb</span><span class="p">,</span>
+            <span class="n">ms</span><span class="o">=</span><span class="n">ms</span><span class="p">,</span>
+            <span class="n">region_tag</span><span class="o">=</span><span class="n">region_tag</span><span class="p">,</span>
+            <span class="n">eventname</span><span class="o">=</span><span class="n">eventname</span><span class="p">,</span>
+            <span class="n">time_shift</span><span class="o">=</span><span class="n">time_shift</span><span class="p">,</span>
+            <span class="n">hdur</span><span class="o">=</span><span class="n">half_duration</span><span class="p">,</span>
+            <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span>
+            <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span>
+            <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span>
+            <span class="n">Mrr</span><span class="o">=</span><span class="n">Mrr</span><span class="p">,</span>
+            <span class="n">Mtt</span><span class="o">=</span><span class="n">Mtt</span><span class="p">,</span>
+            <span class="n">Mpp</span><span class="o">=</span><span class="n">Mpp</span><span class="p">,</span>
+            <span class="n">Mrt</span><span class="o">=</span><span class="n">Mrt</span><span class="p">,</span>
+            <span class="n">Mrp</span><span class="o">=</span><span class="n">Mrp</span><span class="p">,</span>
+            <span class="n">Mtp</span><span class="o">=</span><span class="n">Mtp</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;6 element moment tensor&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">Mrr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mpp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fulltensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Full 3x3 moment tensor&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">Mrr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrp</span><span class="p">],</span>
+                         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Mrt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span><span class="p">],</span>
+                         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Mrp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mpp</span><span class="p">]])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cmt_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;UTC Origin + Timeshift&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scalar Moment M0 in Nm&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Mrr</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mpp</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrp</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+    <span class="nd">@M0</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">M0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M0</span><span class="p">):</span>
+        <span class="n">iM0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M0</span>
+        <span class="n">fM0</span> <span class="o">=</span> <span class="n">M0</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="n">fM0</span><span class="o">/</span><span class="n">iM0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mrr</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mtt</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mpp</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mrt</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mrp</span> <span class="o">*=</span> <span class="n">factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span> <span class="o">*=</span> <span class="n">factor</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_hdur</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Mw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Moment magnitude M_w&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">7</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">M0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">10.73</span>
+
+    <span class="k">def</span> <span class="nf">pert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pert</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perturb the CMTSOLUTION. `NOT` in-place. CMT is copied.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param : str</span>
+<span class="sd">            parameter to perturb</span>
+<span class="sd">        pert : float</span>
+<span class="sd">            perturbation value</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        CMTSOLUTION</span>
+<span class="sd">            perturbed copy of the original cmtsolution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">outcmt</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">outcmt</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">outcmt</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span> <span class="o">+</span> <span class="n">pert</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outcmt</span>
+
+    <span class="k">def</span> <span class="nf">update_hdur</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the halfduration if M0 is was reset.&quot;&quot;&quot;</span>
+        <span class="c1"># Updates the half duration</span>
+        <span class="n">Nm_conv</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">1e7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">half_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>
+            <span class="mf">2.26</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span> <span class="o">*</span> <span class="n">Nm_conv</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">float_to_str</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Makes fortran style float.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Check whether g formatting removes decimal points</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:{</span><span class="n">N</span><span class="si">}</span><span class="s1">g</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="c1"># Fix to fortran formatting of doubles</span>
+        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;d0&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;.d&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;.d0&#39;</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">axbeach</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
+            <span class="n">bgcolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots beach ball into given axes.</span>
+<span class="sd">        Note that width heavily depends on the given screen size/dpi. Therefore</span>
+<span class="sd">        often does not work.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Plot beach ball</span>
+        <span class="n">bb</span> <span class="o">=</span> <span class="n">beach</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span>
+                   <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
+                   <span class="n">facecolor</span><span class="o">=</span><span class="n">facecolor</span><span class="p">,</span>
+                   <span class="n">bgcolor</span><span class="o">=</span><span class="n">bgcolor</span><span class="p">,</span>
+                   <span class="n">edgecolor</span><span class="o">=</span><span class="n">edgecolor</span><span class="p">,</span>
+                   <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                   <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
+                   <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                   <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># Defines number of interpolation points</span>
+                   <span class="n">axes</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">bb</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">clip_on</span><span class="o">=</span><span class="n">clip_on</span><span class="p">)</span>
+
+        <span class="c1"># This fixes pdf output issue</span>
+        <span class="c1"># bb.set_transform(transforms.Affine2D(np.identity(3)))</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">bb</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes classic CMTSOLUTION in classic format.&quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string in classic CMTSOLUTION format.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Reconstruct the first line as well as possible. All</span>
+        <span class="c1"># hypocentral information is missing.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="p">,</span> <span class="n">UTCDateTime</span><span class="p">):</span>
+            <span class="n">return_str</span> <span class="o">=</span> \
+                <span class="s2">&quot; PDE </span><span class="si">%4i</span><span class="s2"> </span><span class="si">%2i</span><span class="s2"> </span><span class="si">%2i</span><span class="s2"> </span><span class="si">%2i</span><span class="s2"> </span><span class="si">%2i</span><span class="s2"> </span><span class="si">%5.2f</span><span class="s2"> </span><span class="si">%8.4f</span><span class="s2"> </span><span class="si">%9.4f</span><span class="s2"> </span><span class="si">%5.1f</span><span class="s2"> </span><span class="si">%.1f</span><span class="s2"> </span><span class="si">%.1f</span><span class="s2">&quot;</span> \
+                <span class="s2">&quot; </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">day</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">second</span>
+                    <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="o">.</span><span class="n">microsecond</span> <span class="o">/</span> <span class="mf">1E6</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pde_lat</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pde_lon</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pde_depth</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mb</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ms</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">region_tag</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">return_str</span> <span class="o">=</span> <span class="s2">&quot;----- CMT Delta: ------- </span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;event name:  </span><span class="si">%10s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eventname</span><span class="p">),)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;time shift:</span><span class="si">%12.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;half duration:</span><span class="si">%9.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdur</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;latitude:</span><span class="si">%14.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;longitude:</span><span class="si">%13.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;depth:</span><span class="si">%17.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;Mrr:</span><span class="si">%19.6e</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Mrr</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;Mtt:</span><span class="si">%19.6e</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Mtt</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;Mpp:</span><span class="si">%19.6e</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Mpp</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;Mrt:</span><span class="si">%19.6e</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Mrt</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;Mrp:</span><span class="si">%19.6e</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Mrp</span><span class="p">,)</span>
+        <span class="n">return_str</span> <span class="o">+=</span> <span class="s1">&#39;Mtp:</span><span class="si">%19.6e</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span><span class="p">,)</span>
+
+        <span class="k">return</span> <span class="n">return_str</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+</pre></div>
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2023, Lucas Sawade.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

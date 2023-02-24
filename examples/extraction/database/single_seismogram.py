@@ -3,9 +3,9 @@
 Single Seismogram
 =================
 
-The tutorial will go over the reading of a subset file by loading one that is
-included in the directory. At the end we plot an aligned section of waveforms
-using built-in plotting tools.
+The tutorial will go over the reading of a three component seismogram from a
+station file in the database by loading one that is included in the Github repo.
+At the end, we plot the seismograms using built-in plotting tools.
 
 Loading all modules
 -------------------

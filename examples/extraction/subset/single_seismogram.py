@@ -4,8 +4,8 @@ Single Seismogram
 =================
 
 The tutorial will go over the reading of a subset file by loading one that is
-included in the directory. At the end we plot an aligned section of waveforms
-using built-in plotting tools.
+included in the Github repository. At the end, we plot the waveforms using
+built-in plotting tools.
 
 Loading all modules
 -------------------
@@ -13,7 +13,6 @@ Loading all modules
 """
 # sphinx_gallery_thumbnail_number = 1
 # sphinx_gallery_dummy_images = 1
-
 
 # External
 import matplotlib.pyplot as plt
@@ -76,3 +75,6 @@ limits = \
 
 plotseismogram(obs, syn, cmt, limits=limits)
 plt.show()
+
+# %%
+# Note that the seismograms are offset for clarity.

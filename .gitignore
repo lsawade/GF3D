@@ -14,3 +14,4 @@ data
 _build
 docs/source/examples
 writetest
+examples/extraction/database/temp_subset.h5

@@ -117,6 +117,7 @@ class Simulation:
         overwrite : bool, optional
             flag to overwrite certain direcories, by default False
 
+
         Notes
         -----
 
@@ -140,8 +141,8 @@ class Simulation:
 
 
         Before Running the manager, check the DT that the mesher outputs. If
-        ``nstep`` is not set for the class, NSTEP will be computed from the
-        ``duration``, ``t0``, ``tc``, and ``dt``. If ``ndt`` is not provided for
+        `nstep` is not set for the class, NSTEP will be computed from the
+        `duration`, `t0`, `tc`, and `dt`. If `ndt` is not provided for
         downsampling during simulation, the value for the approximately accurate
         period will be used.
 

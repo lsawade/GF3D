@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Station Section &#8212; GF3D 0.0.1 documentation</title>
+    <title>Create subset from database files &#8212; GF3D 0.0.1 documentation</title>
   
   
   
@@ -51,12 +51,12 @@
     <script src="../../../_static/togglebutton.js"></script>
     <script src="../../../_static/design-tabs.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/extraction/subset/station_section';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/extraction/database/make_subset';</script>
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Single Seismogram" href="single_seismogram.html" />
-    <link rel="prev" title="Subset Extraction Tutorials" href="index.html" />
+    <link rel="next" title="Station Section" href="station_section.html" />
+    <link rel="prev" title="Database Extraction Tutorials" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -298,16 +298,16 @@
   </p>
   <div class="bd-toc-item navbar-nav">
     <ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../database/index.html">Database Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../database/make_subset.html">Create subset from database files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database/station_section.html">Station Section</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database/single_seismogram.html">Single Seismogram</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Database Extraction Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Create subset from database files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="station_section.html">Station Section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single_seismogram.html">Single Seismogram</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Subset Extraction Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Station Section</a></li>
-<li class="toctree-l2"><a class="reference internal" href="single_seismogram.html">Single Seismogram</a></li>
-<li class="toctree-l2"><a class="reference internal" href="aligned_stations.html">Aligned Station Section</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../subset/index.html">Subset Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../subset/station_section.html">Station Section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../subset/single_seismogram.html">Single Seismogram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../subset/aligned_stations.html">Aligned Station Section</a></li>
 </ul>
 </li>
 </ul>
@@ -343,70 +343,73 @@
               
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-extraction-subset-station-section-py"><span class="std std-ref">here</span></a>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-extraction-database-make-subset-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="station-section">
-<span id="sphx-glr-examples-extraction-subset-station-section-py"></span><h1>Station Section<a class="headerlink" href="#station-section" title="Permalink to this heading">#</a></h1>
-<p>The tutorial will go over the reading of a subset file by loading one that is
-included in the directory. At the end we plot a station section of waveforms
-using built-in plotting tools.</p>
-<section id="loading-all-modules">
-<h2>Loading all modules<a class="headerlink" href="#loading-all-modules" title="Permalink to this heading">#</a></h2>
+<section class="sphx-glr-example-title" id="create-subset-from-database-files">
+<span id="sphx-glr-examples-extraction-database-make-subset-py"></span><h1>Create subset from database files<a class="headerlink" href="#create-subset-from-database-files" title="Permalink to this heading">#</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># External</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">read</span><span class="p">,</span> <span class="n">read_inventory</span><span class="p">,</span> <span class="n">Stream</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 
 <span class="c1"># Internal</span>
 <span class="kn">from</span> <span class="nn">gf3d.source</span> <span class="kn">import</span> <span class="n">CMTSOLUTION</span>
 <span class="kn">from</span> <span class="nn">gf3d.seismograms</span> <span class="kn">import</span> <span class="n">GFManager</span>
-<span class="kn">from</span> <span class="nn">gf3d.process</span> <span class="kn">import</span> <span class="n">process_stream</span><span class="p">,</span> <span class="n">select_pairs</span>
-<span class="kn">from</span> <span class="nn">gf3d.plot.section</span> <span class="kn">import</span> <span class="n">plotsection</span>
 </pre></div>
 </div>
+<p>Read the event data</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># CMTSOLUTION</span>
 <span class="n">cmt</span> <span class="o">=</span> <span class="n">CMTSOLUTION</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;../../DATA/single_element_read/CMTSOLUTION&#39;</span><span class="p">)</span>
-
-<span class="c1"># Load subset</span>
-<span class="n">gfsub</span> <span class="o">=</span> <span class="n">GFManager</span><span class="p">(</span><span class="s2">&quot;../../DATA/single_element_read/single_element.h5&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Read database files</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gfm</span> <span class="o">=</span> <span class="n">GFManager</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;../../DATA/single_element_read/DB/*/*/*.*.h5&#39;</span><span class="p">))</span>
+<span class="n">gfm</span><span class="o">.</span><span class="n">load_header_variables</span><span class="p">()</span>
+<span class="n">gfm</span><span class="o">.</span><span class="n">get_elements</span><span class="p">(</span><span class="n">cmt</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">cmt</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
+                 <span class="n">cmt</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">dist_in_km</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">NGLL</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gfm</span><span class="o">.</span><span class="n">write_subset</span><span class="p">(</span><span class="s1">&#39;temp_subset.h5&#39;</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">3600.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>shape (3, 3, 3, 125, 776)
+nsteps 776
+</pre></div>
+</div>
+<p>Load a subset</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gfsub</span> <span class="o">=</span> <span class="n">GFManager</span><span class="p">(</span><span class="s1">&#39;temp_subset.h5&#39;</span><span class="p">)</span>
 <span class="n">gfsub</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-
-<span class="c1"># Load Observed Data</span>
-<span class="n">raw</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="s2">&quot;../../DATA/single_element_read/traces/*.sac&quot;</span><span class="p">)</span>
-<span class="n">inv</span> <span class="o">=</span> <span class="n">read_inventory</span><span class="p">(</span><span class="s2">&quot;../../DATA/single_element_read/station.xml&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Finally you can read the seismograms.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rp</span> <span class="o">=</span> <span class="n">gfsub</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">cmt</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rp</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">=</span> <span class="n">process_stream</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">inv</span><span class="o">=</span><span class="n">inv</span><span class="p">,</span> <span class="n">cmt</span><span class="o">=</span><span class="n">cmt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
-<span class="n">syn</span> <span class="o">=</span> <span class="n">process_stream</span><span class="p">(</span><span class="n">rp</span><span class="p">,</span> <span class="n">cmt</span><span class="o">=</span><span class="n">cmt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>9 Trace(s) in Stream:
+II.BFO..MXN  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+II.BFO..MXE  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+II.BFO..MXZ  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+IU.ANMO..MXN | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+IU.ANMO..MXE | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+IU.ANMO..MXZ | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+IU.HRV..MXN  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+IU.HRV..MXE  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+IU.HRV..MXZ  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span> <span class="o">=</span> <span class="n">select_pairs</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">syn</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">starttime</span> <span class="o">=</span> <span class="n">psyn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span> <span class="o">+</span> <span class="mi">0</span>
-<span class="n">endtime</span> <span class="o">=</span> <span class="n">starttime</span> <span class="o">+</span> <span class="mi">3600</span>
-<span class="n">limits</span> <span class="o">=</span> <span class="p">(</span><span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">)</span>
-
-<span class="c1"># Plots a section of observed and synthetic</span>
-<span class="n">plotsection</span><span class="p">(</span><span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span><span class="p">,</span> <span class="n">cmt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="n">limits</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../../../_images/sphx_glr_station_section_001.svg" srcset="../../../_images/sphx_glr_station_section_001.svg" alt="Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km - BP: [40s, 300s]" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.803 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-extraction-subset-station-section-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.285 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-extraction-database-make-subset-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../../_downloads/da1c8bf4343700f020206a49dd015f70/station_section.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">station_section.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../../_downloads/476a2bf38d00d6a8cf212c89501e9045/make_subset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">make_subset.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../../../_downloads/bca83c3cefd1f323359ddd563f26cb6a/station_section.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">station_section.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../../_downloads/82aea9bdcdbb843b1e14cc6e0ea8fe19/make_subset.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">make_subset.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
 </section>
 
 
@@ -421,13 +424,13 @@ using built-in plotting tools.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Subset Extraction Tutorials</p>
+          <p class="prev-next-title">Database Extraction Tutorials</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="single_seismogram.html" title="next page">
+  <a class='right-next' id="next-link" href="station_section.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Single Seismogram</p>
+      <p class="prev-next-title">Station Section</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
@@ -442,23 +445,6 @@ using built-in plotting tools.</p>
               
 <div class="toc-item">
   
-<div class="tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-</div>
-<nav id="bd-toc-nav" class="page-toc">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#loading-all-modules">
-   Loading all modules
-  </a>
- </li>
-</ul>
-
-</nav>
-</div>
-
-<div class="toc-item">
-  
 <div id="searchbox"></div>
 </div>
 
@@ -469,7 +455,7 @@ using built-in plotting tools.</p>
 <div class="toc-item">
   
 <div class="tocsection sourcelink">
-    <a href="../../../_sources/examples/extraction/subset/station_section.rst.txt">
+    <a href="../../../_sources/examples/extraction/database/make_subset.rst.txt">
         <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>

@@ -56,7 +56,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Single Seismogram" href="single_seismogram.html" />
-    <link rel="prev" title="Database Extraction Tutorials" href="index.html" />
+    <link rel="prev" title="Create subset from database files" href="make_subset.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -299,6 +299,7 @@
   <div class="bd-toc-item navbar-nav">
     <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Database Extraction Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="make_subset.html">Create subset from database files</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Station Section</a></li>
 <li class="toctree-l2"><a class="reference internal" href="single_seismogram.html">Single Seismogram</a></li>
 </ul>
@@ -395,15 +396,27 @@ example subset file includes other stations</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span> <span class="o">=</span> <span class="n">select_pairs</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">syn</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Cant find II.AAK..N
-Cant find II.AAK..E
-Cant find II.AAK..Z
-Cant find IU.XMAS..N
-Cant find IU.XMAS..E
-Cant find IU.XMAS..Z
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Cant find II.KDAK..N
+Cant find II.KDAK..E
+Cant find II.KDAK..Z
 Cant find IU.KOWA..N
 Cant find IU.KOWA..E
 Cant find IU.KOWA..Z
+Cant find II.DGAR..N
+Cant find II.DGAR..E
+Cant find II.DGAR..Z
+Cant find II.HOPE..N
+Cant find II.HOPE..E
+Cant find II.HOPE..Z
+Cant find II.BORG..N
+Cant find II.BORG..E
+Cant find II.BORG..Z
+Cant find IU.YAK..N
+Cant find IU.YAK..E
+Cant find IU.YAK..Z
+Cant find IU.SBA..N
+Cant find IU.SBA..E
+Cant find IU.SBA..Z
 Cant find II.KAPI..N
 Cant find II.KAPI..E
 Cant find II.KAPI..Z
@@ -413,35 +426,22 @@ Cant find IU.MAJO..Z
 Cant find IU.SNZO..N
 Cant find IU.SNZO..E
 Cant find IU.SNZO..Z
-Cant find II.HOPE..N
-Cant find II.HOPE..E
-Cant find II.HOPE..Z
+Cant find IU.XMAS..N
+Cant find IU.XMAS..E
+Cant find IU.XMAS..Z
 Cant find IU.DAV..N
 Cant find IU.DAV..E
 Cant find IU.DAV..Z
+Cant find II.AAK..N
+Cant find II.AAK..E
+Cant find II.AAK..Z
 Cant find IU.CTAO..N
 Cant find IU.CTAO..E
 Cant find IU.CTAO..Z
-Cant find II.BORG..N
-Cant find II.BORG..E
-Cant find II.BORG..Z
-Cant find IU.SBA..N
-Cant find IU.SBA..E
-Cant find IU.SBA..Z
-Cant find IU.YAK..N
-Cant find IU.YAK..E
-Cant find IU.YAK..Z
-Cant find II.DGAR..N
-Cant find II.DGAR..E
-Cant find II.DGAR..Z
-Cant find II.KDAK..N
-Cant find II.KDAK..E
-Cant find II.KDAK..Z
 </pre></div>
 </div>
-<p>So, don’t worry about the ‘Cant find &lt;Network&gt;.&lt;Station&gt;..&lt;Component&gt;</p>
-<p>%%
-Plot section with the data</p>
+<p>So, don’t worry about the ‘Cant find &lt;Network&gt;.&lt;Station&gt;..&lt;Component&gt;.</p>
+<p>Plot section with the data</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">starttime</span> <span class="o">=</span> <span class="n">psyn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span> <span class="o">+</span> <span class="mi">0</span>
 <span class="n">endtime</span> <span class="o">=</span> <span class="n">starttime</span> <span class="o">+</span> <span class="mi">3600</span>
 <span class="n">limits</span> <span class="o">=</span> <span class="p">(</span><span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">)</span>
@@ -452,7 +452,7 @@ Plot section with the data</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_station_section_001.svg" srcset="../../../_images/sphx_glr_station_section_001.svg" alt="Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km - BP: [40s, 300s]" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.656 seconds)</p>
+<img src="../../../_images/sphx_glr_station_section_001.svg" srcset="../../../_images/sphx_glr_station_section_001.svg" alt="Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km - BP: [40s, 300s]" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.724 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-extraction-database-station-section-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../../_downloads/0458541568024c9c3bf0e550aef34c48/station_section.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">station_section.py</span></code></a></p>
@@ -473,11 +473,11 @@ Plot section with the data</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="make_subset.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Database Extraction Tutorials</p>
+          <p class="prev-next-title">Create subset from database files</p>
       </div>
   </a>
   <a class='right-next' id="next-link" href="single_seismogram.html" title="next page">

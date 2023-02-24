@@ -22,16 +22,15 @@ Single Seismogram
 =================
 
 The tutorial will go over the reading of a subset file by loading one that is
-included in the directory. At the end we plot an aligned section of waveforms
-using built-in plotting tools.
+included in the Github repository. At the end, we plot the waveforms using
+built-in plotting tools.
 
 Loading all modules
 -------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-26
+.. GENERATED FROM PYTHON SOURCE LINES 14-25
 
 .. code-block:: default
-
 
 
     # External
@@ -51,11 +50,11 @@ Loading all modules
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-30
+.. GENERATED FROM PYTHON SOURCE LINES 28-29
 
 Getting a CMTSOLUTION
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-35
+.. GENERATED FROM PYTHON SOURCE LINES 29-34
 
 .. code-block:: default
 
@@ -90,11 +89,11 @@ Getting a CMTSOLUTION
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-37
+.. GENERATED FROM PYTHON SOURCE LINES 35-36
 
 Loading the subset database
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-41
+.. GENERATED FROM PYTHON SOURCE LINES 36-40
 
 .. code-block:: default
 
@@ -109,11 +108,11 @@ Loading the subset database
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-43
+.. GENERATED FROM PYTHON SOURCE LINES 41-42
 
 Load Observed Data and response files
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-46
+.. GENERATED FROM PYTHON SOURCE LINES 42-45
 
 .. code-block:: default
 
@@ -127,13 +126,13 @@ Load Observed Data and response files
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-50
+.. GENERATED FROM PYTHON SOURCE LINES 46-49
 
 Note that the data has been downloaded from IRIS previously, but it has not
 been processed. Now, we can query the database for synthetic seismograms
 corresponding to the observed ones.
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-56
+.. GENERATED FROM PYTHON SOURCE LINES 51-55
 
 .. code-block:: default
 
@@ -148,12 +147,12 @@ corresponding to the observed ones.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-59
+.. GENERATED FROM PYTHON SOURCE LINES 56-58
 
 Then, we select the station in question and process both observed and
 synthetics seismograms for a band-pass of [40-300].
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-67
+.. GENERATED FROM PYTHON SOURCE LINES 58-66
 
 .. code-block:: default
 
@@ -172,11 +171,11 @@ synthetics seismograms for a band-pass of [40-300].
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-69
+.. GENERATED FROM PYTHON SOURCE LINES 67-68
 
 Set plot limits and plot seismogram
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-79
+.. GENERATED FROM PYTHON SOURCE LINES 68-79
 
 .. code-block:: default
 
@@ -193,6 +192,7 @@ Set plot limits and plot seismogram
 
 
 
+
 .. image-sg:: /examples/extraction/subset/images/sphx_glr_single_seismogram_001.svg
    :alt: single seismogram
    :srcset: /examples/extraction/subset/images/sphx_glr_single_seismogram_001.svg
@@ -202,10 +202,14 @@ Set plot limits and plot seismogram
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 80-81
+
+Note that the seismograms are offset for clarity.
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.447 seconds)
+   **Total running time of the script:** ( 0 minutes  0.462 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_subset_single_seismogram.py:

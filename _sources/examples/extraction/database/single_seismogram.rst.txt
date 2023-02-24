@@ -21,9 +21,9 @@
 Single Seismogram
 =================
 
-The tutorial will go over the reading of a subset file by loading one that is
-included in the directory. At the end we plot an aligned section of waveforms
-using built-in plotting tools.
+The tutorial will go over the reading of a three component seismogram from a
+station file in the database by loading one that is included in the Github repo.
+At the end, we plot the seismograms using built-in plotting tools.
 
 Loading all modules
 -------------------
@@ -182,14 +182,14 @@ Set plot limits and plot seismogram
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-83
+.. GENERATED FROM PYTHON SOURCE LINES 83-84
 
 The seismograms are offset for clarity so that they are easy to read.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.382 seconds)
+   **Total running time of the script:** ( 0 minutes  0.389 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_database_single_seismogram.py:

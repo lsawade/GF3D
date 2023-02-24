@@ -32,7 +32,7 @@ from an extracted subset of Green functions.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The tutorial will go over the reading of a subset file by loading one that is included in the d...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The tutorial will go over the reading of a subset file by loading one that is included in the G...">
 
 .. only:: html
 

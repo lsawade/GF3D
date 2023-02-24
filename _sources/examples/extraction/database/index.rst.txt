@@ -16,6 +16,23 @@ from the raw database of stations.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Create subset from database files">
+
+.. only:: html
+
+  .. image:: /examples/extraction/database/images/thumb/sphx_glr_make_subset_thumb.png
+    :alt: Create subset from database files
+
+  :ref:`sphx_glr_examples_extraction_database_make_subset.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Create subset from database files</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="The tutorial will go over the reading of station files from a database by loading one that is i...">
 
 .. only:: html
@@ -33,7 +50,7 @@ from the raw database of stations.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The tutorial will go over the reading of a subset file by loading one that is included in the d...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The tutorial will go over the reading of a three component seismogram from a station file in th...">
 
 .. only:: html
 
@@ -56,6 +73,7 @@ from the raw database of stations.
 .. toctree::
    :hidden:
 
+   /examples/extraction/database/make_subset
    /examples/extraction/database/station_section
    /examples/extraction/database/single_seismogram
 

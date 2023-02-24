@@ -61,9 +61,8 @@ syn = process_stream(rp, cmt=cmt, duration=3600)
 pobs, psyn = select_pairs(obs, syn)
 
 # %%
-# So, don't worry about the 'Cant find <Network>.<Station>..<Component>
+# So, don't worry about the 'Cant find <Network>.<Station>..<Component>.
 #
-# %%
 # Plot section with the data
 
 starttime = psyn[0].stats.starttime + 0

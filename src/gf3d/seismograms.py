@@ -973,7 +973,7 @@ class GFManager(object):
         NP2 = next_power_of_2(2 * self.header['nsteps'])
 
         # This computes the differential half duration for the new STF from the cmt half duration and the half duration of the database that the database was computed with
-        if cmt.hdur / 1.628 <= self.header['hdur']:
+        if (cmt.hdur / 1.628)**2 <= self.header['hdur']**2:
             hdur_diff = 0.0
         else:
             hdur_diff = np.sqrt((cmt.hdur / 1.628)**2 - self.header['hdur']**2)

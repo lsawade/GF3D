@@ -960,7 +960,7 @@
                             <span class="s1">&#39;Dont have buffer elements for doing the &#39;</span><span class="p">)</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">do_adjacency_search</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">get_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">NGLL</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">dist_in_km</span><span class="o">=</span><span class="mf">125.0</span><span class="p">,</span> <span class="n">NGLL</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subset</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -989,9 +989,12 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_header_variables</span><span class="p">()</span>
 
+        <span class="c1"># Get normalized distance</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">dist_in_km</span><span class="o">/</span><span class="mf">6371.0</span>
+
         <span class="c1"># Get elements</span>
         <span class="n">point_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x_target</span><span class="p">,</span> <span class="n">y_target</span><span class="p">,</span> <span class="n">z_target</span><span class="p">])</span>
-        <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullkdtree</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">point_target</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullkdtree</span><span class="o">.</span><span class="n">query_ball_point</span><span class="p">(</span><span class="n">point_target</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;queried the kdtree&#39;</span><span class="p">)</span>
 
@@ -1285,7 +1288,10 @@
         <span class="n">NP2</span> <span class="o">=</span> <span class="n">next_power_of_2</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">])</span>
 
         <span class="c1"># This computes the differential half duration for the new STF from the cmt half duration and the half duration of the database that the database was computed with</span>
-        <span class="n">hdur_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">cmt</span><span class="o">.</span><span class="n">hdur</span> <span class="o">/</span> <span class="mf">1.628</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;hdur&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cmt</span><span class="o">.</span><span class="n">hdur</span> <span class="o">/</span> <span class="mf">1.628</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;hdur&#39;</span><span class="p">]:</span>
+            <span class="n">hdur_diff</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hdur_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">cmt</span><span class="o">.</span><span class="n">hdur</span> <span class="o">/</span> <span class="mf">1.628</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;hdur&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># Heaviside STF to reproduce SPECFEM stf</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">stf_r</span> <span class="o">=</span> <span class="n">create_stf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">400.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">],</span>

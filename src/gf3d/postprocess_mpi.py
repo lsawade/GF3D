@@ -1,3 +1,4 @@
+from scipy.spatial import KDTree  # Only import to avoid a certain error message
 from mpi4py import MPI
 import numpy as np
 import h5py

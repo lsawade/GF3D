@@ -1289,7 +1289,8 @@
 
         <span class="c1"># This computes the differential half duration for the new STF from the cmt half duration and the half duration of the database that the database was computed with</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">cmt</span><span class="o">.</span><span class="n">hdur</span> <span class="o">/</span> <span class="mf">1.628</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;hdur&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Requested half duration smaller than what was simulated.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Requested half duration smaller than what was simulated.&quot;</span><span class="p">)</span>
             <span class="n">hdur_diff</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -1297,18 +1298,17 @@
 
             <span class="c1"># Heaviside STF to reproduce SPECFEM stf</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">stf_r</span> <span class="o">=</span> <span class="n">create_stf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">400.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">],</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span> <span class="n">hdur_diff</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gaussian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lpfilter</span><span class="o">=</span><span class="s1">&#39;butter&#39;</span><span class="p">)</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span> <span class="n">hdur_diff</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gaussian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lpfilter</span><span class="o">=</span><span class="s1">&#39;butter&#39;</span><span class="p">)</span>
             <span class="n">STF_R</span> <span class="o">=</span> <span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">stf_r</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">NP2</span><span class="p">)</span>
 
             <span class="n">shift</span> <span class="o">=</span> <span class="o">-</span><span class="mf">400.0</span>
             <span class="n">phshift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="n">shift</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">NP2</span><span class="p">,</span>
-                                                    <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
 
         <span class="c1"># Add traces to the</span>
         <span class="n">traces</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">_h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="p">)):</span>
             <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">]):</span>
-
 
                 <span class="k">if</span> <span class="n">hdur_diff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">seismograms</span><span class="p">[</span><span class="n">_h</span><span class="p">,</span> <span class="n">_i</span><span class="p">,</span> <span class="p">:]</span>
@@ -1520,8 +1520,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">do_adjacency_search</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;do_adjacency_search&#39;</span><span class="p">][()]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_adjacency_search</span><span class="p">:</span>
-                <span class="n">db</span><span class="p">[</span><span class="s1">&#39;xadj&#39;</span><span class="p">][:]</span>
-                <span class="n">db</span><span class="p">[</span><span class="s1">&#39;adjacency&#39;</span><span class="p">][:]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xadj</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;xadj&#39;</span><span class="p">][:]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">adjacency</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;adjacency&#39;</span><span class="p">][:]</span>
 
             <span class="c1"># Header Variables</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;DT&#39;</span><span class="p">][()]</span>

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Aligned Station Section &#8212; GF3D 0.0.1 documentation</title>
+    <title>Station Section &#8212; GF3D 0.0.1 documentation</title>
   
   
   
@@ -51,12 +51,12 @@
     <script src="../../../_static/togglebutton.js"></script>
     <script src="../../../_static/design-tabs.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/extraction/subset/aligned_stations';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/extraction/database/station_section';</script>
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="API Documentation" href="../../../parts/api/index.html" />
-    <link rel="prev" title="Single Seismogram" href="single_seismogram.html" />
+    <link rel="next" title="Single Seismogram" href="single_seismogram.html" />
+    <link rel="prev" title="Database Extraction Tutorials" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -298,15 +298,15 @@
   </p>
   <div class="bd-toc-item navbar-nav">
     <ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../database/index.html">Database Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../database/station_section.html">Station Section</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../database/single_seismogram.html">Single Seismogram</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Database Extraction Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Station Section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single_seismogram.html">Single Seismogram</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Subset Extraction Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="station_section.html">Station Section</a></li>
-<li class="toctree-l2"><a class="reference internal" href="single_seismogram.html">Single Seismogram</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Aligned Station Section</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../subset/index.html">Subset Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../subset/station_section.html">Station Section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../subset/single_seismogram.html">Single Seismogram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../subset/aligned_stations.html">Aligned Station Section</a></li>
 </ul>
 </li>
 </ul>
@@ -342,17 +342,18 @@
               
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-extraction-subset-aligned-stations-py"><span class="std std-ref">here</span></a>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-extraction-database-station-section-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="aligned-station-section">
-<span id="sphx-glr-examples-extraction-subset-aligned-stations-py"></span><h1>Aligned Station Section<a class="headerlink" href="#aligned-station-section" title="Permalink to this heading">#</a></h1>
-<p>The tutorial will go over the reading of a subset file by loading one that is
-included in the directory. At the end we plot an aligned section of waveforms
-using built-in plotting tools.</p>
+<section class="sphx-glr-example-title" id="station-section">
+<span id="sphx-glr-examples-extraction-database-station-section-py"></span><h1>Station Section<a class="headerlink" href="#station-section" title="Permalink to this heading">#</a></h1>
+<p>The tutorial will go over the reading of station files from a database by
+loading one that is included in the github repo. At the end, we plot a station
+section of waveforms using built-in plotting tools.</p>
 <section id="loading-all-modules">
 <h2>Loading all modules<a class="headerlink" href="#loading-all-modules" title="Permalink to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># External</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">read</span><span class="p">,</span> <span class="n">read_inventory</span><span class="p">,</span> <span class="n">Stream</span>
 
@@ -360,86 +361,104 @@ using built-in plotting tools.</p>
 <span class="kn">from</span> <span class="nn">gf3d.source</span> <span class="kn">import</span> <span class="n">CMTSOLUTION</span>
 <span class="kn">from</span> <span class="nn">gf3d.seismograms</span> <span class="kn">import</span> <span class="n">GFManager</span>
 <span class="kn">from</span> <span class="nn">gf3d.process</span> <span class="kn">import</span> <span class="n">process_stream</span><span class="p">,</span> <span class="n">select_pairs</span>
-<span class="kn">from</span> <span class="nn">gf3d.plot.util</span> <span class="kn">import</span> <span class="n">set_default_color</span>
-<span class="kn">from</span> <span class="nn">gf3d.plot.section_aligned</span> <span class="kn">import</span> <span class="n">plotsection_aligned</span><span class="p">,</span> <span class="n">get_azimuth_distance_traveltime</span><span class="p">,</span> <span class="n">filter_stations</span>
+<span class="kn">from</span> <span class="nn">gf3d.plot.section</span> <span class="kn">import</span> <span class="n">plotsection</span>
 </pre></div>
 </div>
-<p>Load CMTSOLUTION, observed data, and Green functions</p>
+<p>Read observed data and event parameters</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># CMTSOLUTION</span>
 <span class="n">cmt</span> <span class="o">=</span> <span class="n">CMTSOLUTION</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;../../DATA/single_element_read/CMTSOLUTION&#39;</span><span class="p">)</span>
-
-<span class="c1"># Load subset</span>
-<span class="n">gfsub</span> <span class="o">=</span> <span class="n">GFManager</span><span class="p">(</span><span class="s2">&quot;../../DATA/single_element_read/single_element.h5&quot;</span><span class="p">)</span>
-<span class="n">gfsub</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
 <span class="c1"># Load Observed Data</span>
 <span class="n">raw</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="s2">&quot;../../DATA/single_element_read/traces/*.sac&quot;</span><span class="p">)</span>
 <span class="n">inv</span> <span class="o">=</span> <span class="n">read_inventory</span><span class="p">(</span><span class="s2">&quot;../../DATA/single_element_read/station.xml&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rp</span> <span class="o">=</span> <span class="n">gfsub</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">cmt</span><span class="p">)</span>
+<p>Get seismograms from the database</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load subset</span>
+<span class="n">gfm</span> <span class="o">=</span> <span class="n">GFManager</span><span class="p">(</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;../../DATA/single_element_read/DB/*/*/*.*.h5&#39;</span><span class="p">))</span>
+<span class="n">gfm</span><span class="o">.</span><span class="n">load_header_variables</span><span class="p">()</span>
+
+<span class="c1"># You will have to load a subset of elements first (just one here for storage reasons)</span>
+<span class="n">gfm</span><span class="o">.</span><span class="n">get_elements</span><span class="p">(</span><span class="n">cmt</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">cmt</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">cmt</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">NGLL</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># Finally you can read the seismograms.</span>
+<span class="n">rp</span> <span class="o">=</span> <span class="n">gfm</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">cmt</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">=</span> <span class="n">process_stream</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">inv</span><span class="o">=</span><span class="n">inv</span><span class="p">,</span> <span class="n">cmt</span><span class="o">=</span><span class="n">cmt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
 <span class="n">syn</span> <span class="o">=</span> <span class="n">process_stream</span><span class="p">(</span><span class="n">rp</span><span class="p">,</span> <span class="n">cmt</span><span class="o">=</span><span class="n">cmt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">windowP</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>
-<span class="n">windowS</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>
-<span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span> <span class="o">=</span> <span class="n">select_pairs</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">syn</span><span class="p">)</span>
-
-<span class="c1"># For pwaves</span>
-<span class="n">Pobs</span><span class="p">,</span> <span class="n">Psyn</span> <span class="o">=</span> <span class="n">get_azimuth_distance_traveltime</span><span class="p">(</span>
-    <span class="n">cmt</span><span class="p">,</span> <span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span>
-    <span class="n">traveltime_window</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="n">windowP</span><span class="p">))</span>
-
-<span class="n">Sobs</span><span class="p">,</span> <span class="n">Ssyn</span> <span class="o">=</span> <span class="n">get_azimuth_distance_traveltime</span><span class="p">(</span>
-    <span class="n">cmt</span><span class="p">,</span> <span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span>
-    <span class="n">traveltime_window</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">windowS</span><span class="p">))</span>
+<p>Note that the only 3 stations (II.BFO, IU.ANMO, IU.HRV) are in the example
+database, which means that the observed data that we downloaded for the
+example subset file includes other stations</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span> <span class="o">=</span> <span class="n">select_pairs</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">syn</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">selection</span> <span class="o">=</span> <span class="n">filter_stations</span><span class="p">(</span><span class="n">Pobs</span><span class="p">,</span> <span class="n">Sobs</span><span class="p">)</span>
-
-<span class="n">Pobs</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">([</span><span class="n">Pobs</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">])</span>
-<span class="n">Psyn</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">([</span><span class="n">Psyn</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">])</span>
-<span class="n">Sobs</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">([</span><span class="n">Sobs</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">])</span>
-<span class="n">Ssyn</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">([</span><span class="n">Ssyn</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">])</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Cant find II.AAK..N
+Cant find II.AAK..E
+Cant find II.AAK..Z
+Cant find IU.XMAS..N
+Cant find IU.XMAS..E
+Cant find IU.XMAS..Z
+Cant find IU.KOWA..N
+Cant find IU.KOWA..E
+Cant find IU.KOWA..Z
+Cant find II.KAPI..N
+Cant find II.KAPI..E
+Cant find II.KAPI..Z
+Cant find IU.MAJO..N
+Cant find IU.MAJO..E
+Cant find IU.MAJO..Z
+Cant find IU.SNZO..N
+Cant find IU.SNZO..E
+Cant find IU.SNZO..Z
+Cant find II.HOPE..N
+Cant find II.HOPE..E
+Cant find II.HOPE..Z
+Cant find IU.DAV..N
+Cant find IU.DAV..E
+Cant find IU.DAV..Z
+Cant find IU.CTAO..N
+Cant find IU.CTAO..E
+Cant find IU.CTAO..Z
+Cant find II.BORG..N
+Cant find II.BORG..E
+Cant find II.BORG..Z
+Cant find IU.SBA..N
+Cant find IU.SBA..E
+Cant find IU.SBA..Z
+Cant find IU.YAK..N
+Cant find IU.YAK..E
+Cant find IU.YAK..Z
+Cant find II.DGAR..N
+Cant find II.DGAR..E
+Cant find II.DGAR..Z
+Cant find II.KDAK..N
+Cant find II.KDAK..E
+Cant find II.KDAK..Z
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plots a section of observed and synthetic</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<p>So, don’t worry about the ‘Cant find &lt;Network&gt;.&lt;Station&gt;..&lt;Component&gt;</p>
+<p>%%
+Plot section with the data</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">starttime</span> <span class="o">=</span> <span class="n">psyn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">starttime</span> <span class="o">+</span> <span class="mi">0</span>
+<span class="n">endtime</span> <span class="o">=</span> <span class="n">starttime</span> <span class="o">+</span> <span class="mi">3600</span>
+<span class="n">limits</span> <span class="o">=</span> <span class="p">(</span><span class="n">starttime</span><span class="p">,</span> <span class="n">endtime</span><span class="p">)</span>
 
-<span class="c1"># Plot Arrivals around ak135 P arrival</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">plotsection_aligned</span><span class="p">(</span>
-    <span class="n">Pobs</span><span class="p">,</span> <span class="n">Psyn</span><span class="p">,</span> <span class="n">cmt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
-    <span class="n">traveltime_window</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="n">windowP</span><span class="p">),</span> <span class="n">labelright</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="c1"># Plot Arrivals around ak135 S arrival</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">plotsection_aligned</span><span class="p">(</span>
-    <span class="n">Sobs</span><span class="p">,</span> <span class="n">Ssyn</span><span class="p">,</span> <span class="n">cmt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
-    <span class="n">traveltime_window</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">windowS</span><span class="p">),</span> <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="c1"># Set Title</span>
-<span class="n">title</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cmt</span><span class="o">.</span><span class="n">cmt_time</span><span class="o">.</span><span class="n">ctime</span><span class="p">()</span><span class="si">}</span><span class="s2"> &quot;</span>
-         <span class="sa">f</span><span class="s2">&quot;Loc: </span><span class="si">{</span><span class="n">cmt</span><span class="o">.</span><span class="n">latitude</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">dg, </span><span class="si">{</span><span class="n">cmt</span><span class="o">.</span><span class="n">longitude</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">dg, </span><span class="si">{</span><span class="n">cmt</span><span class="o">.</span><span class="n">depth</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">km&quot;</span>
-         <span class="sa">f</span><span class="s2">&quot; - BP: [40s, 300s]&quot;</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">)</span>
-
-<span class="c1"># Adjust plot</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="c1"># Plots a section of observed and synthetic</span>
+<span class="n">plotsection</span><span class="p">(</span><span class="n">pobs</span><span class="p">,</span> <span class="n">psyn</span><span class="p">,</span> <span class="n">cmt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="n">limits</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_aligned_stations_001.svg" srcset="../../../_images/sphx_glr_aligned_stations_001.svg" alt="Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km - BP: [40s, 300s]" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.070 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-extraction-subset-aligned-stations-py">
+<img src="../../../_images/sphx_glr_station_section_001.svg" srcset="../../../_images/sphx_glr_station_section_001.svg" alt="Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km - BP: [40s, 300s]" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.656 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-extraction-database-station-section-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../../_downloads/0e3d3c83b902e206dc974bc917292145/aligned_stations.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">aligned_stations.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../../_downloads/0458541568024c9c3bf0e550aef34c48/station_section.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">station_section.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../../../_downloads/2f9fdf78f03e98c963fe8d341c351601/aligned_stations.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">aligned_stations.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../../_downloads/a159c21e99ab7ff6674a1f93fafabd71/station_section.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">station_section.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -454,17 +473,17 @@ using built-in plotting tools.</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="single_seismogram.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="index.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Single Seismogram</p>
+          <p class="prev-next-title">Database Extraction Tutorials</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="../../../parts/api/index.html" title="next page">
+  <a class='right-next' id="next-link" href="single_seismogram.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">API Documentation</p>
+      <p class="prev-next-title">Single Seismogram</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
@@ -506,7 +525,7 @@ using built-in plotting tools.</p>
 <div class="toc-item">
   
 <div class="tocsection sourcelink">
-    <a href="../../../_sources/examples/extraction/subset/aligned_stations.rst.txt">
+    <a href="../../../_sources/examples/extraction/database/station_section.rst.txt">
         <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>

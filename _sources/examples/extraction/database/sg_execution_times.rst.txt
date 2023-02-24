@@ -1,0 +1,14 @@
+
+:orphan:
+
+.. _sphx_glr_examples_extraction_database_sg_execution_times:
+
+Computation times
+=================
+**00:02.038** total execution time for **examples_extraction_database** files:
+
++----------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_examples_extraction_database_station_section.py` (``station_section.py``)     | 00:01.656 | 0.0 MB |
++----------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_examples_extraction_database_single_seismogram.py` (``single_seismogram.py``) | 00:00.382 | 0.0 MB |
++----------------------------------------------------------------------------------------------+-----------+--------+

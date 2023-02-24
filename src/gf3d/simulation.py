@@ -582,9 +582,14 @@ class Simulation:
         locmat = np.loadtxt(self.target_file)
 
         # Assign latitude
-        self.target_latitude = locmat[:, 0]
-        self.target_longitude = locmat[:, 1]
-        self.target_depth = locmat[:, 2]
+        if len(locmat.shape) > 1:
+            self.target_latitude = locmat[:, 0]
+            self.target_longitude = locmat[:, 1]
+            self.target_depth = locmat[:, 2]
+        else:
+            self.target_latitude = locmat[0]
+            self.target_longitude = locmat[1]
+            self.target_depth = locmat[2]
 
         # print(f"{'Lat':<20}{'Lon':<20}{'Dep':<20}")
         # print(60 * "-")

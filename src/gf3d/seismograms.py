@@ -645,7 +645,7 @@ class GFManager(object):
                             'Dont have buffer elements for doing the ')
                         self.do_adjacency_search = False
 
-    def get_elements(self, lat, lon, depth, k=30, NGLL=5):
+    def get_elements(self, lat, lon, depth, dist_in_km=125.0, NGLL=5):
 
         if self.subset:
             logging.warning(
@@ -674,9 +674,12 @@ class GFManager(object):
         if not self.header:
             self.load_header_variables()
 
+        # Get normalized distance
+        r = dist_in_km/6371.0
+
         # Get elements
         point_target = np.array([x_target, y_target, z_target])
-        _, self.ispec_subset = self.fullkdtree.query(point_target, k=k)
+        self.ispec_subset = self.fullkdtree.query_ball_point(point_target, r=r)
 
         logger.debug('queried the kdtree')
 
@@ -970,7 +973,10 @@ class GFManager(object):
         NP2 = next_power_of_2(2 * self.header['nsteps'])
 
         # This computes the differential half duration for the new STF from the cmt half duration and the half duration of the database that the database was computed with
-        hdur_diff = np.sqrt((cmt.hdur / 1.628)**2 - self.header['hdur']**2)
+        if cmt.hdur / 1.628 <= self.header['hdur']:
+            hdur_diff = 0.0
+        else:
+            hdur_diff = np.sqrt((cmt.hdur / 1.628)**2 - self.header['hdur']**2)
 
         # Heaviside STF to reproduce SPECFEM stf
         _, stf_r = create_stf(0, 400.0, self.header['nsteps'],

@@ -1,19 +1,10 @@
 # %% Imports
 # External
 from glob import glob
-from copy import deepcopy
-import matplotlib.axes
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
-import matplotlib.dates as mdates
-import numpy as np
-from obspy import read, Stream, Inventory
-from obspy.geodetics.base import locations2degrees
 import os
-import typing as tp
 
 # Internal
-from gf3d.plot.util import plot_label
 from gf3d.source import CMTSOLUTION
 from gf3d.seismograms import GFManager
 from gf3d.process import process_stream, select_pairs
@@ -25,7 +16,7 @@ from gf3d.download import download_stream
 
 # DB files
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
-elementdir = '/home/lsawade/lwsspy/gf3d/scripts/DATA/single_element_read/'
+elementdir = '/home/lsawade/gf3d/examples/DATA/single_element_read/'
 subsetfilename = os.path.join(elementdir, 'single_element.h5')
 tracedir = os.path.join(elementdir, "traces")
 stationxml = os.path.join(elementdir, "station.xml")
@@ -33,7 +24,7 @@ stationxml = os.path.join(elementdir, "station.xml")
 h5files = os.path.join(specfemmagic, 'DB', '*', '*', '*.h5')
 
 # CMTSOLUTION
-cmt = CMTSOLUTION.read('/home/lsawade/lwsspy/gf3d/scripts/DATA/CHILE_CMT')
+cmt = CMTSOLUTION.read('/home/lsawade/GF3D/examples/DATA/single_element_read/CMTSOLUTION')
 
 # %% Initialize the GF manager
 gfm = GFManager(glob(h5files)[:])
@@ -91,3 +82,18 @@ limits = (starttime.datetime, endtime.datetime)
 # Plots a section of observed and synthetic
 plotsection(pobs, psyn, cmt, comp='Z', lw=0.75, limits=limits)
 plt.savefig('subset_IO_section.pdf', dpi=300)
+
+
+
+# %%
+
+# %% Initialize the GF manager
+gfm = GFManager(glob(h5files)[:])
+gfm.load_header_variables()
+
+# %%
+gfm.get_elements(-23.0, -68.0, 150, dist_in_km=175.0, NGLL=3)
+
+# %%
+gfm.write_subset('/scratch/gpfs/lsawade/subset_S23_W68_Z150_NGLL3.h5', duration=4*3600.0)
+

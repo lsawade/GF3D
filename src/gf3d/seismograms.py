@@ -974,7 +974,8 @@ class GFManager(object):
 
         # This computes the differential half duration for the new STF from the cmt half duration and the half duration of the database that the database was computed with
         if (cmt.hdur / 1.628)**2 <= self.header['hdur']**2:
-            logger.warn("Requested half duration smaller than what was simulated.")
+            logger.warn(
+                "Requested half duration smaller than what was simulated.")
             hdur_diff = None
 
         else:
@@ -982,18 +983,17 @@ class GFManager(object):
 
             # Heaviside STF to reproduce SPECFEM stf
             _, stf_r = create_stf(0, 400.0, self.header['nsteps'],
-                                self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
+                                  self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
             STF_R = fft.fft(stf_r, n=NP2)
 
             shift = -400.0
             phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
-                                                    self.header['dt'])*2*np.pi)
+                                                        self.header['dt'])*2*np.pi)
 
         # Add traces to the
         traces = []
         for _h in range(len(self.stations)):
             for _i, comp in enumerate(['N', 'E', 'Z']):
-
 
                 if hdur_diff is None:
                     data = seismograms[_h, _i, :]
@@ -1205,8 +1205,8 @@ class GFManager(object):
             self.do_adjacency_search = db['do_adjacency_search'][()]
 
             if self.do_adjacency_search:
-                db['xadj'][:]
-                db['adjacency'][:]
+                self.xadj = db['xadj'][:]
+                self.adjacency = db['adjacency'][:]
 
             # Header Variables
             self.header['dt'] = db['DT'][()]

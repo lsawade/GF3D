@@ -24,7 +24,8 @@ stationxml = os.path.join(elementdir, "station.xml")
 h5files = os.path.join(specfemmagic, 'DB', '*', '*', '*.h5')
 
 # CMTSOLUTION
-cmt = CMTSOLUTION.read('/home/lsawade/GF3D/examples/DATA/single_element_read/CMTSOLUTION')
+cmt = CMTSOLUTION.read(
+    '/home/lsawade/GF3D/examples/DATA/single_element_read/CMTSOLUTION')
 
 # %% Initialize the GF manager
 gfm = GFManager(glob(h5files)[:])
@@ -84,7 +85,6 @@ plotsection(pobs, psyn, cmt, comp='Z', lw=0.75, limits=limits)
 plt.savefig('subset_IO_section.pdf', dpi=300)
 
 
-
 # %%
 
 # %% Initialize the GF manager
@@ -95,10 +95,14 @@ gfm.load_header_variables()
 gfm.get_elements(-23.0, -68.0, 150, dist_in_km=175.0, NGLL=3)
 
 # %%
-gfm.write_subset('/scratch/gpfs/lsawade/subset_S23_W68_Z150_NGLL3.h5', duration=4*3600.0)
+gfm.write_subset(
+    '/scratch/gpfs/lsawade/subset_S23_W68_Z150_NGLL3.h5', duration=4*3600.0)
 
 
-#%%
-gfm2 = GFManager('/scratch/gpfs/lsawade/subset_S23_W68_Z150_R175_NGLL3.h5')
+# %%
+gfm2 = GFManager(
+    '/Users/lucassawade/Downloads/subset_S23_W68_Z150_R175_NGLL3.h5')
 gfm2.load()
-st = gfm2.get_seismograms(CMTSOLUTION.read('testcmt'))
+
+# %%
+st = gfm2.get_seismograms(cmt)

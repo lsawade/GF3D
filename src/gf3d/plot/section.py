@@ -150,7 +150,7 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
 
         else:
             title = (
-                f"{cmt.cmt_time.ctime()} Loc: {cmt.latitude:.2f}dg, {cmt.longitude:.2f}dg, {cmt.depth:.1f}km - BP: [20s, 50s]")
+                f"{cmt.cmt_time.ctime()} Loc: {cmt.latitude:.2f}dg, {cmt.longitude:.2f}dg, {cmt.depth:.1f}km - BP: [40s, 300s]")
         ax.set_title(title, loc='left', ha='left', fontsize='small')
         plt.subplots_adjust(left=0.125, right=0.8, top=0.925)
 

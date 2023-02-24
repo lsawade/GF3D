@@ -97,3 +97,8 @@ gfm.get_elements(-23.0, -68.0, 150, dist_in_km=175.0, NGLL=3)
 # %%
 gfm.write_subset('/scratch/gpfs/lsawade/subset_S23_W68_Z150_NGLL3.h5', duration=4*3600.0)
 
+
+#%%
+gfm2 = GFManager('/scratch/gpfs/lsawade/subset_S23_W68_Z150_R175_NGLL3.h5')
+gfm2.load()
+st = gfm2.get_seismograms(CMTSOLUTION.read('testcmt'))

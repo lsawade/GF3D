@@ -533,11 +533,11 @@ def find_best_neighbor(
         #       to be the starting initial guess for finding the local coordinates.
 
         # gets first guess as starting point
-        ix_initial_guess = MIDX
-        iy_initial_guess = MIDY
-        iz_initial_guess = MIDZ
+        ix_initial_guess = NGLL//2
+        iy_initial_guess = NGLL//2
+        iz_initial_guess = NGLL//2
 
-        iglob = ibool[MIDX, MIDY, MIDZ, ispec]
+        iglob = ibool[NGLL//2, NGLL//2, NGLL//2, ispec]
 
         distmin_squared_guess = (x_target - x_store[iglob])**2 \
             + (y_target - y_store[iglob])**2 \

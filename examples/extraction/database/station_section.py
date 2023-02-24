@@ -4,7 +4,7 @@ Station Section
 ===============
 
 The tutorial will go over the reading of station files from a database by
-loading one that is included in the github repo. At the end we plot a station
+loading one that is included in the github repo. At the end, we plot a station
 section of waveforms using built-in plotting tools.
 
 Loading all modules
@@ -15,6 +15,7 @@ Loading all modules
 # sphinx_gallery_dummy_images = 1
 
 # External
+from glob import glob
 import matplotlib.pyplot as plt
 from obspy import read, read_inventory, Stream
 
@@ -38,7 +39,7 @@ inv = read_inventory("../../DATA/single_element_read/station.xml")
 # Get seismograms from the database
 
 # Load subset
-gfm = GFManager("../../DATA/single_element_read/DB/*/*/*.h5")
+gfm = GFManager(glob('../../DATA/single_element_read/DB/*/*/*.*.h5'))
 gfm.load_header_variables()
 
 # You will have to load a subset of elements first (just one here for storage reasons)
@@ -53,10 +54,17 @@ obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)
 syn = process_stream(rp, cmt=cmt, duration=3600)
 
 # %%
+# Note that the only 3 stations (II.BFO, IU.ANMO, IU.HRV) are in the example
+# database, which means that the observed data that we downloaded for the
+# example subset file includes other stations
 
 pobs, psyn = select_pairs(obs, syn)
 
-# %% Plot section
+# %%
+# So, don't worry about the 'Cant find <Network>.<Station>..<Component>
+#
+# %%
+# Plot section with the data
 
 starttime = psyn[0].stats.starttime + 0
 endtime = starttime + 3600

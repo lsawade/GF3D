@@ -63,7 +63,7 @@ autosummary_generate = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pydata_sphinx_theme'
+html_theme = 'furo'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -72,18 +72,10 @@ html_static_path = ['_static']
 
 html_css_files = ['css/custom.css']
 
-# html_logo = '_static/logo.png'
+html_logo = '_static/logo.png'
 
 html_theme_options = {
-    "logo": {
-        "image_light": "logo.png",
-        "image_dark": "logo.png",
-    },
-    "navbar_end": ["theme-switcher", "navbar-icon-links"],
     # "navbar_end": ["navbar-icon-links"],
-    "pygment_light_style": "tango",
-    "pygment_dark_style": "monokai",
-
     "icon_links": [
         {
             # Label for this link
@@ -103,7 +95,7 @@ html_favicon = '_static/favicon.ico'
 
 html_context = {
 
-    "default_mode": "dark",
+    "default_mode": "auto",
     # "github_url": "https://github.com", # or your GitHub Enterprise site
     "github_user": "lsawade",
     "github_repo": "GF3D",

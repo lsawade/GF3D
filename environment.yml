@@ -16,7 +16,7 @@ dependencies:
   - pip
   - pip:
     - sphinx<6.0
-    - pydata-sphinx-theme
+    - furo
     - sphinx-design
     - sphinx_togglebutton
     - sphinx_gallery

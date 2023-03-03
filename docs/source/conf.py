@@ -112,7 +112,7 @@ def reset_mpl(gallery_conf, fname):
     import matplotlib as mpl
     COLOR = 'k'
     mpl.rcParams["font.family"] = "monospace"
-    mpl.rcParams["savefig.transparent"] = True
+    mpl.rcParams["savefig.transparent"] = False
     mpl.rcParams["savefig.dpi"] = 300
     mpl.rcParams["savefig.format"] = 'svg'
     mpl.rcParams['axes.edgecolor'] = COLOR

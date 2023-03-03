@@ -136,48 +136,48 @@ example subset file includes other stations
 
  .. code-block:: none
 
-    Cant find II.BORG..N
-    Cant find II.BORG..E
-    Cant find II.BORG..Z
-    Cant find IU.KOWA..N
-    Cant find IU.KOWA..E
-    Cant find IU.KOWA..Z
+    Cant find II.KAPI..N
+    Cant find II.KAPI..E
+    Cant find II.KAPI..Z
+    Cant find IU.XMAS..N
+    Cant find IU.XMAS..E
+    Cant find IU.XMAS..Z
+    Cant find IU.CTAO..N
+    Cant find IU.CTAO..E
+    Cant find IU.CTAO..Z
     Cant find II.DGAR..N
     Cant find II.DGAR..E
     Cant find II.DGAR..Z
-    Cant find II.KDAK..N
-    Cant find II.KDAK..E
-    Cant find II.KDAK..Z
-    Cant find IU.SNZO..N
-    Cant find IU.SNZO..E
-    Cant find IU.SNZO..Z
+    Cant find II.HOPE..N
+    Cant find II.HOPE..E
+    Cant find II.HOPE..Z
     Cant find IU.DAV..N
     Cant find IU.DAV..E
     Cant find IU.DAV..Z
     Cant find IU.MAJO..N
     Cant find IU.MAJO..E
     Cant find IU.MAJO..Z
-    Cant find IU.SBA..N
-    Cant find IU.SBA..E
-    Cant find IU.SBA..Z
     Cant find II.AAK..N
     Cant find II.AAK..E
     Cant find II.AAK..Z
-    Cant find IU.XMAS..N
-    Cant find IU.XMAS..E
-    Cant find IU.XMAS..Z
+    Cant find II.BORG..N
+    Cant find II.BORG..E
+    Cant find II.BORG..Z
+    Cant find IU.KOWA..N
+    Cant find IU.KOWA..E
+    Cant find IU.KOWA..Z
+    Cant find II.KDAK..N
+    Cant find II.KDAK..E
+    Cant find II.KDAK..Z
     Cant find IU.YAK..N
     Cant find IU.YAK..E
     Cant find IU.YAK..Z
-    Cant find II.HOPE..N
-    Cant find II.HOPE..E
-    Cant find II.HOPE..Z
-    Cant find IU.CTAO..N
-    Cant find IU.CTAO..E
-    Cant find IU.CTAO..Z
-    Cant find II.KAPI..N
-    Cant find II.KAPI..E
-    Cant find II.KAPI..Z
+    Cant find IU.SBA..N
+    Cant find IU.SBA..E
+    Cant find IU.SBA..Z
+    Cant find IU.SNZO..N
+    Cant find IU.SNZO..E
+    Cant find IU.SNZO..Z
 
 
 
@@ -216,7 +216,7 @@ Plot section with the data
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.956 seconds)
+   **Total running time of the script:** ( 0 minutes  1.624 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_database_station_section.py:

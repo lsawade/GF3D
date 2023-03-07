@@ -3,12 +3,14 @@ Readers and writers for FORCESOLUTION and CMTSOLUTION for specfem.
 
 
 """
+import os
 import warnings
 import numpy as np
 from obspy import UTCDateTime
 from copy import deepcopy
 from obspy.imaging.mopad_wrapper import beach
 from matplotlib import transforms  # For beachball fix
+from typing import TypeVar
 
 
 class FORCESOLUTION:
@@ -210,7 +212,7 @@ class CMTSOLUTION:
 
     def __init__(
         self,
-        origin_time: UTCDateTime = UTCDateTime(2000, 1, 1, 0, 0, 0),
+        origin_time: UTCDateTime | float = UTCDateTime(2000, 1, 1, 0, 0, 0),
         pde_lat: float = 0.0,
         pde_lon: float = 0.0,
         pde_depth: float = 0.0,
@@ -310,15 +312,25 @@ class CMTSOLUTION:
             A class that contains all the tensor info
 
         """
+        try:
+            # Read an actual file
+            if os.path.exists(infile):
+                with open(infile, "rt") as f:
+                    lines = f.readlines()
 
-        with open(infile, "rt") as f:
-            lines = f.readlines()
+            # Read a multiline string.
+            else:
+                lines = infile.strip().split("\n")
+
+        except Exception as e:
+            print(e)
+            raise IOError('Could not read CMTFile.')
 
         # Convert first line
         line0 = lines[0]
 
         # Split up origin time values
-        origin_time = line0[5:].strip().split()[:6]
+        origin_time = line0.strip()[4:].strip().split()[:6]
 
         # Create datetime values
         values = list(map(int, origin_time[:-1])) + [float(origin_time[-1])]
@@ -551,6 +563,81 @@ class CMTSOLUTION:
         return_str += 'Mtp:%19.6e\n' % (self.Mtp,)
 
         return return_str
+
+    @staticmethod
+    def same_eventids(id1, id2):
+
+        id1 = id1 if not id1[0].isalpha() else id1[1:]
+        id2 = id2 if not id2[0].isalpha() else id2[1:]
+
+        return id1 == id2
+
+    def __sub__(self, other):
+        """ USE WITH CAUTION!!
+        -> Origin time becomes float of delta t
+        -> centroid time becomes float of delta t
+        -> half duration is weird to compare like this as well.
+        -> the other class will be subtracted from this one and the resulting
+           instance will keep the eventname and the region tag from this class
+        """
+
+        if not self.same_eventids(self.eventname, other.eventname):
+            raise ValueError(
+                'CMTSource.eventname must be equal to compare the events')
+
+        # The origin time is the most problematic part
+        origin_time = self.origin_time - other.origin_time
+        pde_lat = self.pde_lat - other.pde_lat
+        pde_lon = self.pde_lon - other.pde_lon
+        pde_depth = self.pde_depth - other.pde_depth
+        region_tag = self.region_tag
+        eventame = self.eventname
+        mb = self.mb - other.mb
+        ms = self.ms - other.ms
+        cmt_time = self.cmt_time - other.cmt_time
+        print(self.cmt_time, other.cmt_time, cmt_time)
+        half_duration = self.hdur - other.hdur
+        latitude = self.latitude - other.latitude
+        longitude = self.longitude - other.longitude
+        depth = self.depth - other.depth
+        Mrr = self.Mrr - other.Mrr
+        Mtt = self.Mtt - other.Mtt
+        Mpp = self.Mpp - other.Mpp
+        Mrt = self.Mrt - other.Mrt
+        Mrp = self.Mrp - other.Mrp
+        Mtp = self.Mtp - other.Mtp
+
+        return CMTSOLUTION(
+            origin_time=origin_time,
+            pde_lat=pde_lat, pde_lon=pde_lon, mb=mb, ms=ms,
+            pde_depth=pde_depth, region_tag=region_tag,
+            eventname=eventame, time_shift=cmt_time, hdur=half_duration,
+            latitude=latitude, longitude=longitude, depth=depth,
+            Mrr=Mrr, Mtt=Mtt, Mpp=Mpp, Mrt=Mrt, Mrp=Mrp, Mtp=Mtp)
+
+    def __ge__(self, other):
+        """This comparison are implemented for the sorting in time."""
+        if self.origin_time == other.origin_time:
+            return self.time_shift >= other.time_shift
+        else:
+            return self.origin_time >= other.origin_time
+
+    def __gt__(self, other):
+        """This comparison are implemented for the sorting in time."""
+        if self.origin_time == other.origin_time:
+            return self.time_shift > other.time_shift
+        else:
+            return self.origin_time > other.origin_time
+
+    def __eq__(self, other):
+        return (
+            (self.origin_time, self.eventname, self.cmt_time, self.hdur,
+             self.latitude, self.longitude, self.depth,
+             self.Mrr, self.Mtt, self.Mpp, self.Mrt, self.Mrp, self.Mtp)
+            ==
+            (other.origin_time, other.eventname, other.cmt_time, other.hdur,
+             other.latitude, other.longitude, other.depth,
+             other.Mrr, other.Mtt, other.Mpp, other.Mrt, other.Mrp, other.Mtp))
 
     def __repr__(self) -> str:
         return self.__str__()

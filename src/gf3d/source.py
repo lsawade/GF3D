@@ -3,14 +3,49 @@ Readers and writers for FORCESOLUTION and CMTSOLUTION for specfem.
 
 
 """
+from __future__ import annotations
 import os
 import warnings
 import numpy as np
-from obspy import UTCDateTime
+from obspy import UTCDateTime, read_events
+from obspy.core.event import Event
 from copy import deepcopy
-from obspy.imaging.mopad_wrapper import beach
-from matplotlib import transforms  # For beachball fix
-from typing import TypeVar
+from .plot.source import ax_beach
+
+
+def float_to_str(x: float, N: int):
+    """Makes fortran style float."""
+
+    # Check whether g formatting removes decimal points
+    out = f'{x:{N}g}'
+
+    # Fix to fortran formatting of doubles
+    if '.' in out:
+        if 'e' in out:
+            out = out.replace('e', 'd')
+        else:
+            out += 'd0'
+    else:
+        if 'e' in out:
+            out = out.replace('e', '.d')
+        else:
+            out += '.d0'
+
+    return out
+
+
+def str2float(x: str):
+    """Reads fortran style float."""
+
+    # Fix to fortran formatting of doubles
+    if "d+" in x:
+        x = x.replace('d+', 'e+')
+    elif "d-" in x:
+        x = x.replace('d-', 'e-')
+    elif "d" in x:
+        x = x.replace('d', '')
+
+    return float(x)
 
 
 class FORCESOLUTION:
@@ -115,48 +150,15 @@ class FORCESOLUTION:
         stf = int(lines[6].strip().split(':')[-1].split()[0])
 
         # Reading eigth line
-        forcefactor = cls.str2float(lines[7].strip().split(':')[-1].split()[0])
+        forcefactor = str2float(lines[7].strip().split(':')[-1].split()[0])
 
         # Reading lines 9-11
-        compE = cls.str2float(lines[8].strip().split(':')[-1].split()[0])
-        compN = cls.str2float(lines[9].strip().split(':')[-1].split()[0])
-        compZ_UP = cls.str2float(lines[10].strip().split(':')[-1].split()[0])
+        compE = str2float(lines[8].strip().split(':')[-1].split()[0])
+        compN = str2float(lines[9].strip().split(':')[-1].split()[0])
+        compZ_UP = str2float(lines[10].strip().split(':')[-1].split()[0])
 
         return cls(
             time_shift=time_shift, hdur=half_duration, latitude=latitude, longitude=longitude, depth=depth, stf=stf, forcefactor=forcefactor, vector_E=compE, vector_N=compN, vector_Z_UP=compZ_UP, force_no=force_no)
-
-    @staticmethod
-    def float_to_str(x: float, N: int):
-
-        # Check whether g formatting removes decimal points
-        out = f'{x:{N}g}'
-
-        # Fix to fortran formatting of doubles
-        if '.' in out:
-            if 'e' in out:
-                out = out.replace('e', 'd')
-            else:
-                out += 'd0'
-        else:
-            if 'e' in out:
-                out = out.replace('e', '.d')
-            else:
-                out += '.d0'
-
-        return out
-
-    @staticmethod
-    def str2float(x: str):
-
-        # Fix to fortran formatting of doubles
-        if "d+" in x:
-            x = x.replace('d+', 'e+')
-        elif "d-" in x:
-            x = x.replace('d-', 'e-')
-        elif "d" in x:
-            x = x.replace('d', '')
-
-        return float(x)
 
     def write(self, outfile: str):
 
@@ -173,10 +175,10 @@ class FORCESOLUTION:
         rstr += f"longitude:{self.longitude:16.4f}    ! Degree\n"
         rstr += f"depth:{self.depth:20.4f}    ! km\n"
         rstr += f"source time function:{self.stf:2d}       ! 0=Gaussian function, 1=Ricker wavelet, 2=Step function\n"
-        FF = self.float_to_str(self.forcefactor, 5)
-        E = self.float_to_str(self.vector_E, 3)
-        N = self.float_to_str(self.vector_N, 3)
-        Z = self.float_to_str(self.vector_Z_UP, 3)
+        FF = float_to_str(self.forcefactor, 5)
+        E = float_to_str(self.vector_E, 3)
+        N = float_to_str(self.vector_N, 3)
+        Z = float_to_str(self.vector_Z_UP, 3)
         rstr += f"factor force source: {FF:<8} ! Newton\n"
         rstr += f"component dir vect source E: {E:>9}\n"
         rstr += f"component dir vect source N: {N:>9}\n"
@@ -296,6 +298,80 @@ class CMTSOLUTION:
         self.Mrt = Mrt
         self.Mrp = Mrp
         self.Mtp = Mtp
+
+    @classmethod
+    def read_quakeml(cls, infile: str):
+        return cls.from_event(read_events(infile)[0])
+
+    @classmethod
+    def from_event(cls, event: Event):
+
+        cmtsolution = None
+        pdesolution = None
+
+        for origin in event.origins:
+            if origin.origin_type == 'centroid':
+                cmtsolution = origin
+            else:
+                pdesolution = origin
+
+        if cmtsolution is None:
+            raise ValueError('Moment tensor not found in event.')
+
+        if pdesolution is None:
+            raise ValueError('PDE not found in event.')
+
+        origin_time = pdesolution.time
+        pde_lat = pdesolution.latitude
+        pde_lon = pdesolution.longitude
+        pde_depth_in_m = pdesolution.depth
+        mb = 0.0
+        ms = 0.0
+        for mag in event.magnitudes:
+            if mag.magnitude_type == "Mb":
+                mb = mag.mag
+            elif mag.magnitude_type == "MS":
+                ms = mag.mag
+
+        # Get region tag
+        try:
+            region_tag = cmtsolution.region
+        except Exception:
+            try:
+                region_tag = pdesolution.region
+            except Exception:
+                warnings.warn("Region tag not found.")
+        region_tag = "N/A"
+
+        eventname = ""
+        for descrip in event.event_descriptions:
+            if descrip.type == "earthquake name":
+                eventname = descrip.text
+
+        cmt_time = cmtsolution.time
+        focal_mechanism = event.focal_mechanisms[0]
+        half_duration = \
+            focal_mechanism.moment_tensor.source_time_function.duration/2.0
+        latitude = cmtsolution.latitude
+        longitude = cmtsolution.longitude
+        depth_in_m = cmtsolution.depth
+        tensor = focal_mechanism.moment_tensor.tensor
+        # Convert to dyn cm
+        Mrr = tensor.m_rr * 1e7
+        Mtt = tensor.m_tt * 1e7
+        Mpp = tensor.m_pp * 1e7
+        Mrt = tensor.m_rt * 1e7
+        Mrp = tensor.m_rp * 1e7
+        Mtp = tensor.m_tp * 1e7
+
+        return cls(origin_time=origin_time,
+                   pde_lat=pde_lat, pde_lon=pde_lon, mb=mb, ms=ms,
+                   pde_depth=pde_depth_in_m, region_tag=region_tag,
+                   eventname=eventname, time_shift=cmt_time-origin_time,
+                   hdur=half_duration, latitude=latitude,
+                   longitude=longitude, depth=depth_in_m/1000.0,
+                   Mrr=Mrr, Mtt=Mtt, Mpp=Mpp, Mrt=Mrt,
+                   Mrp=Mrp, Mtp=Mtp)
 
     @classmethod
     def read(cls, infile: str):
@@ -470,59 +546,16 @@ class CMTSOLUTION:
         self.half_duration = np.round(
             2.26 * 10**(-6) * (self.M0 * Nm_conv)**(1/3), decimals=1)
 
-    @staticmethod
-    def float_to_str(x: float, N: int):
-        """Makes fortran style float."""
-
-        # Check whether g formatting removes decimal points
-        out = f'{x:{N}g}'
-
-        # Fix to fortran formatting of doubles
-        if '.' in out:
-            if 'e' in out:
-                out = out.replace('e', 'd')
-            else:
-                out += 'd0'
-        else:
-            if 'e' in out:
-                out = out.replace('e', '.d')
-            else:
-                out += '.d0'
-
-        return out
-
-    def axbeach(
-            self, ax, x, y, width=50, facecolor='k', edgecolor='k',
-            bgcolor='w', linewidth=2, alpha=1.0,
-            clip_on=False, **kwargs):
-        """Plots beach ball into given axes.
-        Note that width heavily depends on the given screen size/dpi. Therefore
-        often does not work."""
-
-        # Plot beach ball
-        bb = beach(self.tensor,
-                   linewidth=linewidth,
-                   facecolor=facecolor,
-                   bgcolor=bgcolor,
-                   edgecolor=edgecolor,
-                   alpha=alpha,
-                   xy=(x, y),
-                   width=width,
-                   size=100,  # Defines number of interpolation points
-                   axes=ax,
-                   **kwargs)
-        bb.set(clip_on=clip_on)
-
-        # This fixes pdf output issue
-        # bb.set_transform(transforms.Affine2D(np.identity(3)))
-
-        ax.add_collection(bb)
-
     def write(self, outfile: str):
         """Writes classic CMTSOLUTION in classic format."""
 
         with open(outfile, 'w') as f:
             f.write(self.__str__())
+
+    def ax_beach(self, *args, **kwargs):
+        """For the documentation of the beachball plot, see
+        :func:`gf3d.plot.source.axbeach`."""
+        return ax_beach(self, *args, **kwargs)
 
     def __str__(self):
         """Returns a string in classic CMTSOLUTION format."""
@@ -564,6 +597,9 @@ class CMTSOLUTION:
 
         return return_str
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
     @staticmethod
     def same_eventids(id1, id2):
 
@@ -572,7 +608,9 @@ class CMTSOLUTION:
 
         return id1 == id2
 
-    def __sub__(self, other):
+    def __sub__(self, other: CMTSOLUTION):
+        if not isinstance(other, CMTSOLUTION):
+            return NotImplemented
         """ USE WITH CAUTION!!
         -> Origin time becomes float of delta t
         -> centroid time becomes float of delta t
@@ -615,21 +653,27 @@ class CMTSOLUTION:
             latitude=latitude, longitude=longitude, depth=depth,
             Mrr=Mrr, Mtt=Mtt, Mpp=Mpp, Mrt=Mrt, Mrp=Mrp, Mtp=Mtp)
 
-    def __ge__(self, other):
+    def __ge__(self, other: CMTSOLUTION):
+        if not isinstance(other, CMTSOLUTION):
+            return NotImplemented
         """This comparison are implemented for the sorting in time."""
         if self.origin_time == other.origin_time:
             return self.time_shift >= other.time_shift
         else:
             return self.origin_time >= other.origin_time
 
-    def __gt__(self, other):
+    def __gt__(self, other: CMTSOLUTION):
+        if not isinstance(other, CMTSOLUTION):
+            return NotImplemented
         """This comparison are implemented for the sorting in time."""
         if self.origin_time == other.origin_time:
             return self.time_shift > other.time_shift
         else:
             return self.origin_time > other.origin_time
 
-    def __eq__(self, other):
+    def __eq__(self, other: CMTSOLUTION):
+        if not isinstance(other, CMTSOLUTION):
+            return NotImplemented
         return (
             (self.origin_time, self.eventname, self.cmt_time, self.hdur,
              self.latitude, self.longitude, self.depth,
@@ -638,6 +682,3 @@ class CMTSOLUTION:
             (other.origin_time, other.eventname, other.cmt_time, other.hdur,
              other.latitude, other.longitude, other.depth,
              other.Mrr, other.Mtt, other.Mpp, other.Mrt, other.Mrp, other.Mtp))
-
-    def __repr__(self) -> str:
-        return self.__str__()

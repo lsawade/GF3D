@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_extraction_database_make_subset.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_extraction_database_make_subset.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -151,15 +151,15 @@ Finally you can read the seismograms.
  .. code-block:: none
 
     9 Trace(s) in Stream:
-    II.BFO..MXN  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
-    II.BFO..MXE  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
-    II.BFO..MXZ  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
-    IU.ANMO..MXN | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
-    IU.ANMO..MXE | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
-    IU.ANMO..MXZ | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
     IU.HRV..MXN  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
     IU.HRV..MXE  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
     IU.HRV..MXZ  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+    IU.ANMO..MXN | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+    IU.ANMO..MXE | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+    IU.ANMO..MXZ | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+    II.BFO..MXN  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+    II.BFO..MXE  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
+    II.BFO..MXZ  | 2015-09-16T22:52:02.880000Z - 2015-09-16T23:55:20.380027Z | 0.2 Hz, 776 samples
 
 
 
@@ -175,6 +175,8 @@ Finally you can read the seismograms.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

@@ -21,7 +21,7 @@ from the raw database of stations.
 .. only:: html
 
   .. image:: /examples/extraction/database/images/thumb/sphx_glr_make_subset_thumb.png
-    :alt: Create subset from database files
+    :alt:
 
   :ref:`sphx_glr_examples_extraction_database_make_subset.py`
 
@@ -38,7 +38,7 @@ from the raw database of stations.
 .. only:: html
 
   .. image:: /examples/extraction/database/images/thumb/sphx_glr_station_section_thumb.svg
-    :alt: Station Section
+    :alt:
 
   :ref:`sphx_glr_examples_extraction_database_station_section.py`
 
@@ -55,7 +55,7 @@ from the raw database of stations.
 .. only:: html
 
   .. image:: /examples/extraction/database/images/thumb/sphx_glr_single_seismogram_thumb.svg
-    :alt: Single Seismogram
+    :alt:
 
   :ref:`sphx_glr_examples_extraction_database_single_seismogram.py`
 

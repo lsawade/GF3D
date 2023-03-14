@@ -20,7 +20,7 @@ To be created.
 .. only:: html
 
   .. image:: /examples/generation/images/thumb/sphx_glr_simulation_thumb.png
-    :alt: Simulation Class Demo
+    :alt:
 
   :ref:`sphx_glr_examples_generation_simulation.py`
 

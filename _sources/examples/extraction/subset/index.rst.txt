@@ -20,7 +20,7 @@ from an extracted subset of Green functions.
 .. only:: html
 
   .. image:: /examples/extraction/subset/images/thumb/sphx_glr_station_section_thumb.svg
-    :alt: Station Section
+    :alt:
 
   :ref:`sphx_glr_examples_extraction_subset_station_section.py`
 
@@ -37,7 +37,7 @@ from an extracted subset of Green functions.
 .. only:: html
 
   .. image:: /examples/extraction/subset/images/thumb/sphx_glr_single_seismogram_thumb.svg
-    :alt: Single Seismogram
+    :alt:
 
   :ref:`sphx_glr_examples_extraction_subset_single_seismogram.py`
 
@@ -54,7 +54,7 @@ from an extracted subset of Green functions.
 .. only:: html
 
   .. image:: /examples/extraction/subset/images/thumb/sphx_glr_aligned_stations_thumb.svg
-    :alt: Aligned Station Section
+    :alt:
 
   :ref:`sphx_glr_examples_extraction_subset_aligned_stations.py`
 

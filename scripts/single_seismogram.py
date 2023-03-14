@@ -38,12 +38,22 @@ def process_stream(st: Stream):
 
 # %% Get Reciprocal seismograms
 rp = get_seismograms(h5file, cmt)
+
+
 process_stream(rp)
 
 # %% Get forward seismograms
 
 fw = read(os.path.join(specfemmagic,
                        'specfem3d_globe_forward', 'OUTPUT_FILES', 'II*.sac'))
+
+# %% Get obs seismograms
+fw = read('*.sac')
+
+
+
+
+
 process_stream(fw)
 
 # %% Set up time limits

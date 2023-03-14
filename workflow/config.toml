@@ -32,12 +32,9 @@ ndt = 4.0
 lpfilter = "butter"
 subsample = true
 force_factor = 10000000000.0
-forward_test = false
-cmtsolutionfile = "CMTSOLUTION"
-broadcast_mesh_model = false
-simultaneous_runs = false
-overwrite = false
 
 [root.processparams]
 precision = "half"
 compression = "None"
+
+

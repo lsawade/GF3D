@@ -13,6 +13,7 @@ dependencies:
   - gdal
   - obspy
   - joblib
+  - toml
   - pip
   - pip:
     - sphinx<6.0

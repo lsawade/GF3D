@@ -275,3 +275,19 @@ def set_default_color(COLOR):
     plt.rcParams['axes.labelcolor'] = COLOR
     plt.rcParams['xtick.color'] = COLOR
     plt.rcParams['ytick.color'] = COLOR
+
+
+def reset_mpl(gallery_conf, fname):
+    """Function to set default look of the figures.
+    """
+    import matplotlib as mpl
+    COLOR = 'k'
+    mpl.rcParams["font.family"] = "monospace"
+    mpl.rcParams["savefig.transparent"] = False
+    mpl.rcParams["savefig.dpi"] = 300
+    mpl.rcParams["savefig.format"] = 'svg'
+    mpl.rcParams['axes.edgecolor'] = COLOR
+    mpl.rcParams['text.color'] = COLOR
+    mpl.rcParams['axes.labelcolor'] = COLOR
+    mpl.rcParams['xtick.color'] = COLOR
+    mpl.rcParams['ytick.color'] = COLOR

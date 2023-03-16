@@ -234,12 +234,49 @@
 
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">UTCDateTime</span>
+<span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">UTCDateTime</span><span class="p">,</span> <span class="n">read_events</span>
+<span class="kn">from</span> <span class="nn">obspy.core.event</span> <span class="kn">import</span> <span class="n">Event</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">obspy.imaging.mopad_wrapper</span> <span class="kn">import</span> <span class="n">beach</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">transforms</span>  <span class="c1"># For beachball fix</span>
+<span class="kn">from</span> <span class="nn">.plot.source</span> <span class="kn">import</span> <span class="n">ax_beach</span>
+
+
+<span class="k">def</span> <span class="nf">float_to_str</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes fortran style float.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Check whether g formatting removes decimal points</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:{</span><span class="n">N</span><span class="si">}</span><span class="s1">g</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="c1"># Fix to fortran formatting of doubles</span>
+    <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;d0&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;.d&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;.d0&#39;</span>
+
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="k">def</span> <span class="nf">str2float</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads fortran style float.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Fix to fortran formatting of doubles</span>
+    <span class="k">if</span> <span class="s2">&quot;d+&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d+&#39;</span><span class="p">,</span> <span class="s1">&#39;e+&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="s2">&quot;d-&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d-&#39;</span><span class="p">,</span> <span class="s1">&#39;e-&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="s2">&quot;d&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="FORCESOLUTION"><a class="viewcode-back" href="../../parts/api/index.html#gf3d.source.FORCESOLUTION">[docs]</a><span class="k">class</span> <span class="nc">FORCESOLUTION</span><span class="p">:</span>
@@ -344,48 +381,15 @@
         <span class="n">stf</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="c1"># Reading eigth line</span>
-        <span class="n">forcefactor</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">forcefactor</span> <span class="o">=</span> <span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="c1"># Reading lines 9-11</span>
-        <span class="n">compE</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">compN</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">compZ_UP</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">compE</span> <span class="o">=</span> <span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">compN</span> <span class="o">=</span> <span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">compZ_UP</span> <span class="o">=</span> <span class="n">str2float</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">time_shift</span><span class="o">=</span><span class="n">time_shift</span><span class="p">,</span> <span class="n">hdur</span><span class="o">=</span><span class="n">half_duration</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">stf</span><span class="o">=</span><span class="n">stf</span><span class="p">,</span> <span class="n">forcefactor</span><span class="o">=</span><span class="n">forcefactor</span><span class="p">,</span> <span class="n">vector_E</span><span class="o">=</span><span class="n">compE</span><span class="p">,</span> <span class="n">vector_N</span><span class="o">=</span><span class="n">compN</span><span class="p">,</span> <span class="n">vector_Z_UP</span><span class="o">=</span><span class="n">compZ_UP</span><span class="p">,</span> <span class="n">force_no</span><span class="o">=</span><span class="n">force_no</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">float_to_str</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-
-        <span class="c1"># Check whether g formatting removes decimal points</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:{</span><span class="n">N</span><span class="si">}</span><span class="s1">g</span><span class="si">}</span><span class="s1">&#39;</span>
-
-        <span class="c1"># Fix to fortran formatting of doubles</span>
-        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;d0&#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;.d&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;.d0&#39;</span>
-
-        <span class="k">return</span> <span class="n">out</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">str2float</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-
-        <span class="c1"># Fix to fortran formatting of doubles</span>
-        <span class="k">if</span> <span class="s2">&quot;d+&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d+&#39;</span><span class="p">,</span> <span class="s1">&#39;e+&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s2">&quot;d-&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d-&#39;</span><span class="p">,</span> <span class="s1">&#39;e-&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s2">&quot;d&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 
@@ -402,10 +406,10 @@
         <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;longitude:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="si">:</span><span class="s2">16.4f</span><span class="si">}</span><span class="s2">    ! Degree</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;depth:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="si">:</span><span class="s2">20.4f</span><span class="si">}</span><span class="s2">    ! km</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;source time function:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">stf</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">       ! 0=Gaussian function, 1=Ricker wavelet, 2=Step function</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">FF</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forcefactor</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-        <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_E</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_N</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-        <span class="n">Z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_Z_UP</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">FF</span> <span class="o">=</span> <span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forcefactor</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_E</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_N</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_Z_UP</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
         <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;factor force source: </span><span class="si">{</span><span class="n">FF</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> ! Newton</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;component dir vect source E: </span><span class="si">{</span><span class="n">E</span><span class="si">:</span><span class="s2">&gt;9</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">rstr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;component dir vect source N: </span><span class="si">{</span><span class="n">N</span><span class="si">:</span><span class="s2">&gt;9</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -441,7 +445,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">origin_time</span><span class="p">:</span> <span class="n">UTCDateTime</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">origin_time</span><span class="p">:</span> <span class="n">UTCDateTime</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">UTCDateTime</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="n">pde_lat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">pde_lon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">pde_depth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -527,6 +531,80 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span> <span class="o">=</span> <span class="n">Mtp</span>
 
     <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">read_quakeml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_event</span><span class="p">(</span><span class="n">read_events</span><span class="p">(</span><span class="n">infile</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_event</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">):</span>
+
+        <span class="n">cmtsolution</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">pdesolution</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">origin</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">origins</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">origin</span><span class="o">.</span><span class="n">origin_type</span> <span class="o">==</span> <span class="s1">&#39;centroid&#39;</span><span class="p">:</span>
+                <span class="n">cmtsolution</span> <span class="o">=</span> <span class="n">origin</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pdesolution</span> <span class="o">=</span> <span class="n">origin</span>
+
+        <span class="k">if</span> <span class="n">cmtsolution</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Moment tensor not found in event.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pdesolution</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;PDE not found in event.&#39;</span><span class="p">)</span>
+
+        <span class="n">origin_time</span> <span class="o">=</span> <span class="n">pdesolution</span><span class="o">.</span><span class="n">time</span>
+        <span class="n">pde_lat</span> <span class="o">=</span> <span class="n">pdesolution</span><span class="o">.</span><span class="n">latitude</span>
+        <span class="n">pde_lon</span> <span class="o">=</span> <span class="n">pdesolution</span><span class="o">.</span><span class="n">longitude</span>
+        <span class="n">pde_depth_in_m</span> <span class="o">=</span> <span class="n">pdesolution</span><span class="o">.</span><span class="n">depth</span>
+        <span class="n">mb</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">ms</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">mag</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">magnitudes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mag</span><span class="o">.</span><span class="n">magnitude_type</span> <span class="o">==</span> <span class="s2">&quot;Mb&quot;</span><span class="p">:</span>
+                <span class="n">mb</span> <span class="o">=</span> <span class="n">mag</span><span class="o">.</span><span class="n">mag</span>
+            <span class="k">elif</span> <span class="n">mag</span><span class="o">.</span><span class="n">magnitude_type</span> <span class="o">==</span> <span class="s2">&quot;MS&quot;</span><span class="p">:</span>
+                <span class="n">ms</span> <span class="o">=</span> <span class="n">mag</span><span class="o">.</span><span class="n">mag</span>
+
+        <span class="c1"># Get region tag</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">region_tag</span> <span class="o">=</span> <span class="n">cmtsolution</span><span class="o">.</span><span class="n">region</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">region_tag</span> <span class="o">=</span> <span class="n">pdesolution</span><span class="o">.</span><span class="n">region</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Region tag not found.&quot;</span><span class="p">)</span>
+        <span class="n">region_tag</span> <span class="o">=</span> <span class="s2">&quot;N/A&quot;</span>
+
+        <span class="n">eventname</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">descrip</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">event_descriptions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">descrip</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;earthquake name&quot;</span><span class="p">:</span>
+                <span class="n">eventname</span> <span class="o">=</span> <span class="n">descrip</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="n">cmt_time</span> <span class="o">=</span> <span class="n">cmtsolution</span><span class="o">.</span><span class="n">time</span>
+        <span class="n">focal_mechanism</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">focal_mechanisms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">half_duration</span> <span class="o">=</span> \
+            <span class="n">focal_mechanism</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">source_time_function</span><span class="o">.</span><span class="n">duration</span><span class="o">/</span><span class="mf">2.0</span>
+        <span class="n">latitude</span> <span class="o">=</span> <span class="n">cmtsolution</span><span class="o">.</span><span class="n">latitude</span>
+        <span class="n">longitude</span> <span class="o">=</span> <span class="n">cmtsolution</span><span class="o">.</span><span class="n">longitude</span>
+        <span class="n">depth_in_m</span> <span class="o">=</span> <span class="n">cmtsolution</span><span class="o">.</span><span class="n">depth</span>
+        <span class="n">tensor</span> <span class="o">=</span> <span class="n">focal_mechanism</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span>
+        <span class="c1"># Convert to dyn cm</span>
+        <span class="n">Mrr</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">m_rr</span> <span class="o">*</span> <span class="mf">1e7</span>
+        <span class="n">Mtt</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">m_tt</span> <span class="o">*</span> <span class="mf">1e7</span>
+        <span class="n">Mpp</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">m_pp</span> <span class="o">*</span> <span class="mf">1e7</span>
+        <span class="n">Mrt</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">m_rt</span> <span class="o">*</span> <span class="mf">1e7</span>
+        <span class="n">Mrp</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">m_rp</span> <span class="o">*</span> <span class="mf">1e7</span>
+        <span class="n">Mtp</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">m_tp</span> <span class="o">*</span> <span class="mf">1e7</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">,</span>
+                   <span class="n">pde_lat</span><span class="o">=</span><span class="n">pde_lat</span><span class="p">,</span> <span class="n">pde_lon</span><span class="o">=</span><span class="n">pde_lon</span><span class="p">,</span> <span class="n">mb</span><span class="o">=</span><span class="n">mb</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="n">ms</span><span class="p">,</span>
+                   <span class="n">pde_depth</span><span class="o">=</span><span class="n">pde_depth_in_m</span><span class="p">,</span> <span class="n">region_tag</span><span class="o">=</span><span class="n">region_tag</span><span class="p">,</span>
+                   <span class="n">eventname</span><span class="o">=</span><span class="n">eventname</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="n">cmt_time</span><span class="o">-</span><span class="n">origin_time</span><span class="p">,</span>
+                   <span class="n">hdur</span><span class="o">=</span><span class="n">half_duration</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span>
+                   <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth_in_m</span><span class="o">/</span><span class="mf">1000.0</span><span class="p">,</span>
+                   <span class="n">Mrr</span><span class="o">=</span><span class="n">Mrr</span><span class="p">,</span> <span class="n">Mtt</span><span class="o">=</span><span class="n">Mtt</span><span class="p">,</span> <span class="n">Mpp</span><span class="o">=</span><span class="n">Mpp</span><span class="p">,</span> <span class="n">Mrt</span><span class="o">=</span><span class="n">Mrt</span><span class="p">,</span>
+                   <span class="n">Mrp</span><span class="o">=</span><span class="n">Mrp</span><span class="p">,</span> <span class="n">Mtp</span><span class="o">=</span><span class="n">Mtp</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">infile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads CMT solution file</span>
 
@@ -541,15 +619,25 @@
 <span class="sd">            A class that contains all the tensor info</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Read an actual file</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="c1"># Read a multiline string.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Could not read CMTFile.&#39;</span><span class="p">)</span>
 
         <span class="c1"># Convert first line</span>
         <span class="n">line0</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Split up origin time values</span>
-        <span class="n">origin_time</span> <span class="o">=</span> <span class="n">line0</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
+        <span class="n">origin_time</span> <span class="o">=</span> <span class="n">line0</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span>
 
         <span class="c1"># Create datetime values</span>
         <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">origin_time</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">+</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">origin_time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
@@ -689,59 +777,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">half_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>
             <span class="mf">2.26</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span> <span class="o">*</span> <span class="n">Nm_conv</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">float_to_str</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Makes fortran style float.&quot;&quot;&quot;</span>
-
-        <span class="c1"># Check whether g formatting removes decimal points</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:{</span><span class="n">N</span><span class="si">}</span><span class="s1">g</span><span class="si">}</span><span class="s1">&#39;</span>
-
-        <span class="c1"># Fix to fortran formatting of doubles</span>
-        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;d0&#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;e&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;.d&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;.d0&#39;</span>
-
-        <span class="k">return</span> <span class="n">out</span>
-
-    <span class="k">def</span> <span class="nf">axbeach</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
-            <span class="n">bgcolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-            <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots beach ball into given axes.</span>
-<span class="sd">        Note that width heavily depends on the given screen size/dpi. Therefore</span>
-<span class="sd">        often does not work.&quot;&quot;&quot;</span>
-
-        <span class="c1"># Plot beach ball</span>
-        <span class="n">bb</span> <span class="o">=</span> <span class="n">beach</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span>
-                   <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
-                   <span class="n">facecolor</span><span class="o">=</span><span class="n">facecolor</span><span class="p">,</span>
-                   <span class="n">bgcolor</span><span class="o">=</span><span class="n">bgcolor</span><span class="p">,</span>
-                   <span class="n">edgecolor</span><span class="o">=</span><span class="n">edgecolor</span><span class="p">,</span>
-                   <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
-                   <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
-                   <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-                   <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># Defines number of interpolation points</span>
-                   <span class="n">axes</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
-                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">bb</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">clip_on</span><span class="o">=</span><span class="n">clip_on</span><span class="p">)</span>
-
-        <span class="c1"># This fixes pdf output issue</span>
-        <span class="c1"># bb.set_transform(transforms.Affine2D(np.identity(3)))</span>
-
-        <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">bb</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes classic CMTSOLUTION in classic format.&quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">ax_beach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;For the documentation of the beachball plot, see</span>
+<span class="sd">        :func:`gf3d.plot.source.axbeach`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ax_beach</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string in classic CMTSOLUTION format.&quot;&quot;&quot;</span>
@@ -784,7 +829,90 @@
         <span class="k">return</span> <span class="n">return_str</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">same_eventids</span><span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">):</span>
+
+        <span class="n">id1</span> <span class="o">=</span> <span class="n">id1</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">id1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="k">else</span> <span class="n">id1</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">id2</span> <span class="o">=</span> <span class="n">id2</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">id2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="k">else</span> <span class="n">id2</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="k">return</span> <span class="n">id1</span> <span class="o">==</span> <span class="n">id2</span>
+
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">CMTSOLUTION</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">CMTSOLUTION</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; USE WITH CAUTION!!</span>
+<span class="sd">        -&gt; Origin time becomes float of delta t</span>
+<span class="sd">        -&gt; centroid time becomes float of delta t</span>
+<span class="sd">        -&gt; half duration is weird to compare like this as well.</span>
+<span class="sd">        -&gt; the other class will be subtracted from this one and the resulting</span>
+<span class="sd">           instance will keep the eventname and the region tag from this class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">same_eventids</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eventname</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">eventname</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;CMTSource.eventname must be equal to compare the events&#39;</span><span class="p">)</span>
+
+        <span class="c1"># The origin time is the most problematic part</span>
+        <span class="n">origin_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">origin_time</span>
+        <span class="n">pde_lat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pde_lat</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">pde_lat</span>
+        <span class="n">pde_lon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pde_lon</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">pde_lon</span>
+        <span class="n">pde_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pde_depth</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">pde_depth</span>
+        <span class="n">region_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_tag</span>
+        <span class="n">eventame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventname</span>
+        <span class="n">mb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mb</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">mb</span>
+        <span class="n">ms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ms</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">ms</span>
+        <span class="n">cmt_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmt_time</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">cmt_time</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmt_time</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">cmt_time</span><span class="p">,</span> <span class="n">cmt_time</span><span class="p">)</span>
+        <span class="n">half_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdur</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">hdur</span>
+        <span class="n">latitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">latitude</span>
+        <span class="n">longitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">longitude</span>
+        <span class="n">depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">depth</span>
+        <span class="n">Mrr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrr</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">Mrr</span>
+        <span class="n">Mtt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtt</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">Mtt</span>
+        <span class="n">Mpp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mpp</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">Mpp</span>
+        <span class="n">Mrt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrt</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">Mrt</span>
+        <span class="n">Mrp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrp</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">Mrp</span>
+        <span class="n">Mtp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">Mtp</span>
+
+        <span class="k">return</span> <span class="n">CMTSOLUTION</span><span class="p">(</span>
+            <span class="n">origin_time</span><span class="o">=</span><span class="n">origin_time</span><span class="p">,</span>
+            <span class="n">pde_lat</span><span class="o">=</span><span class="n">pde_lat</span><span class="p">,</span> <span class="n">pde_lon</span><span class="o">=</span><span class="n">pde_lon</span><span class="p">,</span> <span class="n">mb</span><span class="o">=</span><span class="n">mb</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="n">ms</span><span class="p">,</span>
+            <span class="n">pde_depth</span><span class="o">=</span><span class="n">pde_depth</span><span class="p">,</span> <span class="n">region_tag</span><span class="o">=</span><span class="n">region_tag</span><span class="p">,</span>
+            <span class="n">eventname</span><span class="o">=</span><span class="n">eventame</span><span class="p">,</span> <span class="n">time_shift</span><span class="o">=</span><span class="n">cmt_time</span><span class="p">,</span> <span class="n">hdur</span><span class="o">=</span><span class="n">half_duration</span><span class="p">,</span>
+            <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span>
+            <span class="n">Mrr</span><span class="o">=</span><span class="n">Mrr</span><span class="p">,</span> <span class="n">Mtt</span><span class="o">=</span><span class="n">Mtt</span><span class="p">,</span> <span class="n">Mpp</span><span class="o">=</span><span class="n">Mpp</span><span class="p">,</span> <span class="n">Mrt</span><span class="o">=</span><span class="n">Mrt</span><span class="p">,</span> <span class="n">Mrp</span><span class="o">=</span><span class="n">Mrp</span><span class="p">,</span> <span class="n">Mtp</span><span class="o">=</span><span class="n">Mtp</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">CMTSOLUTION</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">CMTSOLUTION</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This comparison are implemented for the sorting in time.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">origin_time</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">time_shift</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">origin_time</span>
+
+    <span class="k">def</span> <span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">CMTSOLUTION</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">CMTSOLUTION</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This comparison are implemented for the sorting in time.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">origin_time</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_shift</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">time_shift</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">origin_time</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">CMTSOLUTION</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">CMTSOLUTION</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eventname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmt_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdur</span><span class="p">,</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">Mrr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mpp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mrp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mtp</span><span class="p">)</span>
+            <span class="o">==</span>
+            <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">origin_time</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">eventname</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">cmt_time</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">hdur</span><span class="p">,</span>
+             <span class="n">other</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
+             <span class="n">other</span><span class="o">.</span><span class="n">Mrr</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">Mtt</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">Mpp</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">Mrt</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">Mrp</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">Mtp</span><span class="p">))</span></div>
 </pre></div>
         </article>
       </div>

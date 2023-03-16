@@ -59,6 +59,8 @@ add_module_names = False
 autoclass_content = 'both'
 autosummary_generate = True
 
+numpydoc_class_members_toctree = False
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -75,20 +77,21 @@ html_css_files = ['css/custom.css']
 
 html_logo = '_static/logo.png'
 
+
 html_theme_options = {
     # "navbar_end": ["navbar-icon-links"],
-    "icon_links": [
-        {
-            # Label for this link
-            "name": "GitHub",
-            # URL where the link will redirect
-            "url": "https://github.com/lsawade/GF3D",  # required
-            # Icon class (if "type": "fontawesome"), or path to local image (if "type": "local")
-            "icon": "fa-brands fa-square-github",
-            # The type of image to be used (see below for details)
-            "type": "fontawesome",
-        },
-    ]
+    # "icon_links": [
+    #     {
+    #         # Label for this link
+    #         "name": "GitHub",
+    #         # URL where the link will redirect
+    #         "url": "https://github.com/lsawade/GF3D",  # required
+    #         # Icon class (if "type": "fontawesome"), or path to local image (if "type": "local")
+    #         "icon": "fa-brands fa-square-github",
+    #         # The type of image to be used (see below for details)
+    #         "type": "fontawesome",
+    #     },
+    # ]
 
 }
 

@@ -161,9 +161,10 @@ class Simulation:
                 - starttime ``T0``
 
         What does the simulation manager not do?
-        - Postprocessing of the Green function files, such as, combine an
+
+        * Postprocessing of the Green function files, such as, combine an
           simulated Green function set to a single SGT file for each station.
-        - Querying the Green function database
+        * Querying the Green function database
 
         """
 

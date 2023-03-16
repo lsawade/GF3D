@@ -256,7 +256,13 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     NP2 = next_power_of_2(2*NT)
 
     # This computes the half duration for the new STF from the
-    hdur_r = np.sqrt((cmt.hdur / 1.628)**2 - hdur**2)
+    if (cmt.hdur / 1.628) <= hdur:
+        hdur_r = 0.000001
+        logger.warn(
+            f"Requested half duration smaller than what was simulated.\n"
+            f"Half duration set to {hdur_r}s to simulate a Heaviside function.")
+    else:
+        hdur_r = np.sqrt((cmt.hdur / 1.628)**2 - hdur**2)
 
     logger.debug(
         f"CMT hdur: {cmt.hdur:.3f}, GF DB hdur: {hdur:.3f} -> Used hdur: {hdur_r}")
@@ -972,39 +978,38 @@ class GFManager(object):
         # For following FFTs
         NP2 = next_power_of_2(2 * self.header['nsteps'])
 
-        # This computes the differential half duration for the new STF from the cmt half duration and the half duration of the database that the database was computed with
+        # This computes the differential half duration for the new STF from
+        # the cmt half duration and the half duration of the database that the
+        # database was computed with
         if (cmt.hdur / 1.628)**2 <= self.header['hdur']**2:
+            hdur_diff = 0.000001
             logger.warn(
-                "Requested half duration smaller than what was simulated.")
-            hdur_diff = None
-
+                f"Requested half duration smaller than what was simulated.\n"
+                f"Half duration set to {hdur_diff}s to simulate a Heaviside function.")
         else:
             hdur_diff = np.sqrt((cmt.hdur / 1.628)**2 - self.header['hdur']**2)
 
-            # Heaviside STF to reproduce SPECFEM stf
-            _, stf_r = create_stf(0, 400.0, self.header['nsteps'],
-                                  self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
-            STF_R = fft.fft(stf_r, n=NP2)
+        # Heaviside STF to reproduce SPECFEM stf
+        _, stf_r = create_stf(0, 400.0, self.header['nsteps'],
+                              self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
 
-            shift = -400.0
-            phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
-                                                        self.header['dt'])*2*np.pi)
+        STF_R = fft.fft(stf_r, n=NP2)
 
+        shift = -400.0
+        phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
+                                                    self.header['dt'])*2*np.pi)
+
+        logger.debug(f"Lengths: {self.header['nsteps']}, {NP2}")
         # Add traces to the
         traces = []
         for _h in range(len(self.stations)):
             for _i, comp in enumerate(['N', 'E', 'Z']):
 
-                if hdur_diff is None:
-                    data = seismograms[_h, _i, :]
-                # Convolution with Specfem Heaviside function
-                else:
-                    data = np.real(
-                        fft.ifft(
-                            phshift
-                            * fft.fft(seismograms[_h, _i, :], n=NP2)
-                            * STF_R)
-                    )[:self.header['nsteps']] * self.header['dt']
+                data = np.real(
+                    fft.ifft(
+                        STF_R * fft.fft(seismograms[_h, _i, :], n=NP2)
+                        * phshift
+                    ))[:self.header['nsteps']] * self.header['dt']
 
                 stats = Stats()
                 stats.delta = self.header['dt']
@@ -1022,7 +1027,7 @@ class GFManager(object):
 
                 traces.append(tr)
 
-        logger.debug('HELOHLOHOPHEIHRLIHR')
+        logger.debug('Outputting traces')
         return Stream(traces)
 
     def get_frechet(self, cmt: CMTSOLUTION, rtype=3):

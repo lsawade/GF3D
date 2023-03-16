@@ -18,6 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 from sphinx_gallery.scrapers import matplotlib_scraper
+from gf3d.plot.util import reset_mpl
 project = 'GF3D'
 copyright = '2023, Lucas Sawade'
 author = 'Lucas Sawade'
@@ -104,22 +105,6 @@ html_context = {
 }
 
 # --------------------------------
-
-
-def reset_mpl(gallery_conf, fname):
-    """Function to set default look of the figures.
-    """
-    import matplotlib as mpl
-    COLOR = 'k'
-    mpl.rcParams["font.family"] = "monospace"
-    mpl.rcParams["savefig.transparent"] = False
-    mpl.rcParams["savefig.dpi"] = 300
-    mpl.rcParams["savefig.format"] = 'svg'
-    mpl.rcParams['axes.edgecolor'] = COLOR
-    mpl.rcParams['text.color'] = COLOR
-    mpl.rcParams['axes.labelcolor'] = COLOR
-    mpl.rcParams['xtick.color'] = COLOR
-    mpl.rcParams['ytick.color'] = COLOR
 
 
 class matplotlib_svg_scraper(object):

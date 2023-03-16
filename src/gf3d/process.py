@@ -55,9 +55,9 @@ def process_stream(
         out.detrend("linear")
         out.detrend("demean")
         out.taper(max_percentage=0.05, type='hann')
-        out.remove_response(output="DISP", pre_filt=[0.003, 0.005, 45, 50],
+        out.remove_response(output="VEL", pre_filt=[0.003, 0.005, 45, 50],
                             zero_mean=False, taper=False,
-                            water_level=60, inventory=inv)
+                            water_level=100, inventory=inv)
         out.rotate('->ZNE', inventory=inv)
 
     # Filter

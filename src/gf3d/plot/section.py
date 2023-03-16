@@ -17,7 +17,7 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
                 limits: tp.Tuple[UTCDateTime] | None = None,
                 newsyn: Stream or None = None,
                 newcmt: CMTSOLUTION or None = None, scale: float = 1.0,
-                obsc='k', sync='r', newsync='b',
+                obsc='k', sync='r', newsync='b', bandpass=None,
                 **kwargs):
 
     if ax is None:
@@ -143,14 +143,19 @@ def plotsection(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
 
     if plottitle:
 
+        if bandpass is not None:
+            bandpass_string = f"- BP: {bandpass}s"
+        else:
+            bandpass_string = ""
+
         if newcmt:
             title = (
-                f"    {cmt.cmt_time.ctime()} Loc: {cmt.latitude:.4f}dg, {cmt.longitude:.4f}dg, {cmt.depth:.4f}km, ts={cmt.time_shift:.4f}s, hdur={cmt.hdur:.4f}s - BP: [40s, 300s]\n"
+                f"    {cmt.cmt_time.ctime()} Loc: {cmt.latitude:.4f}dg, {cmt.longitude:.4f}dg, {cmt.depth:.4f}km, ts={cmt.time_shift:.4f}s, hdur={cmt.hdur:.4f}s {bandpass_string}\n"
                 f"New {newcmt.cmt_time.ctime()} Loc: {newcmt.latitude:.4f}dg, {newcmt.longitude:.4f}dg, {cmt.depth:.4f}km, ts={newcmt.time_shift:.4f}s, hdur={newcmt.hdur:.4f}s")
 
         else:
             title = (
-                f"{cmt.cmt_time.ctime()} Loc: {cmt.latitude:.2f}dg, {cmt.longitude:.2f}dg, {cmt.depth:.1f}km - BP: [40s, 300s]")
+                f"{cmt.cmt_time.ctime()} Loc: {cmt.latitude:.2f}dg, {cmt.longitude:.2f}dg, {cmt.depth:.1f}km {bandpass_string}")
         ax.set_title(title, loc='left', ha='left', fontsize='small')
         plt.subplots_adjust(left=0.125, right=0.8, top=0.925)
 

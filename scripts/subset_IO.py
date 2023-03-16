@@ -2,7 +2,7 @@
 # External
 from glob import glob
 import matplotlib.pyplot as plt
-import os
+import os, sys
 
 # Internal
 from gf3d.source import CMTSOLUTION
@@ -83,6 +83,8 @@ limits = (starttime.datetime, endtime.datetime)
 # Plots a section of observed and synthetic
 plotsection(pobs, psyn, cmt, comp='Z', lw=0.75, limits=limits)
 plt.savefig('subset_IO_section.pdf', dpi=300)
+
+sys.exit()
 
 
 # %%

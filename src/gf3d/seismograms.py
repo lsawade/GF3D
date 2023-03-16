@@ -600,6 +600,7 @@ class GFManager(object):
                 self.header['ellipticity_spline'] = db['ellipticity_spline'][:]
                 self.header['ellipticity_spline2'] = db['ellipticity_spline2'][:]
 
+            self.header['NGLOB'] = db['NGLOB'][()]
             self.header['NGLLX'] = db['NGLLX'][()]
             self.header['NGLLY'] = db['NGLLY'][()]
             self.header['NGLLZ'] = db['NGLLZ'][()]
@@ -1170,6 +1171,7 @@ class GFManager(object):
                 db.create_dataset('ellipticity_spline2',
                                   data=self.header['ellipticity_spline2'])
 
+            db.create_dataset('NGLOB', data=self.header['NGLOB'])
             db.create_dataset('NGLLX', data=self.NGLL)
             db.create_dataset('NGLLY', data=self.NGLL)
             db.create_dataset('NGLLZ', data=self.NGLL)

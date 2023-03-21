@@ -1115,7 +1115,7 @@ class GFManager(object):
 
         return frechets
 
-    def write_subset(self, outfile, duration=None):
+    def write_subset(self, outfile, duration=None, fortran=False):
         """Given the files in the database, get a set of strains and write it
         into to a single file in a single epsilon array.
         Also write a list of stations and normal header info required for
@@ -1128,8 +1128,16 @@ class GFManager(object):
             db.create_dataset('Stations', data=self.stations)
             db.create_dataset('latitudes', data=self.latitudes)
             db.create_dataset('longitudes', data=self.longitudes)
-            db.create_dataset('ibool', data=self.ibool)
-            db.create_dataset('xyz', data=self.xyz)
+
+            if fortran:
+                db.create_dataset('fortran', data=1)
+                db.create_dataset(
+                    'ibool', data=self.ibool.transpose((3, 2, 1, 0)))
+                db.create_dataset('xyz', data=self.xyz.transpose((1, 0)))
+            else:
+                db.create_dataset('ibool', data=self.ibool)
+                db.create_dataset('xyz', data=self.xyz)
+
             db.create_dataset('do_adjacency_search',
                               data=self.do_adjacency_search)
 
@@ -1157,11 +1165,16 @@ class GFManager(object):
             db.create_dataset('ELLIPTICITY', data=self.header['ellipticity'])
 
             if self.header['topography']:
-                db.create_dataset('BATHY', data=self.header['itopo'])
                 db.create_dataset('NX_BATHY', data=self.header['nx_topo'])
                 db.create_dataset('NY_BATHY', data=self.header['ny_topo'])
                 db.create_dataset('RESOLUTION_TOPO_FILE',
                                   data=self.header['res_topo'])
+
+                if fortran:
+                    db.create_dataset(
+                        'BATHY', data=self.header['itopo'].transpose(1, 0))
+                else:
+                    db.create_dataset('BATHY', data=self.header['itopo'])
 
             if self.header['ellipticity']:
                 db.create_dataset('rspl', data=self.header['rspl'])
@@ -1177,8 +1190,14 @@ class GFManager(object):
             # Use duration keyword to set the number of samples to save to file:
             print('shape', self.displacement.shape)
             print('nsteps', nsteps)
-            db.create_dataset(
-                'displacement', data=self.displacement[:, :, :, :, :nsteps])  # ,
+
+            if fortran:
+                db.create_dataset(
+                    'displacement',
+                    data=self.displacement[:, :, :, :, :nsteps].transpose((4, 3, 2, 1, 0)))
+            else:
+                db.create_dataset(
+                    'displacement', data=self.displacement[:, :, :, :, :nsteps])  # ,
             # shuffle=True, compression='lzf')
 
     def load(self):
@@ -1192,6 +1211,10 @@ class GFManager(object):
 
         with h5py.File(self.headerfile, 'r') as db:
 
+            if 'fortran' in db:
+                fortran = True
+            else:
+                fortran = False
             self.header['NGLLX'] = db['NGLLX'][()]
             self.header['NGLLY'] = db['NGLLY'][()]
             self.header['NGLLZ'] = db['NGLLZ'][()]
@@ -1234,3 +1257,10 @@ class GFManager(object):
                 self.header['ellipticity_spline2'] = db['ellipticity_spline2'][:]
 
             self.displacement = db['displacement'][:]
+
+            if fortran:
+                self.displacement = self.displacement.transpose(
+                    (4, 3, 2, 1, 0))
+                self.header['itopo'] = self.header['itopo'].transpose((1, 0))
+                self.xyz = self.xyz.transpose((1, 0))
+                self.ibool = self.ibool.transpose((3, 2, 1, 0))

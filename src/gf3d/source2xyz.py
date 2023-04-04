@@ -10,6 +10,59 @@ from .transformations.rthetaphi_xyz import lat_2_geocentric_colat, reduce_geocen
 from .logger import logger
 
 
+def rotate_mt(lat: float, lon: float, M: np.ndarray):
+
+    # Make sure the longitude in [0.0, 360.0]
+    lon = lon + 360.0 if (lon < 0.0) else lon
+    lon = lon - 360.0 if (lon > 360.0) else lon
+
+    # convert geographic latitude lat(degrees) to geocentric colatitude theta(radians)
+    # lat in degrees --> theta in radians
+    theta = lat_2_geocentric_colat(lat)
+
+    phi = lon*DEGREES_TO_RADIANS
+    theta, phi = reduce_geocentric(theta, phi)
+
+    logger.debug(f"lat  {lat}, lon {lon}")
+    logger.debug(f"theta {theta}, phi {phi}")
+
+    sint = np.sin(theta)
+    cost = np.cos(theta)
+    sinp = np.sin(phi)
+    cosp = np.cos(phi)
+
+    # get the moment tensor
+    Mrr = M[0]
+    Mtt = M[1]
+    Mpp = M[2]
+    Mrt = M[3]
+    Mrp = M[4]
+    Mtp = M[5]
+
+    # convert from a spherical to a Cartesian representation of the moment tensor
+    Mxx = sint*sint*cosp*cosp*Mrr + cost*cost*cosp*cosp*Mtt + sinp*sinp*Mpp \
+        + 2.0*sint*cost*cosp*cosp*Mrt - 2.0*sint*sinp*cosp*Mrp - 2.0*cost*sinp*cosp*Mtp
+
+    Myy = sint*sint*sinp*sinp*Mrr + cost*cost*sinp*sinp*Mtt + cosp*cosp*Mpp \
+        + 2.0*sint*cost*sinp*sinp*Mrt + 2.0*sint*sinp*cosp*Mrp + 2.0*cost*sinp*cosp*Mtp
+
+    Mzz = cost*cost*Mrr + sint*sint*Mtt - 2.0*sint*cost*Mrt
+
+    Mxy = sint*sint*sinp*cosp*Mrr + cost*cost*sinp*cosp*Mtt - sinp*cosp*Mpp \
+        + 2.0*sint*cost*sinp*cosp*Mrt + sint * \
+        (cosp*cosp-sinp*sinp)*Mrp + cost*(cosp*cosp-sinp*sinp)*Mtp
+
+    Mxz = sint*cost*cosp*Mrr - sint*cost*cosp*Mtt \
+        + (cost*cost-sint*sint)*cosp*Mrt - cost*sinp*Mrp + sint*sinp*Mtp
+
+    Myz = sint*cost*sinp*Mrr - sint*cost*sinp*Mtt \
+        + (cost*cost-sint*sint)*sinp*Mrt + cost*cosp*Mrp - sint*cosp*Mtp
+
+    mx = np.array([Mxx, Myy, Mzz, Mxy, Mxz, Myz])
+
+    return mx
+
+
 def source2xyz(
         lat: float, lon: float, depth_in_km: float, M: None | np.ndarray = None,
         topography: bool = False, ellipticity: bool = False,

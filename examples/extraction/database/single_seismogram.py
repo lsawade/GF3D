@@ -80,4 +80,4 @@ plotseismogram(obs, syn, cmt, limits=limits)
 plt.show()
 
 # %%
-# The seismograms are offset for clarity so that they are easy to read.
+# The seismograms are offset for clarity so that they are easy to read.s

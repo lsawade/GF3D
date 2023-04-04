@@ -9,7 +9,7 @@ import numpy as np
 from joblib import parallel_backend, Parallel, delayed
 from obspy.core.util.attribdict import AttribDict
 from .lagrange import gll_nodes, lagrange_any
-from .source2xyz import source2xyz
+from .source2xyz import source2xyz, rotate_mt
 from .locate_point import locate_point
 from .source import CMTSOLUTION
 from .utils import timeshift, next_power_of_2
@@ -1031,6 +1031,168 @@ class GFManager(object):
         logger.debug('Outputting traces')
         return Stream(traces)
 
+
+    def get_mt_frechet(self, cmt: CMTSOLUTION) -> Stream:
+
+        # Get moment tensor
+        x_target, y_target, z_target = source2xyz(
+            cmt.latitude, cmt.longitude, cmt.depth, M=None,
+            topography=self.header['topography'],
+            ellipticity=self.header['ellipticity'],
+            ibathy_topo=self.header['itopo'],
+            NX_BATHY=self.header['nx_topo'],
+            NY_BATHY=self.header['ny_topo'],
+            RESOLUTION_TOPO_FILE=self.header['res_topo'],
+            rspl=self.header['rspl'],
+            ellipicity_spline=self.header['ellipticity_spline'],
+            ellipicity_spline2=self.header['ellipticity_spline2'],
+        )
+
+        # Get rotated moment tensors
+        pertdict = dict(
+            Mrr=1e23, Mtt=1e23, Mpp=1e23,
+            Mrt=1e23, Mrp=1e23, Mtp=1e23,
+        )
+        mx = []
+        for _i, (_key, pert) in enumerate(pertdict.items()):
+            m = np.zeros(6)
+            m[_i] = pert
+            mx.append(rotate_mt(cmt.latitude, cmt.longitude, m))
+
+        if self.do_adjacency_search:
+            logger.debug("DOING ADJACENCY SEARCH")
+
+        ispec_selected, xi, eta, gamma, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz, _, _, _, _ = locate_point(
+            x_target, y_target, z_target, cmt.latitude, cmt.longitude,
+            self.xyz[self.ibool[self.NGLL//2, self.NGLL//2, self.NGLL//2, :],
+                     :], self.xyz[:, 0], self.xyz[:, 1],
+            self.xyz[:, 2], self.ibool,
+            xadj=self.xadj, adjacency=self.adjacency,
+            POINT_CAN_BE_BURIED=True, kdtree=self.kdtree,
+            do_adjacent_search=self.do_adjacency_search, NGLL=self.NGLL)
+
+        # Get global indeces.
+        iglob = self.ibool[:, :, :, ispec_selected]
+
+        # Get displacement for interpolation
+        displacement = self.displacement[:, :, :, iglob, :]
+
+        # GLL points and weights (degree)
+        npol = self.NGLL - 1
+        xigll, _, _ = gll_nodes(npol)
+
+        # Get lagrange values at specific GLL poins
+        hxi, hpxi = lagrange_any(xi, xigll, npol)
+        heta, hpeta = lagrange_any(eta, xigll, npol)
+        hgamma, hpgamma = lagrange_any(gamma, xigll, npol)
+
+        # Initialize epsilon array
+        epsilon = np.zeros((len(self.stations), 3, 6, self.header['nsteps']))
+
+        for k in range(self.NGLL):
+            for j in range(self.NGLL):
+                for i in range(self.NGLL):
+
+                    hlagrange_xi = hpxi[i] * heta[j] * hgamma[k]
+                    hlagrange_eta = hxi[i] * hpeta[j] * hgamma[k]
+                    hlagrange_gamma = hxi[i] * heta[j] * hpgamma[k]
+                    hlagrange_x = hlagrange_xi * xix + hlagrange_eta * etax + hlagrange_gamma * gammax
+                    hlagrange_y = hlagrange_xi * xiy + hlagrange_eta * etay + hlagrange_gamma * gammay
+                    hlagrange_z = hlagrange_xi * xiz + hlagrange_eta * etaz + hlagrange_gamma * gammaz
+
+                    for _s in range(len(self.stations)):
+                        for _c in range(3):
+                            epsilon[_s, _c, 0, :] += (
+                                displacement[_s, _c, 0, i, j, k, :] * hlagrange_x)
+                            epsilon[_s, _c, 1, :] += (
+                                displacement[_s, _c, 1, i, j, k, :] * hlagrange_y)
+                            epsilon[_s, _c, 2, :] += (
+                                displacement[_s, _c, 2, i, j, k, :] * hlagrange_z)
+                            epsilon[_s, _c, 3, :] += 0.5 * (
+                                displacement[_s, _c, 1, i,
+                                             j, k, :] * hlagrange_x
+                                + displacement[_s, _c, 0, i, j, k, :] * hlagrange_y)
+                            epsilon[_s, _c, 4, :] += 0.5 * (
+                                displacement[_s, _c, 2, i,
+                                             j, k, :] * hlagrange_x
+                                + displacement[_s, _c, 0, i, j, k, :] * hlagrange_z)
+                            epsilon[_s, _c, 5, :] += 0.5 * (
+                                displacement[_s, _c, 2, i,
+                                             j, k, :] * hlagrange_y
+                                + displacement[_s, _c, 1, i, j, k, :] * hlagrange_z)
+
+
+        # For following FFTs
+        NP2 = next_power_of_2(2 * self.header['nsteps'])
+
+        # This computes the differential half duration for the new STF from
+        # the cmt half duration and the half duration of the database that the
+        # database was computed with
+        if (cmt.hdur / 1.628)**2 <= self.header['hdur']**2:
+            hdur_diff = 0.000001
+            logger.warn(
+                f"Requested half duration smaller than what was simulated.\n"
+                f"Half duration set to {hdur_diff}s to simulate a Heaviside function.")
+        else:
+            hdur_diff = np.sqrt((cmt.hdur / 1.628)**2 - self.header['hdur']**2)
+
+        # Heaviside STF to reproduce SPECFEM stf
+        _, stf_r = create_stf(0, 400.0, self.header['nsteps'],
+                              self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
+
+        STF_R = fft.fft(stf_r, n=NP2)
+
+        shift = -400.0
+        phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
+                                                    self.header['dt'])*2*np.pi)
+
+        logger.debug(f"Lengths: {self.header['nsteps']}, {NP2}")
+
+        # Add traces to the
+        compdict = dict()
+        for _j, mtc in enumerate(['Mrr', 'Mtt', 'Mpp', 'Mrt', 'Mrp', 'Mtp']):
+
+            # Get lagrange values at specific GLL points
+            M = mx[_j] * np.array([1., 1., 1., 2., 2., 2.])
+
+            # Since the database is the same for all
+            seismograms = np.einsum('hijo,j->hio', epsilon[:, :, :, :], M)
+
+            logger.debug(f"SEISUM: {np.sum(seismograms)}")
+
+            traces = []
+
+            for _h in range(len(self.stations)):
+                for _i, comp in enumerate(['N', 'E', 'Z']):
+
+                    data = np.real(
+                        fft.ifft(
+                            STF_R * fft.fft(seismograms[_h, _i, :], n=NP2)
+                            * phshift
+                        ))[:self.header['nsteps']] * self.header['dt']/1e23
+
+                    stats = Stats()
+                    stats.delta = self.header['dt']
+                    stats.network = self.networks[_h]
+                    stats.station = self.stations[_h]
+                    stats.latitude = self.latitudes[_h]
+                    stats.longitude = self.longitudes[_h]
+                    stats.coordinates = AttribDict(
+                        latitude=self.latitudes[_h], longitude=self.longitudes[_h])
+                    stats.location = ''
+                    stats.channel = f'MX{comp}'
+                    stats.starttime = cmt.cmt_time - self.header['tc']
+                    stats.npts = self.header['nsteps']
+                    tr = Trace(data=data, header=stats)
+
+                    traces.append(tr)
+
+            # Add traces to dictionary
+            compdict[mtc] = Stream(traces)
+
+        logger.debug('Outputting traces')
+        return compdict
+
     def get_frechet(self, cmt: CMTSOLUTION, rtype=3):
         """Computes centered finite difference using 10m perturbations"""
 
@@ -1062,25 +1224,15 @@ class GFManager(object):
             )
 
         frechets = dict()
-
+        mt_computed = False
         for par, pert in pertdict.items():
 
             if par in mtpar:
+                if mt_computed is False:
+                    compdict = self.get_mt_frechet(cmt)
+                    mt_computed = True
 
-                dcmt = deepcopy(cmt)
-
-                # Set all M... to zero
-                for mpar in mtpar:
-                    setattr(dcmt, mpar, 0.0)
-
-                # Set one to none-zero
-                setattr(dcmt, par, pert)
-
-                # Get reciprocal synthetics
-                drp = self.get_seismograms(dcmt)
-
-                for tr in drp:
-                    tr.data /= pert
+                drp = compdict[par]
 
             elif par == 'time_shift':
 
@@ -1116,7 +1268,7 @@ class GFManager(object):
 
         return frechets
 
-    def write_subset(self, outfile, duration=None):
+    def write_subset(self, outfile, duration=None, fortran=False):
         """Given the files in the database, get a set of strains and write it
         into to a single file in a single epsilon array.
         Also write a list of stations and normal header info required for
@@ -1129,8 +1281,16 @@ class GFManager(object):
             db.create_dataset('Stations', data=self.stations)
             db.create_dataset('latitudes', data=self.latitudes)
             db.create_dataset('longitudes', data=self.longitudes)
-            db.create_dataset('ibool', data=self.ibool)
-            db.create_dataset('xyz', data=self.xyz)
+
+            if fortran:
+                db.create_dataset('fortran', data=1)
+                db.create_dataset(
+                    'ibool', data=self.ibool.transpose((3, 2, 1, 0)))
+                db.create_dataset('xyz', data=self.xyz.transpose((1, 0)))
+            else:
+                db.create_dataset('ibool', data=self.ibool)
+                db.create_dataset('xyz', data=self.xyz)
+
             db.create_dataset('do_adjacency_search',
                               data=self.do_adjacency_search)
 
@@ -1158,11 +1318,16 @@ class GFManager(object):
             db.create_dataset('ELLIPTICITY', data=self.header['ellipticity'])
 
             if self.header['topography']:
-                db.create_dataset('BATHY', data=self.header['itopo'])
                 db.create_dataset('NX_BATHY', data=self.header['nx_topo'])
                 db.create_dataset('NY_BATHY', data=self.header['ny_topo'])
                 db.create_dataset('RESOLUTION_TOPO_FILE',
                                   data=self.header['res_topo'])
+
+                if fortran:
+                    db.create_dataset(
+                        'BATHY', data=self.header['itopo'].transpose(1, 0))
+                else:
+                    db.create_dataset('BATHY', data=self.header['itopo'])
 
             if self.header['ellipticity']:
                 db.create_dataset('rspl', data=self.header['rspl'])
@@ -1179,8 +1344,14 @@ class GFManager(object):
             # Use duration keyword to set the number of samples to save to file:
             print('shape', self.displacement.shape)
             print('nsteps', nsteps)
-            db.create_dataset(
-                'displacement', data=self.displacement[:, :, :, :, :nsteps])  # ,
+
+            if fortran:
+                db.create_dataset(
+                    'displacement',
+                    data=self.displacement[:, :, :, :, :nsteps].transpose((4, 3, 2, 1, 0)))
+            else:
+                db.create_dataset(
+                    'displacement', data=self.displacement[:, :, :, :, :nsteps])  # ,
             # shuffle=True, compression='lzf')
 
     def load(self):
@@ -1194,6 +1365,10 @@ class GFManager(object):
 
         with h5py.File(self.headerfile, 'r') as db:
 
+            if 'fortran' in db:
+                fortran = True
+            else:
+                fortran = False
             self.header['NGLLX'] = db['NGLLX'][()]
             self.header['NGLLY'] = db['NGLLY'][()]
             self.header['NGLLZ'] = db['NGLLZ'][()]
@@ -1236,3 +1411,10 @@ class GFManager(object):
                 self.header['ellipticity_spline2'] = db['ellipticity_spline2'][:]
 
             self.displacement = db['displacement'][:]
+
+            if fortran:
+                self.displacement = self.displacement.transpose(
+                    (4, 3, 2, 1, 0))
+                self.header['itopo'] = self.header['itopo'].transpose((1, 0))
+                self.xyz = self.xyz.transpose((1, 0))
+                self.ibool = self.ibool.transpose((3, 2, 1, 0))

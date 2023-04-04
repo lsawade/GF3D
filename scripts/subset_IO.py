@@ -16,7 +16,7 @@ from gf3d.download import download_stream
 
 # DB files
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
-elementdir = '/home/lsawade/gf3d/examples/DATA/single_element_read/'
+elementdir = '/home/lsawade/GF3D'
 subsetfilename = os.path.join(elementdir, 'single_element.h5')
 tracedir = os.path.join(elementdir, "traces")
 stationxml = os.path.join(elementdir, "station.xml")
@@ -30,13 +30,13 @@ cmt = CMTSOLUTION.read(
 # %% Initialize the GF manager
 gfm = GFManager(glob(h5files)[:])
 gfm.load_header_variables()
-gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 1, NGLL=3)
+gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, dist_in_km=27.5, NGLL=3)
 
 # %% Write a subset
-gfm.write_subset(subsetfilename, duration=3600.0)
+gfm.write_subset(subsetfilename, duration=3600.0, fortran=True)
 
 # %% load a subset
-
+sys.exit()
 gfsub = GFManager(subsetfilename)
 gfsub.load()
 

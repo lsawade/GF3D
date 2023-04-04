@@ -287,6 +287,7 @@ def reset_mpl(gallery_conf, fname):
     mpl.rcParams["savefig.dpi"] = 300
     mpl.rcParams["savefig.format"] = 'svg'
     mpl.rcParams['axes.edgecolor'] = COLOR
+    # mpl.rcParams['axes.backgroundcolor'] = 'w'
     mpl.rcParams['text.color'] = COLOR
     mpl.rcParams['axes.labelcolor'] = COLOR
     mpl.rcParams['xtick.color'] = COLOR

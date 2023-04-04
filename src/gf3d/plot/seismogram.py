@@ -16,7 +16,7 @@ def plotseismogram(
         *args,
         ax: matplotlib.axes.Axes | None = None,
         limits: tp.Tuple[UTCDateTime] | None = None,
-        newsyn: Stream or None = None,
+        newsyn: Stream or None = None, bandpass=None,
         obsc='k', sync='r', newsync='b',
         **kwargs):
 
@@ -94,9 +94,15 @@ def plotseismogram(
             # Add title with event info
             network = syn[0].stats.network
             station = syn[0].stats.station
+
+            if bandpass is not None:
+                bandpass_string = f"- BP: {bandpass}s"
+            else:
+                bandpass_string = ""
+
             plot_label(ax,
                        f"{cmt.cmt_time.strftime('%Y-%m-%d %H:%M:%S')}  Loc: {cmt.latitude}dg, {cmt.longitude}dg, {cmt.depth}km\n"
-                       f"{network}.{station} -- BP: [40s, 300s]",
+                       f"{network}.{station} {bandpass_string}",
                        fontsize='medium', box=False, location=6)
 
             # Add legend

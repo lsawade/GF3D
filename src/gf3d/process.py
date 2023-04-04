@@ -4,7 +4,8 @@ from gf3d.logger import logger
 
 
 def process_stream_trace_by_trace(
-        st: Stream, inv: Inventory | None = None, cmt: CMTSOLUTION | None = None, duration: float | None = None,
+        st: Stream, inv: Inventory | None = None, cmt: CMTSOLUTION | None = None,
+        duration: float | None = None,
         bandpass=[40.0, 300.0], starttimeoffset: float = 0.0):
     cpstream = st.copy()
     out = []
@@ -47,7 +48,8 @@ def process_stream_trace_by_trace(
 
 
 def process_stream(
-        st: Stream, inv: Inventory | None = None, cmt: CMTSOLUTION | None = None, duration: float | None = None,
+        st: Stream, inv: Inventory | None = None, cmt: CMTSOLUTION | None = None,
+        duration: float | None = None,
         bandpass=[40.0, 300.0], starttimeoffset: float = 0.0):
     out = st.copy()
 
@@ -55,7 +57,7 @@ def process_stream(
         out.detrend("linear")
         out.detrend("demean")
         out.taper(max_percentage=0.05, type='hann')
-        out.remove_response(output="VEL", pre_filt=[0.003, 0.005, 45, 50],
+        out.remove_response(output="DISP", pre_filt=[0.003, 0.005, 45, 50],
                             zero_mean=False, taper=False,
                             water_level=100, inventory=inv)
         out.rotate('->ZNE', inventory=inv)

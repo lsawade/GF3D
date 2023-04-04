@@ -134,7 +134,7 @@ Loading all modules
 
 
 .. image-sg:: /examples/extraction/subset/images/sphx_glr_station_section_001.svg
-   :alt: Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km - BP: [40s, 300s]
+   :alt: Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km 
    :srcset: /examples/extraction/subset/images/sphx_glr_station_section_001.svg
    :class: sphx-glr-single-img
 
@@ -145,7 +145,7 @@ Loading all modules
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.682 seconds)
+   **Total running time of the script:** ( 0 minutes  2.690 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_subset_station_section.py:

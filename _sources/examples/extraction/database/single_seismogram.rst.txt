@@ -184,12 +184,12 @@ Set plot limits and plot seismogram
 
 .. GENERATED FROM PYTHON SOURCE LINES 83-84
 
-The seismograms are offset for clarity so that they are easy to read.
+The seismograms are offset for clarity so that they are easy to read.s
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.404 seconds)
+   **Total running time of the script:** ( 0 minutes  0.403 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_database_single_seismogram.py:

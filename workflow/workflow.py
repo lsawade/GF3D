@@ -89,7 +89,7 @@ def create_station_dir(node: Node):
     # Setup
     S = Simulation(**config)
     print(S)
-    S.create(no_specfem=True)
+    S.create()
 
     # dump config
     with open(os.path.join(node.db, node.network, node.station, 'config.toml'), 'w') as f:

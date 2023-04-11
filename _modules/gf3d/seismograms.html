@@ -821,12 +821,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ellipticity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;ELLIPTICITY&#39;</span><span class="p">][()]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading topography ...&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;itopo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;BATHY&#39;</span><span class="p">][:]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nx_topo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;NX_BATHY&#39;</span><span class="p">][()]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ny_topo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;NY_BATHY&#39;</span><span class="p">][()]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;res_topo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;RESOLUTION_TOPO_FILE&#39;</span><span class="p">][()]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ellipticity&#39;</span><span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading ellipticity ...&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;rspl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;rspl&#39;</span><span class="p">][:]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ellipticity_spline&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;ellipticity_spline&#39;</span><span class="p">][:]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ellipticity_spline2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;ellipticity_spline2&#39;</span><span class="p">][:]</span>
@@ -837,14 +839,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLZ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;NGLLZ&#39;</span><span class="p">][()]</span>
 
             <span class="c1"># Only read midpoints for now</span>
-            <span class="n">ibool</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;ibool&#39;</span><span class="p">][</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLX&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLY&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLZ&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span>
-                <span class="p">:</span>
-            <span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading ibool midpoints ...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ibool</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;ibool&#39;</span><span class="p">][:]</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;midpoints&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;xyz&#39;</span><span class="p">][</span><span class="n">ibool</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading xyz midpoints ...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;xyz&#39;</span><span class="p">][:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;midpoints&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ibool</span><span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLX&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLY&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLZ&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span>
+                    <span class="p">:]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading scalars ...&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;DT&#39;</span><span class="p">][()]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;tc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;TC&#39;</span><span class="p">][()]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;NSTEPS&#39;</span><span class="p">][()]</span>
@@ -852,6 +858,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;hdur&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;HDUR&#39;</span><span class="p">][()]</span>
 
             <span class="c1"># Create KDTree</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Making KDTree ...&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fullkdtree</span> <span class="o">=</span> <span class="n">KDTree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;midpoints&#39;</span><span class="p">])</span>
 
             <span class="c1"># Now if this is a subset, we can already define the needed arrays</span>
@@ -996,7 +1003,7 @@
                         <span class="sa">f</span><span class="s1">&#39;NGLL </span><span class="si">{</span><span class="n">NGLL</span><span class="si">}</span><span class="s1"> is not valid. Choose 3 or 5.&#39;</span><span class="p">)</span>
 
                 <span class="c1"># Read ibool</span>
-                <span class="n">ibool</span> <span class="o">=</span> <span class="n">dbs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;ibool&#39;</span><span class="p">][</span>
+                <span class="n">ibool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibool</span><span class="p">[</span>
                     <span class="n">iboolslice</span><span class="p">,</span> <span class="n">iboolslice</span><span class="p">,</span> <span class="n">iboolslice</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span><span class="p">]</span>
 
@@ -1011,7 +1018,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">ibool</span> <span class="o">=</span> <span class="n">indeces</span><span class="p">[</span><span class="n">inv</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ibool</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
                 <span class="c1"># Then finally get sub set of coordinates</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="n">dbs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;xyz&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">nglob2sub</span><span class="p">,</span> <span class="p">:]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nglob2sub</span><span class="p">,</span> <span class="p">:]</span>
 
                 <span class="c1"># Mini kdtree</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">kdtree</span> <span class="o">=</span> <span class="n">KDTree</span><span class="p">(</span>

@@ -546,10 +546,10 @@ class CMTSOLUTION:
         self.half_duration = np.round(
             2.26 * 10**(-6) * (self.M0 * Nm_conv)**(1/3), decimals=1)
 
-    def write(self, outfile: str):
+    def write(self, outfile: str, mode='w'):
         """Writes classic CMTSOLUTION in classic format."""
 
-        with open(outfile, 'w') as f:
+        with open(outfile, 'a') as f:
             f.write(self.__str__())
 
     def ax_beach(self, *args, **kwargs):

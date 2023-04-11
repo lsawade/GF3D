@@ -18,6 +18,7 @@ from mpi4py.MPI import Intracomm
 logger = logging.getLogger('gf3d')
 logger.setLevel('DEBUG')
 
+import traceback
 
 class ProcessAdios(object):
 
@@ -400,8 +401,8 @@ class Adios2HDF5(object):
 
         # Compression
         if compression is not None:
-            if compression in ['lzf', 'gzip', 'szip', 'None']:
-                if compression == 'None':
+            if compression.lower() in ['lzf', 'gzip', 'szip', 'none']:
+                if compression.lower() == 'none':
                     self.compression = None
                 else:
                     self.compression = compression
@@ -591,7 +592,7 @@ class Adios2HDF5(object):
                 displacement_ds = self.DB.create_dataset(
                     f'displacement/{_comp}/array', P.vars['displacement_shape'],
                     dtype=self.precision,
-                    chunks=(3, 1, P.vars['displacement_shape'][-1])
+                    # chunks=(3, 1, P.vars['displacement_shape'][-1])
                     # shuffle=True,
                     # compression=self.compression,
                     # compression_opts=self.compression_opts
@@ -605,6 +606,8 @@ class Adios2HDF5(object):
                 logger.debug(
                     f"CNGLOB {j:>02d}: {P.vars['CNGLOB'][j]} {P.vars['CNGLOB'][j+1]}")
 
+
+
                 if self.rank == 0:
                     t000 = time.time()
 
@@ -612,64 +615,68 @@ class Adios2HDF5(object):
 
                     self.comm.Barrier()
 
-                    with xyz_ds.collective:
+                    # with xyz_ds.collective:
 
-                        if P.vars['NGLOB_LOCAL'][j] > 0:
-                            # Getting the coordinates xyz
-                            xyz = P.get_xyz(j)
+                    if P.vars['NGLOB_LOCAL'][j] > 0:
+                        # Getting the coordinates xyz
+                        xyz = P.get_xyz(j)
 
-                            print(self.rank, 'hello 1', xyz.shape,
-                                  P.vars['CNGLOB'][j+1]-P.vars['CNGLOB'][j])
+                        print(self.rank, 'hello 1', xyz.shape,
+                                P.vars['CNGLOB'][j+1]-P.vars['CNGLOB'][j])
 
-                            xyz_ds[
-                                P.vars['CNGLOB'][j]:P.vars['CNGLOB'][j+1], :] = xyz
+                        xyz_ds[
+                            P.vars['CNGLOB'][j]:P.vars['CNGLOB'][j+1], :] = xyz
 
-                            del xyz
+                        del xyz
 
                     self.comm.Barrier()
 
-                    with ibool_ds.collective:
-                        if P.vars['NGLOB_LOCAL'][j] > 0:
-                            # Getting the addressing array ibool
-                            ibool = P.get_ibool(j)
+                    print("Writing ibool ... ", flush=True)
 
-                            ibool_ds[
-                                :, :, :,
-                                P.vars['CNSPEC'][j]:P.vars['CNSPEC'][j+1]] = ibool
+                    # with ibool_ds.collective:
+                    if P.vars['NGLOB_LOCAL'][j] > 0:
+                        # Getting the addressing array ibool
+                        ibool = P.get_ibool(j)
 
-                            del ibool
+                        ibool_ds[
+                            :, :, :,
+                            P.vars['CNSPEC'][j]:P.vars['CNSPEC'][j+1]] = ibool
+
+                        del ibool
+
+                    print("Writing adjacency ... ", flush=True)
 
                     # Only get BUFFER_ELEMENTS if providided in the file
-
                     if P.vars["USE_BUFFER_ELEMENTS"]:
                         # Neighbor locations in neighbor array note that
                         # for slices
                         self.comm.Barrier()
 
-                        with (
-                                xyz_ds.collective,
-                                adjacency_ds.collective):
+                        # with (xyz_ds.collective,
+                        #         adjacency_ds.collective):
 
-                            k = (P.vars['NGLOB_LOCAL'] != 0).argmax(axis=0)
+                        k = (P.vars['NGLOB_LOCAL'] != 0).argmax(axis=0)
 
-                            if P.vars['NGLOB_LOCAL'][j] > 0:
+                        if P.vars['NGLOB_LOCAL'][j] > 0:
 
-                                xadj, adjacency = P.get_adjacency(j)
+                            xadj, adjacency = P.get_adjacency(j)
 
-                                if j == k:
-                                    xadj_ds[
-                                        P.vars['CNSPEC'][j]:
-                                        P.vars['CNSPEC'][j+1]+1] = xadj
-                                else:
-                                    xadj_ds[
-                                        P.vars['CNSPEC'][j] + 1:
-                                        P.vars['CNSPEC'][j+1] + 1] = xadj[1:]
+                            if j == k:
+                                xadj_ds[
+                                    P.vars['CNSPEC'][j]:
+                                    P.vars['CNSPEC'][j+1]+1] = xadj
+                            else:
+                                xadj_ds[
+                                    P.vars['CNSPEC'][j] + 1:
+                                    P.vars['CNSPEC'][j+1] + 1] = xadj[1:]
 
-                                adjacency_ds[
-                                    P.vars['CNEIGH'][j]:
-                                    P.vars['CNEIGH'][j+1]] = adjacency
+                            adjacency_ds[
+                                P.vars['CNEIGH'][j]:
+                                P.vars['CNEIGH'][j+1]] = adjacency
 
                 self.comm.Barrier()
+
+                print("Writing displacement ... ", flush=True)
 
                 if P.vars['NGLOB_LOCAL'][j] > 0:
 
@@ -699,10 +706,10 @@ class Adios2HDF5(object):
 
                     self.comm.Barrier()
 
-                    with displacement_ds.collective:
-                        displacement_ds[
-                            :, P.vars['CNGLOB'][j]:P.vars['CNGLOB'][j+1], :
-                        ] = disp
+                    # with displacement_ds.collective:
+                    displacement_ds[
+                        :, P.vars['CNGLOB'][j]:P.vars['CNGLOB'][j+1], :
+                    ] = disp
 
                     del disp
 

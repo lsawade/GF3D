@@ -2,7 +2,7 @@ import pytest
 import math
 from obspy import UTCDateTime
 from gf3d.source import CMTSOLUTION
-from gf3d.catalog import CMTCatalog
+from gf3d.catalog.cmt import CMTCatalog
 
 
 cmtfile_1 = """

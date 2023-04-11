@@ -590,12 +590,14 @@ class GFManager(object):
             self.header['ellipticity'] = db['ELLIPTICITY'][()]
 
             if self.header['topography']:
+                logger.info("Loading topography ...")
                 self.header['itopo'] = db['BATHY'][:]
                 self.header['nx_topo'] = db['NX_BATHY'][()]
                 self.header['ny_topo'] = db['NY_BATHY'][()]
                 self.header['res_topo'] = db['RESOLUTION_TOPO_FILE'][()]
 
             if self.header['ellipticity']:
+                logger.info("Loading ellipticity ...")
                 self.header['rspl'] = db['rspl'][:]
                 self.header['ellipticity_spline'] = db['ellipticity_spline'][:]
                 self.header['ellipticity_spline2'] = db['ellipticity_spline2'][:]
@@ -606,14 +608,18 @@ class GFManager(object):
             self.header['NGLLZ'] = db['NGLLZ'][()]
 
             # Only read midpoints for now
-            ibool = db['ibool'][
-                self.header['NGLLX']//2,
-                self.header['NGLLY']//2,
-                self.header['NGLLZ']//2,
-                :
-            ]
+            logger.info("Loading ibool midpoints ...")
+            self.ibool = db['ibool'][:]
 
-            self.header['midpoints'] = db['xyz'][ibool, :]
+            logger.info("Loading xyz midpoints ...")
+            self.xyz = db['xyz'][:]
+            self.header['midpoints'] = self.xyz[
+                self.ibool[
+                    self.header['NGLLX']//2,
+                    self.header['NGLLY']//2,
+                    self.header['NGLLZ']//2, :],
+                    :]
+            logger.info("Loading scalars ...")
             self.header['dt'] = db['DT'][()]
             self.header['tc'] = db['TC'][()]
             self.header['nsteps'] = db['NSTEPS'][()]
@@ -621,6 +627,7 @@ class GFManager(object):
             self.header['hdur'] = db['HDUR'][()]
 
             # Create KDTree
+            logger.info("Making KDTree ...")
             self.fullkdtree = KDTree(self.header['midpoints'])
 
             # Now if this is a subset, we can already define the needed arrays
@@ -765,7 +772,7 @@ class GFManager(object):
                         f'NGLL {NGLL} is not valid. Choose 3 or 5.')
 
                 # Read ibool
-                ibool = dbs[0]['ibool'][
+                ibool = self.ibool[
                     iboolslice, iboolslice, iboolslice,
                     self.ispec_subset]
 
@@ -780,7 +787,7 @@ class GFManager(object):
                 self.ibool = indeces[inv].reshape(ibool.shape)
 
                 # Then finally get sub set of coordinates
-                self.xyz = dbs[0]['xyz'][self.nglob2sub, :]
+                self.xyz = self.xyz[self.nglob2sub, :]
 
                 # Mini kdtree
                 self.kdtree = KDTree(

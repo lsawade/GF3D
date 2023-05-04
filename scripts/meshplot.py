@@ -4,14 +4,32 @@
 # doesn't contain the right GLIBCXX version
 
 import os
+import sys
 from gf3d.plot.mesh import meshplot
 from gf3d.utils import downloadfile, unzip
+import requests
 import shapefile
 # Get file name
-specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
-stationdir = os.path.join(specfemmagic, 'DB', 'II', 'BFO')
-h5file = os.path.join(stationdir,  'II.BFO.h5')
-DIRNAME = f'{os.getenv("HOME")}/lwsspy/gf3d/scripts'
+
+h5file = sys.argv[1]
+DIRNAME = f'{os.getenv("HOME")}/GF3D/scripts'
+
+
+def download_file(url, local_filename):
+    # local_filename = url.split('/')[-1]
+    # NOTE the stream=True parameter below
+    headers = {'user-agent': 'Mozilla/5.0'}
+
+    with requests.get(url, headers=headers, stream=True) as r:
+        r.raise_for_status()
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                # If you have chunk encoded response uncomment if
+                # and set chunk_size parameter to None.
+                #if chunk:
+                f.write(chunk)
+
+    return local_filename
 
 
 def read_land():
@@ -22,7 +40,13 @@ def read_land():
     if os.path.exists(fname) is False:
         if os.path.exists(zipname) is False:
             print('Downloading landareas')
-            downloadfile(url, zipname)
+            try:
+                # downloadfile(url, zipname)
+                download_file(url, zipname)
+            except Exception as e:
+                print(e)
+                print('Download failed')
+                sys.exit()
         print("Unzipping...")
         unzip(zipname, fname)
 

@@ -16,3 +16,7 @@ docs/source/examples
 writetest
 examples/extraction/database/temp_subset.h5
 examples/extras/GF_LOCATIONS
+examples/extras/stations_gcmt.txt
+scripts/DATA
+scripts/*.pkl
+scripts/*.html

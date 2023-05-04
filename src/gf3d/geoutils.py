@@ -1,6 +1,11 @@
 import numpy as np
 import typing as tp
 
+def isiterable(var):
+    if (type(var) is list) or (type(var) is tuple):
+        return True
+    else:
+        return False
 
 def geo2cart(r: float or np.ndarray or list,
              theta: float or np.ndarray or list,
@@ -23,7 +28,7 @@ def geo2cart(r: float or np.ndarray or list,
         (x, y, z)
     """
 
-    if type(r) is list:
+    if isiterable(r) or isiterable(theta) or isiterable(phi):
         r = np.array(r)
         theta = np.array(theta)
         phi = np.array(phi)
@@ -37,7 +42,7 @@ def geo2cart(r: float or np.ndarray or list,
     y = r * np.cos(thetarad) * np.sin(phirad)
     z = r * np.sin(thetarad)
 
-    if type(r) is list:
+    if isiterable(r) or isiterable(theta) or isiterable(phi):
         x = x.tolist()
         y = y.tolist()
         z = z.tolist()

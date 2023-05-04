@@ -47,6 +47,8 @@ with open(locations_file, 'w') as f:
         f.write(f'{_lat:9.4f}   {_lon:9.4f}   {_dep:9.4f}\n')
 
 # %%
+# Just a small check on much storage the Global 17s database would use.
+
 x = [100753, 160553, 251777, 368535, 294368, 305935,
 176917, 246136, 138208, 12263, 382244, 227071,
 404337, 224512, 578171, 341973, 124549, 230091,

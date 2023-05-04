@@ -411,6 +411,7 @@ def downloadfile(url: str, floc: str):
         urllib.request.urlretrieve(url, floc)
     except Exception as e:
         print(f"Error when downloading {url}: {e}")
+        raise(e)
 
 
 

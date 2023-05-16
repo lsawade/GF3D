@@ -30,7 +30,7 @@ cmt = CMTSOLUTION.read(
 # %% Initialize the GF manager
 gfm = GFManager(glob(h5files)[:])
 gfm.load_header_variables()
-gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, dist_in_km=27.5, NGLL=3)
+gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, dist_in_km=27.5, NGLL=5)
 
 # %% Write a subset
 gfm.write_subset(subsetfilename, duration=3600.0, fortran=True)

@@ -1284,8 +1284,14 @@ class GFManager(object):
 
         with h5py.File(outfile, 'w') as db:
 
-            db.create_dataset('Networks', data=self.networks)
-            db.create_dataset('Stations', data=self.stations)
+            # Store fixed length strings for fortran
+            if fortran:
+                db.create_dataset('Networks', data=self.networks, dtype="S5")
+                db.create_dataset('Stations', data=self.stations, dtype="S5")
+            else:
+                db.create_dataset('Networks', data=self.networks)
+                db.create_dataset('Stations', data=self.stations)
+
             db.create_dataset('latitudes', data=self.latitudes)
             db.create_dataset('longitudes', data=self.longitudes)
 

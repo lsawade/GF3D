@@ -1286,9 +1286,13 @@ class GFManager(object):
 
             # Store fixed length strings for fortran
             if fortran:
-                db.create_dataset('Networks', data=self.networks, dtype="S5")
-                db.create_dataset('Stations', data=self.stations, dtype="S5")
+                # NOTE THAT THE STRING LENGTH HERE IS HARD-CODED in the
+                # fortran extraction codes according to the specfem3dglobe
+                # definitions.
+                db.create_dataset('Networks', data=self.networks, dtype="S8")
+                db.create_dataset('Stations', data=self.stations, dtype="S32")
             else:
+                # For python subsets this does not matter.
                 db.create_dataset('Networks', data=self.networks)
                 db.create_dataset('Stations', data=self.stations)
 

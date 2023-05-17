@@ -6,12 +6,12 @@
 
 Computation times
 =================
-**00:05.342** total execution time for **examples_extraction_subset** files:
+**00:06.972** total execution time for **examples_extraction_subset** files:
 
 +--------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_extraction_subset_station_section.py` (``station_section.py``)     | 00:02.789 | 0.0 MB |
+| :ref:`sphx_glr_examples_extraction_subset_station_section.py` (``station_section.py``)     | 00:03.578 | 0.0 MB |
 +--------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_extraction_subset_aligned_stations.py` (``aligned_stations.py``)   | 00:02.092 | 0.0 MB |
+| :ref:`sphx_glr_examples_extraction_subset_aligned_stations.py` (``aligned_stations.py``)   | 00:02.744 | 0.0 MB |
 +--------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_extraction_subset_single_seismogram.py` (``single_seismogram.py``) | 00:00.462 | 0.0 MB |
+| :ref:`sphx_glr_examples_extraction_subset_single_seismogram.py` (``single_seismogram.py``) | 00:00.650 | 0.0 MB |
 +--------------------------------------------------------------------------------------------+-----------+--------+

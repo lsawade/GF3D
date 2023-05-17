@@ -1097,6 +1097,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">stations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span> <span class="o">*</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">latitudes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span> <span class="o">*</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">longitudes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span> <span class="o">*</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">burials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span> <span class="o">*</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">NGLL</span>
 
                 <span class="k">def</span> <span class="nf">read_stuff</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
@@ -1109,6 +1110,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">station</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">latitudes</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">][()]</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">longitudes</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">][()]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">burials</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;burial&#39;</span><span class="p">][()]</span>
 
                     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading </span><span class="si">{</span><span class="n">network</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">station</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -1529,6 +1531,7 @@
 
             <span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;latitudes&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">latitudes</span><span class="p">)</span>
             <span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;longitudes&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">longitudes</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;burials&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">burials</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">fortran</span><span class="p">:</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;fortran&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>

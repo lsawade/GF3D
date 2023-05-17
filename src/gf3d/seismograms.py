@@ -635,7 +635,11 @@ class GFManager(object):
             # .get_elements method
             if self.subset:
                 self.ibool = db['ibool'][:]
-                self.stations = db['stations'][:]
+                self.stations = db['Stations'][:]
+                self.networks = db['Networks'][:]
+                self.burials = db['burials'][:]
+                self.latitudes = db['latitudes'][:]
+                self.longitudes = db['longitudes'][:]
                 self.xyz = db['xyz']
                 self.kdtree = self.fullkdtree
                 self.displacement = db['displacement'][:]

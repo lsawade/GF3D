@@ -858,6 +858,7 @@ class GFManager(object):
                 self.stations = self.Ndb * [None]
                 self.latitudes = self.Ndb * [None]
                 self.longitudes = self.Ndb * [None]
+                self.burials = self.Ndb * [None]
                 self.NGLL
 
                 def read_stuff(args):
@@ -870,6 +871,7 @@ class GFManager(object):
                     self.stations[_i] = station
                     self.latitudes[_i] = db['latitude'][()]
                     self.longitudes[_i] = db['longitude'][()]
+                    self.burials[_i] = db['burial'][()]
 
                     logger.debug(f"Reading {network}.{station}")
 
@@ -1128,6 +1130,7 @@ class GFManager(object):
             db.create_dataset('Stations', data=self.stations)
             db.create_dataset('latitudes', data=self.latitudes)
             db.create_dataset('longitudes', data=self.longitudes)
+            db.create_dataset('burials', data=self.burials)
 
             if fortran:
                 db.create_dataset('fortran', data=1)

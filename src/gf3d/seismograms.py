@@ -1005,28 +1005,33 @@ class GFManager(object):
             hdur_diff = np.sqrt((cmt.hdur / 1.628)**2 - self.header['hdur']**2)
 
         # Heaviside STF to reproduce SPECFEM stf
-        _, stf_r = create_stf(0, 400.0, self.header['nsteps'],
-                              self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
+        _, stf_rg = create_stf(0, 200.0, self.header['nsteps'],
+                               self.header['dt'], hdur_diff, cutoff=None, gaussian=True, lpfilter='butter')
 
-        print(stf_r)
-        STF_R = fft.fft(stf_r, n=NP2)  # * self.header['dt']
-        STF_RR = fft.fft(stf_r[::-1], n=NP2)
-        shift = -400.0
+        _, stf_rh = create_stf(0, 200.0, self.header['nsteps'],
+                               self.header['dt'], hdur_diff/2, cutoff=None, gaussian=False, lpfilter='butter')
+
+        STF_RG = fft.fft(stf_rg, n=NP2)
+        STF_RH = fft.fft(stf_rh, n=NP2)
+        shift = -200.0
         phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
                                                     self.header['dt'])*2*np.pi)
 
         logger.debug(f"Lengths: {self.header['nsteps']}, {NP2}")
-
+        from gf3d.signal.filter import butter_low_two_pass_filter
         # Add traces to the
         traces = []
         for _h in range(len(self.stations)):
             for _i, comp in enumerate(['N', 'E', 'Z']):
-                if _i == 0 and _h == 0:
-                    print(seismograms[_h, _i, :])
+                # if _i == 0 and _h == 0:
+                # print(seismograms[_h, _i, :])
+                # seis = butter_low_two_pass_filter(
+                #     seismograms[_h, _i, :], 1/40.0, 1/self.header['dt'], order=5)
 
                 data = np.real(
                     fft.ifft(
-                        STF_R * fft.fft(seismograms[_h, _i, :], n=NP2)
+                        fft.fft(seismograms[_h, _i, :],
+                                n=NP2) * STF_RG  # * STF_RH
                         * phshift  # * self.header['dt']
                     )[:self.header['nsteps']]) * self.header['dt']  # / self.header['dt']**2  # / np.sum(seismograms[_h, _i, :])
 

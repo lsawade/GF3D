@@ -54,6 +54,7 @@ def process_stream(
     out = st.copy()
 
     out.taper(max_percentage=0.05, type='hann')
+    out.detrend("linear")
     if inv:
         out.detrend("linear")
         out.detrend("demean")

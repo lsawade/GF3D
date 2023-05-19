@@ -16,6 +16,8 @@ Loading all modules
 # sphinx_gallery_dummy_images = 1
 
 # External
+import numpy as np
+from gf3d.signal.filter import butter_low_two_pass_filter
 import matplotlib.pyplot as plt
 from obspy import read, read_inventory, Stream
 
@@ -26,7 +28,7 @@ from gf3d.process import process_stream, select_pairs
 from gf3d.plot.section import plotsection
 
 # %%
-#
+# half duration:  33.4000
 
 # CMTSOLUTION
 cmt = CMTSOLUTION.read('../../DATA/single_element_read/CMTSOLUTION')
@@ -70,12 +72,26 @@ rp = gfsub.get_seismograms(cmt)
 obs = raw  # process_stream(raw, cmt=cmt, duration=3600)
 syn = rp  # process_stream(rp, cmt=cmt, duration=3600)
 
-# obs = process_stream(raw, cmt=cmt, duration=3600)
-# syn = process_stream(rp, cmt=cmt, duration=3600)
+for tr in obs:
+    tr.data = butter_low_two_pass_filter(
+        tr.data, 1/40.0, 1.0/tr.stats.delta, order=5)
+
+for tr in syn:
+    tr.data = butter_low_two_pass_filter(
+        tr.data, 1/40.0, 1.0/tr.stats.delta, order=5)
+
+
+obs.differentiate()
+obs = process_stream(obs, cmt=cmt, duration=14400)
+syn = process_stream(syn, cmt=cmt, duration=14400)
 
 # %%
 
 pobs, psyn = select_pairs(obs, syn)
+
+for _o, _s in zip(pobs, psyn):
+
+    print(np.sum(_o.data*_s.data)/np.sum(_o.data*_o.data))
 
 # %% Plot section
 

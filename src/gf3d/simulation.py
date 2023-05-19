@@ -494,7 +494,7 @@ class Simulation:
         # Following specfem3D_globe we set the the half duration of the STF to
         # very short 5*DT, where DT is the integration sampling time ``self.dt``
         # Playing around with other half durations does not make sense for now.
-        self.hdur = 5.0*self.dt
+        self.hdur = 2.0*self.ndt
         self.logger.debug(f"hdur of step:         {self.hdur:.4f} s")
 
         # The distance between t0 and tc should be larger than the
@@ -505,7 +505,8 @@ class Simulation:
 
         # Determine low pass filter dependent on ndt and corresponding nyquist
         # frequency fny or fcutoff = 1/(2*dt)
-        self.cutoff = 1.0/(self.ndt*2.0)
+        # Reduce
+        self.cutoff = 1.0/(2.0*self.ndt)
 
         # Create new STF using the
         self.t, self.stf = create_stf(

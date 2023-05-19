@@ -53,6 +53,7 @@ def process_stream(
         bandpass=[40.0, 300.0], starttimeoffset: float = 0.0):
     out = st.copy()
 
+    out.taper(max_percentage=0.05, type='hann')
     if inv:
         out.detrend("linear")
         out.detrend("demean")

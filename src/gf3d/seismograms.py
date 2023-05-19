@@ -270,7 +270,9 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     # Heaviside STF to reproduce SPECFEM stf
     _, stf_r = create_stf(0, 200.0, NT, dt, hdur_r,
                           cutoff=None, gaussian=False, lpfilter='butter')
-    STF_R = fft.fft(stf_r, n=NP2)
+
+    STF_R = fft.fft(stf_r, n=NP2) * dt
+
     shift = -200.0
     phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2, dt)*2*np.pi)
 
@@ -285,7 +287,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
 
         # Convolution with Specfem Heaviside function
         data = np.real(
-            fft.ifft(phshift * fft.fft(data, n=NP2) * STF_R))[:NT] * dt
+            fft.ifft(phshift * fft.fft(data, n=NP2) * dt * STF_R))[:NT] / dt*2
 
         stats = Stats()
         stats.delta = dt
@@ -618,7 +620,7 @@ class GFManager(object):
                     self.header['NGLLX']//2,
                     self.header['NGLLY']//2,
                     self.header['NGLLZ']//2, :],
-                    :]
+                :]
             logger.info("Loading scalars ...")
             self.header['dt'] = db['DT'][()]
             self.header['tc'] = db['TC'][()]
@@ -1006,23 +1008,27 @@ class GFManager(object):
         _, stf_r = create_stf(0, 400.0, self.header['nsteps'],
                               self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
 
-        STF_R = fft.fft(stf_r, n=NP2)
-
+        print(stf_r)
+        STF_R = fft.fft(stf_r, n=NP2)  # * self.header['dt']
+        STF_RR = fft.fft(stf_r[::-1], n=NP2)
         shift = -400.0
         phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
                                                     self.header['dt'])*2*np.pi)
 
         logger.debug(f"Lengths: {self.header['nsteps']}, {NP2}")
+
         # Add traces to the
         traces = []
         for _h in range(len(self.stations)):
             for _i, comp in enumerate(['N', 'E', 'Z']):
+                if _i == 0 and _h == 0:
+                    print(seismograms[_h, _i, :])
 
                 data = np.real(
                     fft.ifft(
                         STF_R * fft.fft(seismograms[_h, _i, :], n=NP2)
-                        * phshift
-                    ))[:self.header['nsteps']] * self.header['dt']
+                        * phshift  # * self.header['dt']
+                    )[:self.header['nsteps']]) * self.header['dt']  # / self.header['dt']**2  # / np.sum(seismograms[_h, _i, :])
 
                 stats = Stats()
                 stats.delta = self.header['dt']
@@ -1042,7 +1048,6 @@ class GFManager(object):
 
         logger.debug('Outputting traces')
         return Stream(traces)
-
 
     def get_mt_frechet(self, cmt: CMTSOLUTION) -> Stream:
 
@@ -1132,7 +1137,6 @@ class GFManager(object):
                                 displacement[_s, _c, 2, i,
                                              j, k, :] * hlagrange_y
                                 + displacement[_s, _c, 1, i, j, k, :] * hlagrange_z)
-
 
         # For following FFTs
         NP2 = next_power_of_2(2 * self.header['nsteps'])

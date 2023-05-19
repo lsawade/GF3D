@@ -31,14 +31,34 @@ from gf3d.plot.section import plotsection
 # CMTSOLUTION
 cmt = CMTSOLUTION.read('../../DATA/single_element_read/CMTSOLUTION')
 
+cmt = CMTSOLUTION.read("""
+ PDEW2015  9 16 22 54 32.90 -31.5700  -71.6700  22.4 0.0 8.3 NEAR COAST OF CENTRAL CH
+event name:     201509162254A
+time shift:     49.9800
+half duration:  33.4000
+latitude:      -31.1300
+longitude:     -72.0900
+depth:          17.3500
+Mrr:       1.950000e+28
+Mtt:      -4.360000e+26
+Mpp:      -1.910000e+28
+Mrt:       7.420000e+27
+Mrp:      -2.480000e+28
+Mtp:       9.420000e+26
+"""
+                       )
+
 # Load subset
-gfsub = GFManager("../../DATA/single_element_read/single_element.h5")
+# gfsub = GFManager("../../DATA/single_element_read/single_element.h5")
+# gfsub = GFManager("../../../single_element_not_fortran.h5")
+gfsub = GFManager("../../../single_element.h5")
 gfsub.load()
 
 # Load Observed Data
-raw = read("../../DATA/single_element_read/traces/*.sac")
-inv = read_inventory("../../DATA/single_element_read/station.xml")
+# raw = read("../../DATA/single_element_read/traces/*.sac")
+# inv = read_inventory("../../DATA/single_element_read/station.xml")
 
+raw = read("../../../specfem_traces/*")
 # %% Get seismograms from the database
 
 rp = gfsub.get_seismograms(cmt)
@@ -46,8 +66,12 @@ rp = gfsub.get_seismograms(cmt)
 
 # %% Process
 
-obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)
-syn = process_stream(rp, cmt=cmt, duration=3600)
+# obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)
+obs = raw  # process_stream(raw, cmt=cmt, duration=3600)
+syn = rp  # process_stream(rp, cmt=cmt, duration=3600)
+
+# obs = process_stream(raw, cmt=cmt, duration=3600)
+# syn = process_stream(rp, cmt=cmt, duration=3600)
 
 # %%
 
@@ -56,7 +80,7 @@ pobs, psyn = select_pairs(obs, syn)
 # %% Plot section
 
 starttime = psyn[0].stats.starttime + 0
-endtime = starttime + 3600
+endtime = starttime + 14400
 limits = (starttime, endtime)
 
 # Plots a section of observed and synthetic

@@ -33,7 +33,7 @@ gfm.load_header_variables()
 gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, dist_in_km=27.5, NGLL=5)
 
 # %% Write a subset
-gfm.write_subset(subsetfilename, duration=3600.0, fortran=False)
+gfm.write_subset(subsetfilename, duration=14400.0, fortran=False)
 
 # %% load a subset
 sys.exit()

@@ -14,6 +14,7 @@ Loading all modules
 # sphinx_gallery_thumbnail_number = 1
 # sphinx_gallery_dummy_images = 1
 
+#%%
 # External
 from glob import glob
 import matplotlib.pyplot as plt
@@ -50,8 +51,8 @@ rp = gfm.get_seismograms(cmt)
 
 # %% Process
 
-obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)
-syn = process_stream(rp, cmt=cmt, duration=3600)
+obs = process_stream(raw, inv=inv, cmt=cmt, duration=14400)
+syn = process_stream(rp, cmt=cmt, duration=14400)
 
 # %%
 # Note that the only 3 stations (II.BFO, IU.ANMO, IU.HRV) are in the example
@@ -66,10 +67,10 @@ pobs, psyn = select_pairs(obs, syn)
 # Plot section with the data
 
 starttime = psyn[0].stats.starttime + 0
-endtime = starttime + 3600
+endtime = starttime + 14400
 limits = (starttime, endtime)
 
 # Plots a section of observed and synthetic
 plotsection(pobs, psyn, cmt, comp='Z', lw=0.75, limits=limits)
-
+plt.savefig('testsection.pdf', dpi=300)
 plt.show()

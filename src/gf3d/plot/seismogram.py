@@ -12,12 +12,12 @@ from gf3d.plot.util import plot_label
 
 
 def plotseismogram(
-        obs: Stream, syn: Stream, cmt: CMTSOLUTION,
+        obs: Stream, syn: Stream | None, cmt: CMTSOLUTION,
         *args,
         ax: matplotlib.axes.Axes | None = None,
         limits: tp.Tuple[UTCDateTime] | None = None,
         newsyn: Stream or None = None, bandpass=None,
-        obsc='k', sync='r', newsync='b',
+        obsc='k', sync='r', newsync='b', nooffset=False, lw = 1,
         **kwargs):
 
     if ax is None:
@@ -28,7 +28,7 @@ def plotseismogram(
     else:
         axnone = False
 
-    lw = 1
+
 
     if limits is not None:
         starttime, endtime = limits
@@ -36,7 +36,9 @@ def plotseismogram(
     for _i, comp in enumerate(['N', 'E', 'Z']):
 
         observed = obs.select(component=comp)[0]
-        synthetic = syn.select(component=comp)[0]
+
+        if syn is not None:
+            synthetic = syn.select(component=comp)[0]
 
         if newsyn is not None:
             newsynthetic = newsyn.select(component=comp)[0]
@@ -49,7 +51,7 @@ def plotseismogram(
             absmax = np.max(np.abs(observed.data))
 
         # Define offset
-        if newsyn is not None:
+        if (newsyn is not None) or ((newsyn is None) and (syn is None)) or nooffset:
             absmax_off = 0.0
         else:
             absmax_off = 0.1*absmax
@@ -57,8 +59,12 @@ def plotseismogram(
         ax = plt.subplot(3, 1, _i+1)
         plt.plot(observed.times("matplotlib"), observed.data+absmax_off,
                  '-', *args, c=obsc, lw=lw, label='Observed', **kwargs)
-        plt.plot(synthetic.times("matplotlib"), synthetic.data-absmax_off,
-                 '-', *args, c=sync, lw=lw, label='Synthetic', **kwargs)
+
+        plt.plot([np.min(observed.times("matplotlib")), np.max(observed.times("matplotlib"))],
+                 [0,0], 'k--', lw=lw)
+        if syn is not None:
+            plt.plot(synthetic.times("matplotlib"), synthetic.data-absmax_off,
+                    '-', *args, c=sync, lw=lw, label='Synthetic', **kwargs)
 
         if newsyn is not None:
             plt.plot(newsynthetic.times("matplotlib"), newsynthetic.data,
@@ -92,8 +98,8 @@ def plotseismogram(
 
         if _i == 0:
             # Add title with event info
-            network = syn[0].stats.network
-            station = syn[0].stats.station
+            network = obs[0].stats.network
+            station = obs[0].stats.station
 
             if bandpass is not None:
                 bandpass_string = f"- BP: {bandpass}s"

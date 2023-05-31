@@ -2,7 +2,8 @@
 # External
 from glob import glob
 import matplotlib.pyplot as plt
-import os, sys
+import os
+import sys
 
 # Internal
 from gf3d.source import CMTSOLUTION
@@ -17,7 +18,7 @@ from gf3d.download import download_stream
 # DB files
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
 elementdir = '/home/lsawade/GF3D'
-subsetfilename = os.path.join(elementdir, 'single_element.h5')
+subsetfilename = os.path.join(elementdir, 'single_element_not_fortran.h5')
 tracedir = os.path.join(elementdir, "traces")
 stationxml = os.path.join(elementdir, "station.xml")
 
@@ -30,7 +31,8 @@ cmt = CMTSOLUTION.read(
 # %% Initialize the GF manager
 gfm = GFManager(glob(h5files)[:])
 gfm.load_header_variables()
-gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, dist_in_km=27.5, NGLL=5)
+gfm.get_elements(cmt.latitude, cmt.longitude,
+                 cmt.depth, dist_in_km=27.5, NGLL=3)
 
 # %% Write a subset
 gfm.write_subset(subsetfilename, duration=14400.0, fortran=False)

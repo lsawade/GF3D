@@ -257,7 +257,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
 
     # This computes the half duration for the new STF from the
     if (cmt.hdur / 1.628) <= hdur:
-        hdur_r = 0.000001
+        hdur_r = 1e-6
         logger.warn(
             f"Requested half duration smaller than what was simulated.\n"
             f"Half duration set to {hdur_r}s to simulate a Heaviside function.")
@@ -271,8 +271,10 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     _, stf_r = create_stf(0, 200.0, NT, dt, hdur_r,
                           cutoff=None, gaussian=False, lpfilter='butter')
 
-    STF_R = fft.fft(stf_r, n=NP2) * dt
+    # Fourier Transform the STF
+    STF_R = fft.fft(stf_r, n=NP2)
 
+    # Compute phase shift for the heaviside STF
     shift = -200.0
     phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2, dt)*2*np.pi)
 
@@ -287,7 +289,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
 
         # Convolution with Specfem Heaviside function
         data = np.real(
-            fft.ifft(phshift * fft.fft(data, n=NP2) * dt * STF_R))[:NT] / dt*2
+            fft.ifft(phshift * fft.fft(data, n=NP2) * dt * STF_R))[:NT]
 
         stats = Stats()
         stats.delta = dt
@@ -997,39 +999,40 @@ class GFManager(object):
             logger.warn(
                 f"Requested half duration smaller than what was simulated.\n"
                 f"Half duration set to {hdur_diff}s to simulate a Heaviside function.")
+            hdur_conv = np.sqrt(self.header['hdur']**2 - (cmt.hdur / 1.628)**2)
+
+            logger.warn(f"Try convolving your seismogram with a Gaussian with "
+                        f"{hdur_conv}s standard deviation.")
+
         else:
             hdur_diff = np.sqrt((cmt.hdur / 1.628)**2 - self.header['hdur']**2)
 
         # Heaviside STF to reproduce SPECFEM stf
-        _, stf_rg = create_stf(0, 200.0, self.header['nsteps'],
-                               self.header['dt'], hdur_diff, cutoff=None, gaussian=True, lpfilter='butter')
+        _, stf_r = create_stf(0, 200.0, self.header['nsteps'],
+                               self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
 
-        _, stf_rh = create_stf(0, 200.0, self.header['nsteps'],
-                               self.header['dt'], hdur_diff/2, cutoff=None, gaussian=False, lpfilter='butter')
+        # Fourier Transform the STF
+        STF_R = fft.fft(stf_r, n=NP2)
 
-        STF_RG = fft.fft(stf_rg, n=NP2)
-        STF_RH = fft.fft(stf_rh, n=NP2)
+        # Compute correctional phase shift
         shift = -200.0
         phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
                                                     self.header['dt'])*2*np.pi)
 
         logger.debug(f"Lengths: {self.header['nsteps']}, {NP2}")
-        from gf3d.signal.filter import butter_low_two_pass_filter
+
         # Add traces to the
         traces = []
         for _h in range(len(self.stations)):
             for _i, comp in enumerate(['N', 'E', 'Z']):
-                # if _i == 0 and _h == 0:
-                # print(seismograms[_h, _i, :])
-                # seis = butter_low_two_pass_filter(
-                #     seismograms[_h, _i, :], 1/40.0, 1/self.header['dt'], order=5)
 
+                # Convolution with the STF and correctional timeshift
                 data = np.real(
                     fft.ifft(
-                        fft.fft(seismograms[_h, _i, :],
-                                n=NP2) * STF_RG  # * STF_RH
-                        * phshift  # * self.header['dt']
-                    )[:self.header['nsteps']]) * self.header['dt']  # / self.header['dt']**2  # / np.sum(seismograms[_h, _i, :])
+                        fft.fft(seismograms[_h, _i, :], n=NP2)
+                        * STF_R
+                        * phshift
+                    )[:self.header['nsteps']]) * self.header['dt']
 
                 stats = Stats()
                 stats.delta = self.header['dt']

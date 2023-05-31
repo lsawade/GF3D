@@ -29,12 +29,12 @@ from gf3d.stf import create_stf
 # $ export LD_LIBRARY_PATH='/home/lsawade/.conda/envs/gf/lib'
 
 # %% Get CMT solution to convert
-cmt = CMTSOLUTION.read('/scratch/gpfs/lsawade/SpecfemMagicGF/CMTSOLUTION')
+cmt = CMTSOLUTION.read('/scratch/gpfs/lsawade/SpecfemMagicGF/specfem3d_globe_forward/DATA/CMTSOLUTION')
 
 # Get file name
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
 config_file = os.path.join(specfemmagic, 'reci.toml')
-db = '/scratch/gpfs/lsawade/SpecfemMagicGF/DB'
+db = '/scratch/gpfs/lsawade/SpecfemMagicGF/DB_hdur_test'
 stationdir = os.path.join(db, 'II', 'BFO')
 compdict = dict()
 for _i, comp in enumerate(['N', 'E', 'Z']):
@@ -42,9 +42,9 @@ for _i, comp in enumerate(['N', 'E', 'Z']):
         stationdir, comp, 'specfem', 'OUTPUT_FILES', 'save_forward_arrays_GF.bp')
 
 # %% Test seismograms at the source location
-st = read(os.path.join(os.path.dirname(compdict['E']), 'EQ*.sac'))
+# st = read(os.path.join(os.path.dirname(compdict['E']), 'EQ*.sac'))
 
-st.plot(outfile='seistest1.png', dpi=300)
+# st.plot(outfile='seistest1.png', dpi=300)
 
 
 st = read(os.path.join(

@@ -10,7 +10,7 @@ debug = true
 [root]
 task = [ "workflow", "main",]
 workflowname = "Making a database right now, yeaah!"
-db = "/scratch/gpfs/lsawade/SpecfemMagicGF/DB"
+db = "/scratch/gpfs/lsawade/SpecfemMagicGF/DB_hdur_test"
 station_file = "stations.txt"
 creation = true
 simulation = true

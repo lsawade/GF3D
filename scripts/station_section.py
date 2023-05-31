@@ -13,7 +13,7 @@ import os
 import typing as tp
 
 # Internal
-from gf3d.plot.util import plot_label
+from gf3d.plot.util import plot_label, reset_mpl
 from gf3d.source import CMTSOLUTION
 from gf3d.seismograms import GFManager
 from gf3d.process import process_stream, select_pairs
@@ -25,11 +25,15 @@ from gf3d.download import download_stream
 
 # DB files
 specfemmagic = '/scratch/gpfs/lsawade/SpecfemMagicGF'
-h5files = os.path.join(specfemmagic, 'DB', '*', '*', '*.h5')
+database = os.path.join(specfemmagic, 'DB_force_10_b')
+forwarddir = database + "_forward_test"
+h5files = os.path.join(database, '*', '*', '*.h5')
 
 # CMTSOLUTION
-cmt = CMTSOLUTION.read('/home/lsawade/GF3D/scripts/DATA/CHILE_CMT')
+cmt = CMTSOLUTION.read(os.path.join(forwarddir, 'DATA', 'CMTSOLUTION'))
 
+print(cmt)
+print(glob(h5files))
 # %% Initialize the GF manager
 gfm = GFManager(glob(h5files)[:])
 gfm.load_header_variables()
@@ -37,16 +41,18 @@ gfm.get_elements(cmt.latitude, cmt.longitude, cmt.depth, 30)
 
 # %% Download data
 
-raw, inv = download_stream(
-    cmt.origin_time,
-    duration=4*3600,
-    network='II,IU',
-    station=','.join(gfm.stations),
-    location='00',
-    channel='LH*',
-    starttimeoffset=-300,
-    endtimeoffset=300
-)
+# raw, inv = download_stream(
+#     cmt.origin_time,
+#     duration=4*3600,
+#     network='II,IU',
+#     station=','.join(gfm.stations),
+#     location='00',
+#     channel='LH*',
+#     starttimeoffset=-300,
+#     endtimeoffset=300
+# )
+
+fw = read(os.path.join(forwarddir, 'OUTPUT_FILES', '*.*.*.sac'))
 
 # %% Get a bunch of seismograms
 
@@ -56,9 +62,11 @@ rp = gfm.get_seismograms(cmt)
 
 # %% Process
 
-obs = process_stream(raw, inv=inv, cmt=cmt, duration=4*3600)
-syn = process_stream(rp, cmt=cmt, duration=4*3600)
+obs = process_stream(fw, cmt=cmt, starttimeoffset=120, duration=4*3600-120)
+syn = process_stream(rp, cmt=cmt, starttimeoffset=120, duration=4*3600-120)
 
+# obs = fw.copy()
+# syn = rp.copy()
 # %%
 
 pobs, psyn = select_pairs(obs, syn)
@@ -70,5 +78,6 @@ endtime = starttime + 4*3600
 limits = (starttime, endtime)
 
 # Plots a section of observed and synthetic
-plotsection(pobs, psyn, cmt, comp='Z', lw=0.75, limits=limits)
+reset_mpl('','')
+plotsection(pobs, psyn, cmt, comp='Z', lw=0.25, limits=limits)
 plt.savefig('testsection_data.pdf', dpi=300)

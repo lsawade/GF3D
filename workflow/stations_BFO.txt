@@ -3,4 +3,4 @@
 # stations all sensors are at the same location.
 #
 # Net.Sta,    Lat,    Lon,   Elev,    Bur, Sensor
-  II.BFO ,   48.3,    8.3,  638.0,  160.0, Streckeisen STS-1V/VBB Seismometer
+  II.BFO ,   48.3301,    8.3296,  638.0000,  160.0000, Streckeisen STS-1H/VBB Seismometer

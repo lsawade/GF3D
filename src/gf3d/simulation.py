@@ -172,7 +172,7 @@ class Simulation:
         self.stationdir = stationdir
         self.forwardoutdir = forwardoutdir
         self.station_latitude = station_latitude   # degree
-        self.station_longitude = station_longitude  # degree
+        self.station_longitude = station_longitude # degree
         self.station_burial = station_burial       # km
         self.target_latitude = target_latitude     # degree
         self.target_longitude = target_longitude   # degree
@@ -289,6 +289,7 @@ class Simulation:
 
             # Remove pre-existing directory
             if (os.path.exists(_compdict['dir']) and self.overwrite) or not os.path.exists(_compdict['dir']):
+
                 subprocess.check_call(f'rm -rf {_compdict["dir"]}', shell=True)
 
                 # Make dir
@@ -494,7 +495,7 @@ class Simulation:
         # Following specfem3D_globe we set the the half duration of the STF to
         # very short 5*DT, where DT is the integration sampling time ``self.dt``
         # Playing around with other half durations does not make sense for now.
-        self.hdur = 2.0*self.ndt
+        self.hdur = 5.0*self.dt
         self.logger.debug(f"hdur of step:         {self.hdur:.4f} s")
 
         # The distance between t0 and tc should be larger than the
@@ -791,49 +792,49 @@ class Simulation:
             # Write separate Par file for main specfem directory
             utils.write_par_file(pardict, par_file)
 
-            # Write even more separate Par file for a forward test directory
-            if self.forward_test:
+        # Write even more separate Par file for a forward test directory
+        if self.forward_test:
 
-                # modify Reciprocal Par_file
-                pardict = deepcopy(self.pardict)
-                pardict['SAVE_GREEN_FUNCTIONS'] = False
-                pardict['USE_FORCE_POINT_SOURCE'] = False
+            # modify Reciprocal Par_file
+            pardict = deepcopy(self.pardict)
+            pardict['SAVE_GREEN_FUNCTIONS'] = False
+            pardict['USE_FORCE_POINT_SOURCE'] = False
 
-                pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
-                pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
+            pardict['NUMBER_OF_SIMULTANEOUS_RUNS'] = 1
+            pardict['BROADCAST_SAME_MESH_AND_MODEL'] = False
 
-                pardict['USE_BUFFER_ELEMENTS'] = False
-                pardict['NUMBER_OF_BUFFER_ELEMENTS'] = 0
+            pardict['USE_BUFFER_ELEMENTS'] = False
+            pardict['NUMBER_OF_BUFFER_ELEMENTS'] = 0
 
-                # For now so that specfem makes it's
-                if 'NSTEP' in pardict:
-                    pardict.pop('NSTEP')
-                if 'T0' in pardict:
-                    pardict.pop('T0')
+            # For now so that specfem makes it's
+            if 'NSTEP' in pardict:
+                pardict.pop('NSTEP')
+            if 'T0' in pardict:
+                pardict.pop('T0')
 
-                # Force STF print
-                if self.subsample:
-                    pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
+            # Force STF print
+            if self.subsample:
+                pardict['PRINT_SOURCE_TIME_FUNCTION'] = False
+            else:
+                pardict['PRINT_SOURCE_TIME_FUNCTION'] = True
+
+            if self.subsample:
+                if (self.ndt_requested is not None) and (self.station is not None):
+                    pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
+
+                if self.use_forward_stf:
+                    pardict['NSTEP'] = self.nstep
+                    pardict['T0'] = self.t0
                 else:
-                    pardict['PRINT_SOURCE_TIME_FUNCTION'] = True
-
-                if self.subsample:
-                    if (self.ndt_requested is not None) and (self.station is not None):
-                        pardict['NTSTEP_BETWEEN_FRAMES'] = self.xth_sample
-
-                    if self.use_forward_stf:
-                        pardict['NSTEP'] = self.nstep
-                        pardict['T0'] = self.t0
-                    else:
-                        pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
-
-                else:
-                    pardict['NTSTEP_BETWEEN_FRAMES'] = 1
                     pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
 
-                # Write Par_file
+            else:
+                pardict['NTSTEP_BETWEEN_FRAMES'] = 1
+                pardict['RECORD_LENGTH_IN_MINUTES'] = self.duration_in_min
 
-                utils.write_par_file(pardict, self.par_file_forward)
+            # Write Par_file
+
+            utils.write_par_file(pardict, self.par_file_forward)
 
     def __str__(self) -> str:
 

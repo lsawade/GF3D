@@ -549,7 +549,7 @@ class CMTSOLUTION:
     def write(self, outfile: str, mode='w'):
         """Writes classic CMTSOLUTION in classic format."""
 
-        with open(outfile, 'a') as f:
+        with open(outfile, mode) as f:
             f.write(self.__str__())
 
     def ax_beach(self, *args, **kwargs):

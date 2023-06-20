@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Single Seismogram" href="single_seismogram.html" /><link rel="prev" title="Subset Extraction Tutorials" href="index.html" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Aligned Station Section" href="aligned_stations.html" /><link rel="prev" title="Single Seismogram" href="single_seismogram.html" />
 
     <link rel="shortcut icon" href="../../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2023.03.27 -->
         <title>Station Section - GF3D 0.0.1 documentation</title>
@@ -183,13 +183,11 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../../../parts/gf-extraction/index.html">3D Green Function Extraction</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../database/index.html">Database Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../database/make_subset.html">Create subset from database files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../database/station_section.html">Station Section</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../database/single_seismogram.html">Single Seismogram</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Subset Extraction Tutorials</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Station Section</a></li>
 <li class="toctree-l3"><a class="reference internal" href="single_seismogram.html">Single Seismogram</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Station Section</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aligned_stations.html">Aligned Station Section</a></li>
 </ul>
 </li>
@@ -243,6 +241,8 @@ using built-in plotting tools.</p>
 <section id="loading-all-modules">
 <h2>Loading all modules<a class="headerlink" href="#loading-all-modules" title="Permalink to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># External</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">gf3d.signal.filter</span> <span class="kn">import</span> <span class="n">butter_low_two_pass_filter</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">obspy</span> <span class="kn">import</span> <span class="n">read</span><span class="p">,</span> <span class="n">read_inventory</span><span class="p">,</span> <span class="n">Stream</span>
 
@@ -253,6 +253,7 @@ using built-in plotting tools.</p>
 <span class="kn">from</span> <span class="nn">gf3d.plot.section</span> <span class="kn">import</span> <span class="n">plotsection</span>
 </pre></div>
 </div>
+<p>half duration:  33.4000</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># CMTSOLUTION</span>
 <span class="n">cmt</span> <span class="o">=</span> <span class="n">CMTSOLUTION</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;../../DATA/single_element_read/CMTSOLUTION&#39;</span><span class="p">)</span>
 
@@ -268,7 +269,8 @@ using built-in plotting tools.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rp</span> <span class="o">=</span> <span class="n">gfsub</span><span class="o">.</span><span class="n">get_seismograms</span><span class="p">(</span><span class="n">cmt</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">=</span> <span class="n">process_stream</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">inv</span><span class="o">=</span><span class="n">inv</span><span class="p">,</span> <span class="n">cmt</span><span class="o">=</span><span class="n">cmt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">process_stream</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">inv</span><span class="o">=</span><span class="n">inv</span><span class="p">,</span> <span class="n">cmt</span><span class="o">=</span><span class="n">cmt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
 <span class="n">syn</span> <span class="o">=</span> <span class="n">process_stream</span><span class="p">(</span><span class="n">rp</span><span class="p">,</span> <span class="n">cmt</span><span class="o">=</span><span class="n">cmt</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -285,7 +287,7 @@ using built-in plotting tools.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_station_section_001.svg" srcset="../../../_images/sphx_glr_station_section_001.svg" alt="Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.578 seconds)</p>
+<img src="../../../_images/sphx_glr_station_section_001.svg" srcset="../../../_images/sphx_glr_station_section_001.svg" alt="Wed Sep 16 22:55:22 2015 Loc: -31.13dg, -72.09dg, 17.4km" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.819 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-extraction-subset-station-section-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../../_downloads/da1c8bf4343700f020206a49dd015f70/station_section.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">station_section.py</span></code></a></p>
@@ -303,23 +305,23 @@ using built-in plotting tools.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="single_seismogram.html">
+          <a class="next-page" href="aligned_stations.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Single Seismogram</div>
+                <div class="title">Aligned Station Section</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="single_seismogram.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Subset Extraction Tutorials</div>
+                <div class="title">Single Seismogram</div>
                 
               </div>
             </a>

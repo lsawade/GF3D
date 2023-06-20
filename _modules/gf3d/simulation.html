@@ -182,13 +182,11 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../parts/gf-extraction/index.html">3D Green Function Extraction</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/extraction/database/index.html">Database Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/make_subset.html">Create subset from database files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/station_section.html">Station Section</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/single_seismogram.html">Single Seismogram</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/extraction/subset/index.html">Subset Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/station_section.html">Station Section</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/single_seismogram.html">Single Seismogram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/station_section.html">Station Section</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/aligned_stations.html">Aligned Station Section</a></li>
 </ul>
 </li>
@@ -403,7 +401,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stationdir</span> <span class="o">=</span> <span class="n">stationdir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">forwardoutdir</span> <span class="o">=</span> <span class="n">forwardoutdir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">station_latitude</span> <span class="o">=</span> <span class="n">station_latitude</span>   <span class="c1"># degree</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">station_longitude</span> <span class="o">=</span> <span class="n">station_longitude</span>  <span class="c1"># degree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">station_longitude</span> <span class="o">=</span> <span class="n">station_longitude</span> <span class="c1"># degree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">station_burial</span> <span class="o">=</span> <span class="n">station_burial</span>       <span class="c1"># km</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_latitude</span> <span class="o">=</span> <span class="n">target_latitude</span>     <span class="c1"># degree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_longitude</span> <span class="o">=</span> <span class="n">target_longitude</span>   <span class="c1"># degree</span>
@@ -520,6 +518,7 @@
 
             <span class="c1"># Remove pre-existing directory</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">_compdict</span><span class="p">[</span><span class="s1">&#39;dir&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">_compdict</span><span class="p">[</span><span class="s1">&#39;dir&#39;</span><span class="p">]):</span>
+
                 <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;rm -rf </span><span class="si">{</span><span class="n">_compdict</span><span class="p">[</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
                 <span class="c1"># Make dir</span>
@@ -736,7 +735,8 @@
 
         <span class="c1"># Determine low pass filter dependent on ndt and corresponding nyquist</span>
         <span class="c1"># frequency fny or fcutoff = 1/(2*dt)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndt</span><span class="o">*</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="c1"># Reduce</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ndt</span><span class="p">)</span>
 
         <span class="c1"># Create new STF using the</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stf</span> <span class="o">=</span> <span class="n">create_stf</span><span class="p">(</span>
@@ -1021,49 +1021,49 @@
             <span class="c1"># Write separate Par file for main specfem directory</span>
             <span class="n">utils</span><span class="o">.</span><span class="n">write_par_file</span><span class="p">(</span><span class="n">pardict</span><span class="p">,</span> <span class="n">par_file</span><span class="p">)</span>
 
-            <span class="c1"># Write even more separate Par file for a forward test directory</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_test</span><span class="p">:</span>
+        <span class="c1"># Write even more separate Par file for a forward test directory</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_test</span><span class="p">:</span>
 
-                <span class="c1"># modify Reciprocal Par_file</span>
-                <span class="n">pardict</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pardict</span><span class="p">)</span>
-                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;SAVE_GREEN_FUNCTIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;USE_FORCE_POINT_SOURCE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1"># modify Reciprocal Par_file</span>
+            <span class="n">pardict</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pardict</span><span class="p">)</span>
+            <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;SAVE_GREEN_FUNCTIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;USE_FORCE_POINT_SOURCE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
-                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NUMBER_OF_SIMULTANEOUS_RUNS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;BROADCAST_SAME_MESH_AND_MODEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NUMBER_OF_SIMULTANEOUS_RUNS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;BROADCAST_SAME_MESH_AND_MODEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
-                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;USE_BUFFER_ELEMENTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NUMBER_OF_BUFFER_ELEMENTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;USE_BUFFER_ELEMENTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NUMBER_OF_BUFFER_ELEMENTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-                <span class="c1"># For now so that specfem makes it&#39;s</span>
-                <span class="k">if</span> <span class="s1">&#39;NSTEP&#39;</span> <span class="ow">in</span> <span class="n">pardict</span><span class="p">:</span>
-                    <span class="n">pardict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;NSTEP&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="s1">&#39;T0&#39;</span> <span class="ow">in</span> <span class="n">pardict</span><span class="p">:</span>
-                    <span class="n">pardict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;T0&#39;</span><span class="p">)</span>
+            <span class="c1"># For now so that specfem makes it&#39;s</span>
+            <span class="k">if</span> <span class="s1">&#39;NSTEP&#39;</span> <span class="ow">in</span> <span class="n">pardict</span><span class="p">:</span>
+                <span class="n">pardict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;NSTEP&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;T0&#39;</span> <span class="ow">in</span> <span class="n">pardict</span><span class="p">:</span>
+                <span class="n">pardict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;T0&#39;</span><span class="p">)</span>
 
-                <span class="c1"># Force STF print</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subsample</span><span class="p">:</span>
-                    <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;PRINT_SOURCE_TIME_FUNCTION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1"># Force STF print</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subsample</span><span class="p">:</span>
+                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;PRINT_SOURCE_TIME_FUNCTION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;PRINT_SOURCE_TIME_FUNCTION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subsample</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndt_requested</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">station</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NTSTEP_BETWEEN_FRAMES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xth_sample</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_forward_stf</span><span class="p">:</span>
+                    <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NSTEP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstep</span>
+                    <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;T0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;PRINT_SOURCE_TIME_FUNCTION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subsample</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndt_requested</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">station</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                        <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NTSTEP_BETWEEN_FRAMES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xth_sample</span>
-
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_forward_stf</span><span class="p">:</span>
-                        <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NSTEP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstep</span>
-                        <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;T0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;RECORD_LENGTH_IN_MINUTES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_in_min</span>
-
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NTSTEP_BETWEEN_FRAMES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;RECORD_LENGTH_IN_MINUTES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_in_min</span>
 
-                <span class="c1"># Write Par_file</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;NTSTEP_BETWEEN_FRAMES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">pardict</span><span class="p">[</span><span class="s1">&#39;RECORD_LENGTH_IN_MINUTES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_in_min</span>
 
-                <span class="n">utils</span><span class="o">.</span><span class="n">write_par_file</span><span class="p">(</span><span class="n">pardict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">par_file_forward</span><span class="p">)</span>
+            <span class="c1"># Write Par_file</span>
+
+            <span class="n">utils</span><span class="o">.</span><span class="n">write_par_file</span><span class="p">(</span><span class="n">pardict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">par_file_forward</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 

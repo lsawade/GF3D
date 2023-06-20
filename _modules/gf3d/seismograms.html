@@ -182,13 +182,11 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../parts/gf-extraction/index.html">3D Green Function Extraction</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/extraction/database/index.html">Database Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/make_subset.html">Create subset from database files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/station_section.html">Station Section</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/single_seismogram.html">Single Seismogram</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/extraction/subset/index.html">Subset Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/station_section.html">Station Section</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/single_seismogram.html">Single Seismogram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/station_section.html">Station Section</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/aligned_stations.html">Aligned Station Section</a></li>
 </ul>
 </li>
@@ -488,7 +486,7 @@
 
     <span class="c1"># This computes the half duration for the new STF from the</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">cmt</span><span class="o">.</span><span class="n">hdur</span> <span class="o">/</span> <span class="mf">1.628</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">hdur</span><span class="p">:</span>
-        <span class="n">hdur_r</span> <span class="o">=</span> <span class="mf">0.000001</span>
+        <span class="n">hdur_r</span> <span class="o">=</span> <span class="mf">1e-6</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Requested half duration smaller than what was simulated.</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;Half duration set to </span><span class="si">{</span><span class="n">hdur_r</span><span class="si">}</span><span class="s2">s to simulate a Heaviside function.&quot;</span><span class="p">)</span>
@@ -501,7 +499,11 @@
     <span class="c1"># Heaviside STF to reproduce SPECFEM stf</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">stf_r</span> <span class="o">=</span> <span class="n">create_stf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">,</span> <span class="n">NT</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">hdur_r</span><span class="p">,</span>
                           <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gaussian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lpfilter</span><span class="o">=</span><span class="s1">&#39;butter&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Fourier Transform the STF</span>
     <span class="n">STF_R</span> <span class="o">=</span> <span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">stf_r</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">NP2</span><span class="p">)</span>
+
+    <span class="c1"># Compute phase shift for the heaviside STF</span>
     <span class="n">shift</span> <span class="o">=</span> <span class="o">-</span><span class="mf">200.0</span>
     <span class="n">phshift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="n">shift</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">NP2</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
 
@@ -516,7 +518,7 @@
 
         <span class="c1"># Convolution with Specfem Heaviside function</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span>
-            <span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">phshift</span> <span class="o">*</span> <span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">NP2</span><span class="p">)</span> <span class="o">*</span> <span class="n">STF_R</span><span class="p">))[:</span><span class="n">NT</span><span class="p">]</span> <span class="o">*</span> <span class="n">dt</span>
+            <span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">phshift</span> <span class="o">*</span> <span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">NP2</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">STF_R</span><span class="p">))[:</span><span class="n">NT</span><span class="p">]</span>
 
         <span class="n">stats</span> <span class="o">=</span> <span class="n">Stats</span><span class="p">()</span>
         <span class="n">stats</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">dt</span>
@@ -849,7 +851,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLX&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLY&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;NGLLZ&#39;</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span>
-                    <span class="p">:]</span>
+                <span class="p">:]</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading scalars ...&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;DT&#39;</span><span class="p">][()]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;tc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;TC&#39;</span><span class="p">][()]</span>
@@ -867,10 +869,6 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subset</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ibool</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;ibool&#39;</span><span class="p">][:]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stations</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Stations&#39;</span><span class="p">][:]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">networks</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Networks&#39;</span><span class="p">][:]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">burials</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;burials&#39;</span><span class="p">][:]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">latitudes</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;latitudes&#39;</span><span class="p">][:]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">longitudes</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;longitudes&#39;</span><span class="p">][:]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">xyz</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;xyz&#39;</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">kdtree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullkdtree</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">displacement</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;displacement&#39;</span><span class="p">][:]</span>
@@ -1230,30 +1228,40 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Requested half duration smaller than what was simulated.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Half duration set to </span><span class="si">{</span><span class="n">hdur_diff</span><span class="si">}</span><span class="s2">s to simulate a Heaviside function.&quot;</span><span class="p">)</span>
+            <span class="n">hdur_conv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;hdur&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">cmt</span><span class="o">.</span><span class="n">hdur</span> <span class="o">/</span> <span class="mf">1.628</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Try convolving your seismogram with a Gaussian with &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hdur_conv</span><span class="si">}</span><span class="s2">s standard deviation.&quot;</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
             <span class="n">hdur_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">cmt</span><span class="o">.</span><span class="n">hdur</span> <span class="o">/</span> <span class="mf">1.628</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;hdur&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># Heaviside STF to reproduce SPECFEM stf</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">stf_r</span> <span class="o">=</span> <span class="n">create_stf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">400.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">],</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span> <span class="n">hdur_diff</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gaussian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lpfilter</span><span class="o">=</span><span class="s1">&#39;butter&#39;</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">stf_r</span> <span class="o">=</span> <span class="n">create_stf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">],</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span> <span class="n">hdur_diff</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gaussian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lpfilter</span><span class="o">=</span><span class="s1">&#39;butter&#39;</span><span class="p">)</span>
 
+        <span class="c1"># Fourier Transform the STF</span>
         <span class="n">STF_R</span> <span class="o">=</span> <span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">stf_r</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">NP2</span><span class="p">)</span>
 
-        <span class="n">shift</span> <span class="o">=</span> <span class="o">-</span><span class="mf">400.0</span>
+        <span class="c1"># Compute correctional phase shift</span>
+        <span class="n">shift</span> <span class="o">=</span> <span class="o">-</span><span class="mf">200.0</span>
         <span class="n">phshift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="n">shift</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">NP2</span><span class="p">,</span>
                                                     <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Lengths: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">NP2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="c1"># Add traces to the</span>
         <span class="n">traces</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">_h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="p">)):</span>
             <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">]):</span>
 
+                <span class="c1"># Convolution with the STF and correctional timeshift</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span>
                     <span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span>
-                        <span class="n">STF_R</span> <span class="o">*</span> <span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">seismograms</span><span class="p">[</span><span class="n">_h</span><span class="p">,</span> <span class="n">_i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">n</span><span class="o">=</span><span class="n">NP2</span><span class="p">)</span>
+                        <span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">seismograms</span><span class="p">[</span><span class="n">_h</span><span class="p">,</span> <span class="n">_i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">n</span><span class="o">=</span><span class="n">NP2</span><span class="p">)</span>
+                        <span class="o">*</span> <span class="n">STF_R</span>
                         <span class="o">*</span> <span class="n">phshift</span>
-                    <span class="p">))[:</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+                    <span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">]])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
 
                 <span class="n">stats</span> <span class="o">=</span> <span class="n">Stats</span><span class="p">()</span>
                 <span class="n">stats</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
@@ -1273,7 +1281,6 @@
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Outputting traces&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Stream</span><span class="p">(</span><span class="n">traces</span><span class="p">)</span>
-
 
     <span class="k">def</span> <span class="nf">get_mt_frechet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmt</span><span class="p">:</span> <span class="n">CMTSOLUTION</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">:</span>
 
@@ -1363,7 +1370,6 @@
                                 <span class="n">displacement</span><span class="p">[</span><span class="n">_s</span><span class="p">,</span> <span class="n">_c</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span>
                                              <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">hlagrange_y</span>
                                 <span class="o">+</span> <span class="n">displacement</span><span class="p">[</span><span class="n">_s</span><span class="p">,</span> <span class="n">_c</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">hlagrange_z</span><span class="p">)</span>
-
 
         <span class="c1"># For following FFTs</span>
         <span class="n">NP2</span> <span class="o">=</span> <span class="n">next_power_of_2</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;nsteps&#39;</span><span class="p">])</span>

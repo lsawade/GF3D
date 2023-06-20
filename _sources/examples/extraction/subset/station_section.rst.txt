@@ -28,12 +28,14 @@ using built-in plotting tools.
 Loading all modules
 -------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-26
+.. GENERATED FROM PYTHON SOURCE LINES 15-28
 
 .. code-block:: default
 
 
     # External
+    import numpy as np
+    from gf3d.signal.filter import butter_low_two_pass_filter
     import matplotlib.pyplot as plt
     from obspy import read, read_inventory, Stream
 
@@ -50,7 +52,11 @@ Loading all modules
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-42
+.. GENERATED FROM PYTHON SOURCE LINES 31-32
+
+half duration:  33.4000
+
+.. GENERATED FROM PYTHON SOURCE LINES 32-44
 
 .. code-block:: default
 
@@ -73,7 +79,7 @@ Loading all modules
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-47
+.. GENERATED FROM PYTHON SOURCE LINES 45-49
 
 .. code-block:: default
 
@@ -88,11 +94,12 @@ Loading all modules
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-52
+.. GENERATED FROM PYTHON SOURCE LINES 50-55
 
 .. code-block:: default
 
 
+    # obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)
     obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)
     syn = process_stream(rp, cmt=cmt, duration=3600)
 
@@ -103,10 +110,9 @@ Loading all modules
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-56
+.. GENERATED FROM PYTHON SOURCE LINES 56-58
 
 .. code-block:: default
-
 
     pobs, psyn = select_pairs(obs, syn)
 
@@ -117,7 +123,7 @@ Loading all modules
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-66
+.. GENERATED FROM PYTHON SOURCE LINES 59-68
 
 .. code-block:: default
 
@@ -145,7 +151,7 @@ Loading all modules
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.578 seconds)
+   **Total running time of the script:** ( 0 minutes  1.819 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_subset_station_section.py:

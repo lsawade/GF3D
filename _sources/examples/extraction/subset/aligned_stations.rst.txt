@@ -51,23 +51,36 @@ Loading all modules
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-31
+.. GENERATED FROM PYTHON SOURCE LINES 30-34
+
+Get Sources and Seismograms
+---------------------------
 
 Load CMTSOLUTION, observed data, and Green functions
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-43
+.. GENERATED FROM PYTHON SOURCE LINES 34-37
 
 .. code-block:: default
 
 
-    # CMTSOLUTION
     cmt = CMTSOLUTION.read('../../DATA/single_element_read/CMTSOLUTION')
 
-    # Load subset
-    gfsub = GFManager("../../DATA/single_element_read/single_element.h5")
-    gfsub.load()
 
-    # Load Observed Data
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 38-39
+
+Load Observed Data
+
+.. GENERATED FROM PYTHON SOURCE LINES 39-43
+
+.. code-block:: default
+
+
     raw = read("../../DATA/single_element_read/traces/*.sac")
     inv = read_inventory("../../DATA/single_element_read/station.xml")
 
@@ -78,11 +91,17 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-49
+.. GENERATED FROM PYTHON SOURCE LINES 44-45
+
+Get synthetics
+
+.. GENERATED FROM PYTHON SOURCE LINES 45-51
 
 .. code-block:: default
 
 
+    gfsub = GFManager("../../DATA/single_element_read/single_element.h5")
+    gfsub.load()
     rp = gfsub.get_seismograms(cmt)
 
 
@@ -93,7 +112,13 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-55
+.. GENERATED FROM PYTHON SOURCE LINES 52-55
+
+Process
+-------
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 55-59
 
 .. code-block:: default
 
@@ -108,7 +133,12 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-70
+.. GENERATED FROM PYTHON SOURCE LINES 60-62
+
+Windowing thee traces
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 62-76
 
 .. code-block:: default
 
@@ -133,7 +163,12 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-79
+.. GENERATED FROM PYTHON SOURCE LINES 77-79
+
+Selecting matching traces
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 79-87
 
 .. code-block:: default
 
@@ -152,7 +187,13 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-108
+.. GENERATED FROM PYTHON SOURCE LINES 88-91
+
+Plot section
+------------
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 91-118
 
 .. code-block:: default
 
@@ -198,7 +239,7 @@ Load CMTSOLUTION, observed data, and Green functions
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.094 seconds)
+   **Total running time of the script:** ( 0 minutes  2.552 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_subset_aligned_stations.py:

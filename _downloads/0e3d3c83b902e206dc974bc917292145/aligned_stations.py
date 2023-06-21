@@ -27,32 +27,38 @@ from gf3d.plot.util import set_default_color
 from gf3d.plot.section_aligned import plotsection_aligned, get_azimuth_distance_traveltime, filter_stations
 
 # %%
+# Get Sources and Seismograms
+# ---------------------------
+#
 # Load CMTSOLUTION, observed data, and Green functions
 
-# CMTSOLUTION
 cmt = CMTSOLUTION.read('../../DATA/single_element_read/CMTSOLUTION')
 
-# Load subset
-gfsub = GFManager("../../DATA/single_element_read/single_element.h5")
-gfsub.load()
-
+# %%
 # Load Observed Data
+
 raw = read("../../DATA/single_element_read/traces/*.sac")
 inv = read_inventory("../../DATA/single_element_read/station.xml")
 
-# %% Get seismograms from the database
-#
+# %%
+# Get synthetics
 
+gfsub = GFManager("../../DATA/single_element_read/single_element.h5")
+gfsub.load()
 rp = gfsub.get_seismograms(cmt)
 
 
-# %% Process
+# %%
+# Process
+# -------
 #
 
 obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)
 syn = process_stream(rp, cmt=cmt, duration=3600)
 
 # %%
+# Windowing thee traces
+#
 
 windowP = (-100, 250)
 windowS = (-100, 250)
@@ -68,6 +74,8 @@ Sobs, Ssyn = get_azimuth_distance_traveltime(
     traveltime_window=('S', windowS))
 
 # %%
+# Selecting matching traces
+#
 
 selection = filter_stations(Pobs, Sobs)
 
@@ -76,7 +84,9 @@ Psyn = Stream([Psyn[_i] for _i in selection])
 Sobs = Stream([Sobs[_i] for _i in selection])
 Ssyn = Stream([Ssyn[_i] for _i in selection])
 
-# %% Plot section
+# %%
+# Plot section
+# ------------
 #
 
 

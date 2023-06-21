@@ -33,6 +33,40 @@ from the raw database of stations.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="The tutorial will go over the reading of station files from a database by loading one that is i...">
+
+.. only:: html
+
+  .. image:: /examples/extraction/database/images/thumb/sphx_glr_station_section_db_thumb.svg
+    :alt:
+
+  :ref:`sphx_glr_examples_extraction_database_station_section_db.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Station Section</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The tutorial will go over the reading of a three component seismogram from a station file in th...">
+
+.. only:: html
+
+  .. image:: /examples/extraction/database/images/thumb/sphx_glr_single_seismogram_db_thumb.svg
+    :alt:
+
+  :ref:`sphx_glr_examples_extraction_database_single_seismogram_db.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Single Seismogram</div>
+    </div>
+
+
+.. raw:: html
+
     </div>
 
 
@@ -40,6 +74,8 @@ from the raw database of stations.
    :hidden:
 
    /examples/extraction/database/make_subset
+   /examples/extraction/database/station_section_db
+   /examples/extraction/database/single_seismogram_db
 
 
 .. only:: html

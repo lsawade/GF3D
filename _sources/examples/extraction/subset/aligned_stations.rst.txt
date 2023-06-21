@@ -78,7 +78,7 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-48
+.. GENERATED FROM PYTHON SOURCE LINES 45-49
 
 .. code-block:: default
 
@@ -93,7 +93,7 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-53
+.. GENERATED FROM PYTHON SOURCE LINES 51-55
 
 .. code-block:: default
 
@@ -108,9 +108,10 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-67
+.. GENERATED FROM PYTHON SOURCE LINES 56-70
 
 .. code-block:: default
+
 
     windowP = (-100, 250)
     windowS = (-100, 250)
@@ -132,7 +133,7 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-76
+.. GENERATED FROM PYTHON SOURCE LINES 71-79
 
 .. code-block:: default
 
@@ -151,7 +152,7 @@ Load CMTSOLUTION, observed data, and Green functions
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-104
+.. GENERATED FROM PYTHON SOURCE LINES 81-108
 
 .. code-block:: default
 
@@ -197,7 +198,7 @@ Load CMTSOLUTION, observed data, and Green functions
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.111 seconds)
+   **Total running time of the script:** ( 0 minutes  2.094 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_subset_aligned_stations.py:

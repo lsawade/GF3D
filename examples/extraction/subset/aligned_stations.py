@@ -41,16 +41,19 @@ raw = read("../../DATA/single_element_read/traces/*.sac")
 inv = read_inventory("../../DATA/single_element_read/station.xml")
 
 # %% Get seismograms from the database
+#
 
 rp = gfsub.get_seismograms(cmt)
 
 
 # %% Process
+#
 
 obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)
 syn = process_stream(rp, cmt=cmt, duration=3600)
 
 # %%
+
 windowP = (-100, 250)
 windowS = (-100, 250)
 pobs, psyn = select_pairs(obs, syn)
@@ -74,6 +77,7 @@ Sobs = Stream([Sobs[_i] for _i in selection])
 Ssyn = Stream([Ssyn[_i] for _i in selection])
 
 # %% Plot section
+#
 
 
 # Plots a section of observed and synthetic

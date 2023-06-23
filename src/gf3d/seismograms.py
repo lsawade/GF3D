@@ -271,6 +271,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     _, stf_r = create_stf(0, 200.0, NT, dt, hdur_r,
                           cutoff=None, gaussian=False, lpfilter='butter')
 
+
     # Fourier Transform the STF
     STF_R = fft.fft(stf_r, n=NP2)
 

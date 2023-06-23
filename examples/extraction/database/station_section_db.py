@@ -54,6 +54,9 @@ rp = gfm.get_seismograms(cmt)
 obs = process_stream(raw, inv=inv, cmt=cmt, duration=3600)
 syn = process_stream(rp, cmt=cmt, duration=3600)
 
+# obs = raw
+# syn = rp
+
 # %%
 # Note that the only 3 stations (II.BFO, IU.ANMO, IU.HRV) are in the example
 # database, which means that the observed data that we downloaded for the

@@ -502,6 +502,7 @@
     <span class="n">_</span><span class="p">,</span> <span class="n">stf_r</span> <span class="o">=</span> <span class="n">create_stf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">200.0</span><span class="p">,</span> <span class="n">NT</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">hdur_r</span><span class="p">,</span>
                           <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gaussian</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">lpfilter</span><span class="o">=</span><span class="s1">&#39;butter&#39;</span><span class="p">)</span>
 
+
     <span class="c1"># Fourier Transform the STF</span>
     <span class="n">STF_R</span> <span class="o">=</span> <span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">stf_r</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">NP2</span><span class="p">)</span>
 

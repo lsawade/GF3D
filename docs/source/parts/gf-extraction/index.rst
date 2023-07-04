@@ -85,5 +85,6 @@ Examples
 
     ../../examples/extraction/database/index.rst
     ../../examples/extraction/subset/index.rst
+    ../../examples/client/index.rst
 
 

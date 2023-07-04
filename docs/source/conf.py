@@ -125,16 +125,18 @@ sphinx_gallery_conf = {
     'examples_dirs': [
         '../../examples/extraction/subset',
         '../../examples/extraction/database',
-        '../../examples/generation'],
+        '../../examples/generation',
+        '../../examples/client'],
     # path to where to save gallery generated output
     'gallery_dirs': [
         "examples/extraction/subset",
         "examples/extraction/database",
-        "examples/generation"],
+        "examples/generation",
+        'examples/client'],
     # Checks matplotlib for figure creation
     'image_scrapers': (matplotlib_svg_scraper(),),
     # Which files to include
-    'filename_pattern': r"\.py",
+    'filename_pattern': "/run_",
 
     'reset_modules': (reset_mpl, ),
 

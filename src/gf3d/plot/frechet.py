@@ -6,7 +6,8 @@ import numpy as np
 import matplotlib.dates as mdates
 
 
-def plotfrechet(cmt, rp, drp, network, station, limits, outdir, comp='Z'):
+def plotfrechet(cmt, rp, drp, network, station, limits, outdir, comp='Z',
+                rp2=None, drp2=None, lw=1.0):
 
     N = 1 + len(drp.keys())
     keys = list(drp.keys())
@@ -17,18 +18,31 @@ def plotfrechet(cmt, rp, drp, network, station, limits, outdir, comp='Z'):
 
     for i in range(N):
 
-        lw = 1.0
-
         if i == 0:
             key = 'Syn'
             tr = rp.select(network=network, station=station, component=comp)[0]
+
+            if rp2 is not None:
+                tr2 = rp2.select(
+                    network=network, station=station, component=comp)[0]
+            else:
+                tr2 = None
         else:
+
             key = keys[i-1]
             tr = drp[key].select(
                 network=network, station=station, component=comp)[0]
 
+            if drp2 is not None:
+                tr2 = drp2[key].select(network=network,
+                                       station=station, component=comp)[0]
+            else:
+                tr2 = None
+
         plt.sca(axes[i])
         plt.plot(tr.times("matplotlib"), tr.data, 'k', lw=lw)
+        if tr2 is not None:
+            plt.plot(tr2.times("matplotlib"), tr2.data, 'r--', lw=lw)
 
         absmax = np.max(np.abs(tr.data))
         axes[i].set_ylim(-1.01*absmax*factor, 1.01*absmax*factor)

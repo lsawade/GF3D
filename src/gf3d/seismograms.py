@@ -271,12 +271,11 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
     _, stf_r = create_stf(0, 200.0, NT, dt, hdur_r,
                           cutoff=None, gaussian=False, lpfilter='butter')
 
-
     # Fourier Transform the STF
     STF_R = fft.fft(stf_r, n=NP2)
 
     # Compute phase shift for the heaviside STF
-    shift = -200.0
+    shift = -200.0 + cmt.time_shift
     phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2, dt)*2*np.pi)
 
     # Add traces to the
@@ -302,7 +301,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
             latitude=latitude, longitude=longitude)
         stats.location = ''
         stats.channel = f'MX{comp}'
-        stats.starttime = cmt.cmt_time - tc
+        stats.starttime = cmt.origin_time - tc
         stats.npts = len(data)
         tr = Trace(data=data, header=stats)
         traces.append(tr)
@@ -481,7 +480,7 @@ def get_seismograms_sub(stationfile: str, cmt: CMTSOLUTION):
     _, stf_r = create_stf(0, 100.0, NT, dt, hdur_r,
                           cutoff=None, gaussian=False, lpfilter='butter')
     STF_R = fft.fft(stf_r, n=NP2)
-    shift = -100.0
+    shift = -100.0 + cmt.time_shift
     phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2, dt)*2*np.pi)
 
     # Add traces to the
@@ -507,7 +506,7 @@ def get_seismograms_sub(stationfile: str, cmt: CMTSOLUTION):
             latitude=latitude, longitude=longitude)
         stats.location = ''
         stats.channel = f'MX{comp}'
-        stats.starttime = cmt.cmt_time - tc
+        stats.starttime = cmt.origin_time - tc
         stats.npts = len(data)
         tr = Trace(data=data, header=stats)
         traces.append(tr)
@@ -583,6 +582,44 @@ class GFManager(object):
 
     def get_mesh_location(self):
         pass
+
+    def load_scalar_header_parameters(self):
+        """Small function that loads only the scalar header
+        """
+        header = dict()
+
+        with h5py.File(self.headerfile, 'r') as db:
+            header['topography'] = db['TOPOGRAPHY'][()]
+            header['ellipticity'] = db['ELLIPTICITY'][()]
+
+            if header['topography']:
+                logger.info("Loading topography ...")
+                header['nx_topo'] = db['NX_BATHY'][()]
+                header['ny_topo'] = db['NY_BATHY'][()]
+                header['res_topo'] = db['RESOLUTION_TOPO_FILE'][()]
+
+            if header['ellipticity']:
+                logger.info("Loading ellipticity ...")
+                header['nspl'] = len(db['rspl'][:])
+
+            # Grid
+            header['NSPEC'] = db['NSPEC'][()]
+            header['NGLOB'] = db['NGLOB'][()]
+            header['NGLLX'] = db['NGLLX'][()]
+            header['NGLLY'] = db['NGLLY'][()]
+            header['NGLLZ'] = db['NGLLZ'][()]
+
+            # Timing
+            header['dt'] = db['DT'][()]
+            header['tc'] = db['TC'][()]
+            header['nsteps'] = db['NSTEPS'][()]
+            header['factor'] = db['FACTOR'][()]
+            header['hdur'] = db['HDUR'][()]
+
+            # Buffer elements
+            header['USE_BUFFER_ELEMENTS'] = db['USE_BUFFER_ELEMENTS'][()]
+
+        return header
 
     def load_header_variables(self):
 
@@ -1010,13 +1047,13 @@ class GFManager(object):
 
         # Heaviside STF to reproduce SPECFEM stf
         _, stf_r = create_stf(0, 200.0, self.header['nsteps'],
-                               self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
+                              self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
 
         # Fourier Transform the STF
         STF_R = fft.fft(stf_r, n=NP2)
 
         # Compute correctional phase shift
-        shift = -200.0
+        shift = -200.0 + cmt.time_shift
         phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
                                                     self.header['dt'])*2*np.pi)
 
@@ -1045,7 +1082,7 @@ class GFManager(object):
                     latitude=self.latitudes[_h], longitude=self.longitudes[_h])
                 stats.location = ''
                 stats.channel = f'MX{comp}'
-                stats.starttime = cmt.cmt_time - self.header['tc']
+                stats.starttime = cmt.origin_time - self.header['tc']
                 stats.npts = self.header['nsteps']
                 tr = Trace(data=data, header=stats)
 
@@ -1163,7 +1200,7 @@ class GFManager(object):
 
         STF_R = fft.fft(stf_r, n=NP2)
 
-        shift = -400.0
+        shift = -400.0 + cmt.time_shift
         phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
                                                     self.header['dt'])*2*np.pi)
 
@@ -1202,7 +1239,7 @@ class GFManager(object):
                         latitude=self.latitudes[_h], longitude=self.longitudes[_h])
                     stats.location = ''
                     stats.channel = f'MX{comp}'
-                    stats.starttime = cmt.cmt_time - self.header['tc']
+                    stats.starttime = cmt.origin_time - self.header['tc']
                     stats.npts = self.header['nsteps']
                     tr = Trace(data=data, header=stats)
 
@@ -1278,6 +1315,7 @@ class GFManager(object):
                 prp = self.get_seismograms(pcmt)
                 mrp = self.get_seismograms(mcmt)
 
+                #
                 for ptr, mpr in zip(prp, mrp):
                     ptr.data -= mpr.data
                     ptr.data /= 2 * pert

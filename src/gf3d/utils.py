@@ -1,4 +1,6 @@
 from __future__ import print_function
+import requests
+from urllib.request import urlopen
 import zipfile
 from typing import List
 import urllib.request
@@ -11,6 +13,11 @@ import sys
 import numpy as np
 import typing as tp
 import toml
+
+try:
+    from tqdm import tqdm
+except ImportError:
+    pass
 
 try:
     from reprlib import repr
@@ -398,7 +405,7 @@ def unzip(zipfilename, directory_to_extract_to):
         zip_ref.extractall(directory_to_extract_to)
 
 
-def downloadfile(url: str, floc: str):
+def downloadfile(url: str, floc: str, *args, **kwargs):
     """Downloads file to location
     Parameters
     ----------
@@ -414,7 +421,41 @@ def downloadfile(url: str, floc: str):
         raise(e)
 
 
+class DownloadProgressBar(tqdm):
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None:
+            self.total = tsize
+        self.update(b * bsize - self.n)
 
+
+def downloadfile_progress(url: str, floc: str, desc: str | None = None):
+    """Downloads file to location but with a progress bar
+    Parameters
+    ----------
+    url : str
+        Source URL
+    floc : str
+        Destination
+    """
+
+    if desc is None:
+        desc = url.split('/')[-1]
+    try:
+        with DownloadProgressBar(unit='B', unit_scale=True,
+                                 miniters=1, desc=desc) as t:
+
+            urllib.request.urlretrieve(
+                url, filename=floc, reporthook=t.update_to)
+
+    except Exception as e:
+        print(f"Error when downloading {url}: {e}")
+        raise(e)
+
+
+def get_url_content(url) -> str:
+    with urlopen(url) as response:
+        body = response.read()
+    return body
 
 
 def sec2hhmmss(seconds: float, roundsecs: bool = True) \

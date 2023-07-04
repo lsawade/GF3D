@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="prev" title="Aligned Station Section" href="../../examples/extraction/subset/aligned_stations.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="prev" title="First example of client usage to create subset." href="../../examples/client/client_usage_demo.html" />
 
     <link rel="shortcut icon" href="../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2023.03.27 -->
         <title>API Documentation - GF3D 0.0.1 documentation</title>
@@ -182,15 +182,19 @@
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../gf-extraction/index.html">3D Green Function Extraction</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/extraction/database/index.html">Database Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/make_subset.html">Create subset from database files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/station_section_db.html">Station Section</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/single_seismogram_db.html">Single Seismogram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/run_make_subset.html">Create subset from database files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/run_station_section_db.html">Station Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/database/run_single_seismogram_db.html">Single Seismogram</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/extraction/subset/index.html">Subset Extraction Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/single_seismogram.html">Single Seismogram</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/station_section.html">Station Section</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/aligned_stations.html">Aligned Station Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/run_single_seismogram.html">Single Seismogram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/run_station_section.html">Station Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/extraction/subset/run_aligned_stations.html">Aligned Station Section</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/client/index.html">Using the client to retrieve database subsets and seimograms</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/client/client_usage_demo.html">First example of client usage to create subset.</a></li>
 </ul>
 </li>
 </ul>
@@ -504,7 +508,10 @@ an obspy.Stream with traces from all stations.</p></li>
 <tr class="row-even"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.load" title="gf3d.seismograms.GFManager.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>()</p></td>
 <td><p>Given the files in the database, get a set of strains and write it into to a single file in a single epsilon array.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset" title="gf3d.seismograms.GFManager.write_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_subset</span></code></a>(outfile[, duration, fortran])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.load_scalar_header_parameters" title="gf3d.seismograms.GFManager.load_scalar_header_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_scalar_header_parameters</span></code></a>()</p></td>
+<td><p>Small function that loads only the scalar header</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset" title="gf3d.seismograms.GFManager.write_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_subset</span></code></a>(outfile[, duration, fortran])</p></td>
 <td><p>Given the files in the database, get a set of strains and write it into to a single file in a single epsilon array.</p></td>
 </tr>
 </tbody>
@@ -550,7 +557,10 @@ an obspy.Stream with traces from all stations.</p></li>
 <tr class="row-even"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.load" title="gf3d.seismograms.GFManager.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>()</p></td>
 <td><p>Given the files in the database, get a set of strains and write it into to a single file in a single epsilon array.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset" title="gf3d.seismograms.GFManager.write_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_subset</span></code></a>(outfile[, duration, fortran])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.load_scalar_header_parameters" title="gf3d.seismograms.GFManager.load_scalar_header_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_scalar_header_parameters</span></code></a>()</p></td>
+<td><p>Small function that loads only the scalar header</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset" title="gf3d.seismograms.GFManager.write_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_subset</span></code></a>(outfile[, duration, fortran])</p></td>
 <td><p>Given the files in the database, get a set of strains and write it into to a single file in a single epsilon array.</p></td>
 </tr>
 </tbody>
@@ -591,6 +601,12 @@ into to a single file in a single epsilon array.
 Also write a list of stations and normal header info required for
 source location. This very same GFManager would be used to read the.
 Where</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gf3d.seismograms.GFManager.load_scalar_header_parameters">
+<span class="sig-name descname"><span class="pre">load_scalar_header_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gf3d/seismograms.html#GFManager.load_scalar_header_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gf3d.seismograms.GFManager.load_scalar_header_parameters" title="Permalink to this definition">#</a></dt>
+<dd><p>Small function that loads only the scalar header</p>
 </dd></dl>
 
 <dl class="py method">
@@ -745,14 +761,14 @@ Where</p>
         
         <div class="related-pages">
           
-          <a class="prev-page" href="../../examples/extraction/subset/aligned_stations.html">
+          <a class="prev-page" href="../../examples/client/client_usage_demo.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Aligned Station Section</div>
+                <div class="title">First example of client usage to create subset.</div>
                 
               </div>
             </a>
@@ -804,6 +820,7 @@ Where</p>
 <li><a class="reference internal" href="#gf3d.seismograms.GFManager"><code class="docutils literal notranslate"><span class="pre">GFManager</span></code></a><ul>
 <li><a class="reference internal" href="#gf3d.seismograms.GFManager.get_frechet"><code class="docutils literal notranslate"><span class="pre">GFManager.get_frechet()</span></code></a></li>
 <li><a class="reference internal" href="#gf3d.seismograms.GFManager.load"><code class="docutils literal notranslate"><span class="pre">GFManager.load()</span></code></a></li>
+<li><a class="reference internal" href="#gf3d.seismograms.GFManager.load_scalar_header_parameters"><code class="docutils literal notranslate"><span class="pre">GFManager.load_scalar_header_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset"><code class="docutils literal notranslate"><span class="pre">GFManager.write_subset()</span></code></a></li>
 </ul>
 </li>

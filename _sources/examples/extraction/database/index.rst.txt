@@ -20,10 +20,10 @@ from the raw database of stations.
 
 .. only:: html
 
-  .. image:: /examples/extraction/database/images/thumb/sphx_glr_make_subset_thumb.png
+  .. image:: /examples/extraction/database/images/thumb/sphx_glr_run_make_subset_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_extraction_database_make_subset.py`
+  :ref:`sphx_glr_examples_extraction_database_run_make_subset.py`
 
 .. raw:: html
 
@@ -37,10 +37,10 @@ from the raw database of stations.
 
 .. only:: html
 
-  .. image:: /examples/extraction/database/images/thumb/sphx_glr_station_section_db_thumb.svg
+  .. image:: /examples/extraction/database/images/thumb/sphx_glr_run_station_section_db_thumb.svg
     :alt:
 
-  :ref:`sphx_glr_examples_extraction_database_station_section_db.py`
+  :ref:`sphx_glr_examples_extraction_database_run_station_section_db.py`
 
 .. raw:: html
 
@@ -54,10 +54,10 @@ from the raw database of stations.
 
 .. only:: html
 
-  .. image:: /examples/extraction/database/images/thumb/sphx_glr_single_seismogram_db_thumb.svg
+  .. image:: /examples/extraction/database/images/thumb/sphx_glr_run_single_seismogram_db_thumb.svg
     :alt:
 
-  :ref:`sphx_glr_examples_extraction_database_single_seismogram_db.py`
+  :ref:`sphx_glr_examples_extraction_database_run_single_seismogram_db.py`
 
 .. raw:: html
 
@@ -73,9 +73,9 @@ from the raw database of stations.
 .. toctree::
    :hidden:
 
-   /examples/extraction/database/make_subset
-   /examples/extraction/database/station_section_db
-   /examples/extraction/database/single_seismogram_db
+   /examples/extraction/database/run_make_subset
+   /examples/extraction/database/run_station_section_db
+   /examples/extraction/database/run_single_seismogram_db
 
 
 .. only:: html

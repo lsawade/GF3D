@@ -19,10 +19,10 @@ from an extracted subset of Green functions.
 
 .. only:: html
 
-  .. image:: /examples/extraction/subset/images/thumb/sphx_glr_single_seismogram_thumb.svg
+  .. image:: /examples/extraction/subset/images/thumb/sphx_glr_run_single_seismogram_thumb.svg
     :alt:
 
-  :ref:`sphx_glr_examples_extraction_subset_single_seismogram.py`
+  :ref:`sphx_glr_examples_extraction_subset_run_single_seismogram.py`
 
 .. raw:: html
 
@@ -36,10 +36,10 @@ from an extracted subset of Green functions.
 
 .. only:: html
 
-  .. image:: /examples/extraction/subset/images/thumb/sphx_glr_station_section_thumb.svg
+  .. image:: /examples/extraction/subset/images/thumb/sphx_glr_run_station_section_thumb.svg
     :alt:
 
-  :ref:`sphx_glr_examples_extraction_subset_station_section.py`
+  :ref:`sphx_glr_examples_extraction_subset_run_station_section.py`
 
 .. raw:: html
 
@@ -53,10 +53,10 @@ from an extracted subset of Green functions.
 
 .. only:: html
 
-  .. image:: /examples/extraction/subset/images/thumb/sphx_glr_aligned_stations_thumb.svg
+  .. image:: /examples/extraction/subset/images/thumb/sphx_glr_run_aligned_stations_thumb.svg
     :alt:
 
-  :ref:`sphx_glr_examples_extraction_subset_aligned_stations.py`
+  :ref:`sphx_glr_examples_extraction_subset_run_aligned_stations.py`
 
 .. raw:: html
 
@@ -72,9 +72,9 @@ from an extracted subset of Green functions.
 .. toctree::
    :hidden:
 
-   /examples/extraction/subset/single_seismogram
-   /examples/extraction/subset/station_section
-   /examples/extraction/subset/aligned_stations
+   /examples/extraction/subset/run_single_seismogram
+   /examples/extraction/subset/run_station_section
+   /examples/extraction/subset/run_aligned_stations
 
 
 .. only:: html

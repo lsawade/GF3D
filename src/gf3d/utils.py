@@ -16,6 +16,37 @@ import toml
 
 try:
     from tqdm import tqdm
+
+    class DownloadProgressBar(tqdm):
+
+        def update_to(self, b=1, bsize=1, tsize=None):
+            if tsize is not None:
+                self.total = tsize
+            self.update(b * bsize - self.n)
+
+    def downloadfile_progress(url: str, floc: str, desc: str | None = None):
+        """Downloads file to location but with a progress bar
+        Parameters
+        ----------
+        url : str
+            Source URL
+        floc : str
+            Destination
+        """
+
+        if desc is None:
+            desc = url.split('/')[-1]
+        try:
+            with DownloadProgressBar(unit='B', unit_scale=True,
+                                     miniters=1, desc=desc) as t:
+
+                urllib.request.urlretrieve(
+                    url, filename=floc, reporthook=t.update_to)
+
+        except Exception as e:
+            print(f"Error when downloading {url}: {e}")
+            raise(e)
+
 except ImportError:
     pass
 
@@ -416,37 +447,6 @@ def downloadfile(url: str, floc: str, *args, **kwargs):
     """
     try:
         urllib.request.urlretrieve(url, floc)
-    except Exception as e:
-        print(f"Error when downloading {url}: {e}")
-        raise(e)
-
-
-class DownloadProgressBar(tqdm):
-    def update_to(self, b=1, bsize=1, tsize=None):
-        if tsize is not None:
-            self.total = tsize
-        self.update(b * bsize - self.n)
-
-
-def downloadfile_progress(url: str, floc: str, desc: str | None = None):
-    """Downloads file to location but with a progress bar
-    Parameters
-    ----------
-    url : str
-        Source URL
-    floc : str
-        Destination
-    """
-
-    if desc is None:
-        desc = url.split('/')[-1]
-    try:
-        with DownloadProgressBar(unit='B', unit_scale=True,
-                                 miniters=1, desc=desc) as t:
-
-            urllib.request.urlretrieve(
-                url, filename=floc, reporthook=t.update_to)
-
     except Exception as e:
         print(f"Error when downloading {url}: {e}")
         raise(e)

@@ -63,7 +63,7 @@ i.e., they are hard coded.
 .. code-block:: default
 
 
-    gfcl = GF3DClient('example-db')
+    gfcl = GF3DClient('traverse')
 
 
 
@@ -144,7 +144,7 @@ query a subset quite easily as well
     latitude = -31.1300
     longitude = -72.0900
     depth_in_km = 17.3500
-    radius_in_km = 100
+    radius_in_km = 50
 
     # Make query
     gfcl.get_subset('firstquery.h5', latitude=latitude, longitude=longitude,

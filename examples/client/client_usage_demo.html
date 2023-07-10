@@ -267,7 +267,7 @@ files in the ‘examples/DATA/single_element_read/DB’ files.</p>
 <h2>GF3DClient<a class="headerlink" href="#gf3dclient" title="Permalink to this heading">#</a></h2>
 <p>The client automatically knows about server locations of a given database,
 i.e., they are hard coded.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gfcl</span> <span class="o">=</span> <span class="n">GF3DClient</span><span class="p">(</span><span class="s1">&#39;example-db&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gfcl</span> <span class="o">=</span> <span class="n">GF3DClient</span><span class="p">(</span><span class="s1">&#39;traverse&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>With the client initialized, we can query a dictionary of general parameters</p>
@@ -313,7 +313,7 @@ query a subset quite easily as well</p>
 <span class="n">latitude</span> <span class="o">=</span> <span class="o">-</span><span class="mf">31.1300</span>
 <span class="n">longitude</span> <span class="o">=</span> <span class="o">-</span><span class="mf">72.0900</span>
 <span class="n">depth_in_km</span> <span class="o">=</span> <span class="mf">17.3500</span>
-<span class="n">radius_in_km</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">radius_in_km</span> <span class="o">=</span> <span class="mi">50</span>
 
 <span class="c1"># Make query</span>
 <span class="n">gfcl</span><span class="o">.</span><span class="n">get_subset</span><span class="p">(</span><span class="s1">&#39;firstquery.h5&#39;</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span>

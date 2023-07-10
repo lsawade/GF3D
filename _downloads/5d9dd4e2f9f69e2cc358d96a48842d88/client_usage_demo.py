@@ -33,7 +33,7 @@ from gf3d.source import CMTSOLUTION
 # The client automatically knows about server locations of a given database,
 # i.e., they are hard coded.
 
-gfcl = GF3DClient('example-db')
+gfcl = GF3DClient('traverse')
 
 
 # %%
@@ -92,7 +92,7 @@ print(stations)
 latitude = -31.1300
 longitude = -72.0900
 depth_in_km = 17.3500
-radius_in_km = 100
+radius_in_km = 50
 
 # Make query
 gfcl.get_subset('firstquery.h5', latitude=latitude, longitude=longitude,

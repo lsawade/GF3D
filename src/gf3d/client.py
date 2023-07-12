@@ -44,7 +44,10 @@ class GF3DClient:
     def get_info(self):
         url = f'http://{self.base_url}:{self.port:d}/{self.info_route}?'
         url += f"db={self.db}"
-        return ast.literal_eval(get_url_content(url).decode())
+
+        result = get_url_content(url).decode()
+        print(result)
+        return ast.literal_eval(result)
 
     def get_subset(self, outputfile: str,
                    latitude: float, longitude: float, depth_in_km: float, radius_in_km: float = 100,
@@ -100,6 +103,9 @@ class GF3DClient:
             stationstr = '[' + \
                 ','.join([f'"{_netsta}"' for _netsta in netsta]) + ']'
             url += f"&netsta={stationstr}"
+
+        if isinstance(fortran, bool) and fortran:
+            url += f"&fortran={fortran}"
 
         # return get_url_content(url).decode().split(',')
         downloadfile(url, outputfile, desc='Downloading created subset')

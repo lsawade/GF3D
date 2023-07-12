@@ -71,10 +71,12 @@ def plotfrechet(cmt, rp, drp, network, station, limits, outdir, comp='Z',
 
         if i == 0:
             # Add title with event info
-            network = tr.stats.network
-            station = tr.stats.station
+            net = tr.stats.network
+            sta = tr.stats.station
+            loc = tr.stats.location
+            cha = tr.stats.channel
             plt.title(
-                f"{network}.{station}.{comp} -- {cmt.cmt_time.strftime('%Y-%m-%d %H:%M:%S')}  Loc: {cmt.latitude}dg, {cmt.longitude}dg, {cmt.depth}km", fontsize='medium')
+                f"{net}.{sta}.{loc}.{cha} -- {cmt.cmt_time.strftime('%Y-%m-%d %H:%M:%S')}  Loc: {cmt.latitude}dg, {cmt.longitude}dg, {cmt.depth}km", fontsize='medium')
 
     fig.autofmt_xdate()
     plt.subplots_adjust(

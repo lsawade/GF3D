@@ -295,11 +295,11 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         stats.delta = dt
         stats.network = network
         stats.station = station
+        stats.location = 'S3'
         stats.latitude = latitude
         stats.longitude = longitude
         stats.coordinates = AttribDict(
             latitude=latitude, longitude=longitude)
-        stats.location = ''
         stats.channel = f'MX{comp}'
         stats.starttime = cmt.origin_time - tc
         stats.npts = len(data)
@@ -500,11 +500,11 @@ def get_seismograms_sub(stationfile: str, cmt: CMTSOLUTION):
         stats.delta = dt
         stats.network = network
         stats.station = station
+        stats.location = 'S3'
         stats.latitude = latitude
         stats.longitude = longitude
         stats.coordinates = AttribDict(
             latitude=latitude, longitude=longitude)
-        stats.location = ''
         stats.channel = f'MX{comp}'
         stats.starttime = cmt.origin_time - tc
         stats.npts = len(data)
@@ -1076,11 +1076,11 @@ class GFManager(object):
                 stats.delta = self.header['dt']
                 stats.network = self.networks[_h]
                 stats.station = self.stations[_h]
+                stats.location = 'S3'
                 stats.latitude = self.latitudes[_h]
                 stats.longitude = self.longitudes[_h]
                 stats.coordinates = AttribDict(
                     latitude=self.latitudes[_h], longitude=self.longitudes[_h])
-                stats.location = ''
                 stats.channel = f'MX{comp}'
                 stats.starttime = cmt.origin_time - self.header['tc']
                 stats.npts = self.header['nsteps']
@@ -1233,11 +1233,11 @@ class GFManager(object):
                     stats.delta = self.header['dt']
                     stats.network = self.networks[_h]
                     stats.station = self.stations[_h]
+                    stats.location = 'S3'
                     stats.latitude = self.latitudes[_h]
                     stats.longitude = self.longitudes[_h]
                     stats.coordinates = AttribDict(
                         latitude=self.latitudes[_h], longitude=self.longitudes[_h])
-                    stats.location = ''
                     stats.channel = f'MX{comp}'
                     stats.starttime = cmt.origin_time - self.header['tc']
                     stats.npts = self.header['nsteps']
@@ -1488,3 +1488,47 @@ class GFManager(object):
                 self.header['itopo'] = self.header['itopo'].transpose((1, 0))
                 self.xyz = self.xyz.transpose((1, 0))
                 self.ibool = self.ibool.transpose((3, 2, 1, 0))
+
+    def load_subset_header_only(self):
+        """Given the files in the database, get a set of strains and write it
+        into to a single file in a single epsilon array.
+        Also write a list of stations and normal header info required for
+        source location. This very same GFManager would be used to read the.
+        Where """
+
+        self.header = dict()
+
+        with h5py.File(self.headerfile, 'r') as db:
+
+            if 'fortran' in db:
+                fortran = True
+            else:
+                fortran = False
+            self.header['NGLLX'] = db['NGLLX'][()]
+            self.header['NGLLY'] = db['NGLLY'][()]
+            self.header['NGLLZ'] = db['NGLLZ'][()]
+            self.networks = db['Networks'][:].astype('U13').tolist()
+            self.stations = db['Stations'][:].astype('U13').tolist()
+            self.latitudes = db['latitudes'][:]
+            self.longitudes = db['longitudes'][:]
+            self.burials = db['burials'][:]
+            self.header['NSTAT'] = len(self.networks)
+
+            self.header['do_adjacency_search'] = db['do_adjacency_search'][()]
+
+            # Header Variables
+            self.header['dt'] = db['DT'][()]
+            self.header['tc'] = db['TC'][()]
+            self.header['nsteps'] = db['NSTEPS'][()]
+            self.header['factor'] = db['FACTOR'][()]
+            self.header['hdur'] = db['HDUR'][()]
+            self.header['topography'] = db['TOPOGRAPHY'][()]
+            self.header['ellipticity'] = db['ELLIPTICITY'][()]
+
+            if self.header['topography']:
+                self.header['nx_topo'] = db['NX_BATHY'][()]
+                self.header['ny_topo'] = db['NY_BATHY'][()]
+                self.header['res_topo'] = db['RESOLUTION_TOPO_FILE'][()]
+
+            if self.header['ellipticity']:
+                self.header['nspl'] = len(db['rspl'][:])

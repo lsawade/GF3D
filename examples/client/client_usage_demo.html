@@ -258,7 +258,9 @@ contain errors. Do note that the examples are created using the database
 files in the ‘examples/DATA/single_element_read/DB’ files.</p>
 </div>
 <p>Loading modules</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gf3d.client</span> <span class="kn">import</span> <span class="n">GF3DClient</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">check_call</span>
+<span class="kn">from</span> <span class="nn">gf3d.client</span> <span class="kn">import</span> <span class="n">GF3DClient</span>
 <span class="kn">from</span> <span class="nn">gf3d.seismograms</span> <span class="kn">import</span> <span class="n">GFManager</span>
 <span class="kn">from</span> <span class="nn">gf3d.source</span> <span class="kn">import</span> <span class="n">CMTSOLUTION</span>
 </pre></div>
@@ -267,7 +269,7 @@ files in the ‘examples/DATA/single_element_read/DB’ files.</p>
 <h2>GF3DClient<a class="headerlink" href="#gf3dclient" title="Permalink to this heading">#</a></h2>
 <p>The client automatically knows about server locations of a given database,
 i.e., they are hard coded.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gfcl</span> <span class="o">=</span> <span class="n">GF3DClient</span><span class="p">(</span><span class="s1">&#39;traverse&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gfcl</span> <span class="o">=</span> <span class="n">GF3DClient</span><span class="p">(</span><span class="s1">&#39;princeton&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>With the client initialized, we can query a dictionary of general parameters</p>
@@ -313,7 +315,7 @@ query a subset quite easily as well</p>
 <span class="n">latitude</span> <span class="o">=</span> <span class="o">-</span><span class="mf">31.1300</span>
 <span class="n">longitude</span> <span class="o">=</span> <span class="o">-</span><span class="mf">72.0900</span>
 <span class="n">depth_in_km</span> <span class="o">=</span> <span class="mf">17.3500</span>
-<span class="n">radius_in_km</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">radius_in_km</span> <span class="o">=</span> <span class="mf">28.0</span>  <span class="c1"># -&gt; Only chose 28.0 because it gets a single element.</span>
 
 <span class="c1"># Make query</span>
 <span class="n">gfcl</span><span class="o">.</span><span class="n">get_subset</span><span class="p">(</span><span class="s1">&#39;firstquery.h5&#39;</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span>
@@ -349,6 +351,33 @@ database. Let’s load the downloaded subset using the Python API’s GFManager<
 <span class="n">II</span><span class="o">.</span><span class="n">BFO</span><span class="o">..</span><span class="n">MXN</span>  <span class="o">|</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">16</span><span class="n">T22</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">12.900000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">16</span><span class="n">T23</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">30.400027</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">0.2</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">776</span> <span class="n">samples</span>
 <span class="n">II</span><span class="o">.</span><span class="n">BFO</span><span class="o">..</span><span class="n">MXE</span>  <span class="o">|</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">16</span><span class="n">T22</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">12.900000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">16</span><span class="n">T23</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">30.400027</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">0.2</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">776</span> <span class="n">samples</span>
 <span class="n">II</span><span class="o">.</span><span class="n">BFO</span><span class="o">..</span><span class="n">MXZ</span>  <span class="o">|</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">16</span><span class="n">T22</span><span class="p">:</span><span class="mi">51</span><span class="p">:</span><span class="mf">12.900000</span><span class="n">Z</span> <span class="o">-</span> <span class="mi">2015</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">16</span><span class="n">T23</span><span class="p">:</span><span class="mi">54</span><span class="p">:</span><span class="mf">30.400027</span><span class="n">Z</span> <span class="o">|</span> <span class="mf">0.2</span> <span class="n">Hz</span><span class="p">,</span> <span class="mi">776</span> <span class="n">samples</span>
+</pre></div>
+</div>
+</section>
+<section id="using-the-fortran-api">
+<h2>Using the Fortran API<a class="headerlink" href="#using-the-fortran-api" title="Permalink to this heading">#</a></h2>
+<p>The download would still be made using the Python API</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make query</span>
+<span class="n">gfcl</span><span class="o">.</span><span class="n">get_subset</span><span class="p">(</span><span class="s1">&#39;fortranquery.h5&#39;</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">,</span>
+                <span class="n">depth_in_km</span><span class="o">=</span><span class="n">depth_in_km</span><span class="p">,</span> <span class="n">radius_in_km</span><span class="o">=</span><span class="n">radius_in_km</span><span class="p">,</span> <span class="n">fortran</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For the lines below to work you do need to set the path to the build</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/absolute/<span class="o">[</span>...<span class="o">]</span>/path/to/gf3df/build/bin:<span class="nv">$PATH</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;gf3d-get-sac-sdp&#39;</span>
+<span class="n">subsetfile</span> <span class="o">=</span> <span class="s1">&#39;fortranquery.h5&#39;</span>
+<span class="n">cmtfile</span> <span class="o">=</span> <span class="s1">&#39;../DATA/single_element_read/CMTSOLUTION&#39;</span>
+<span class="n">outdir</span> <span class="o">=</span> <span class="s1">&#39;OUTPUT&#39;</span>
+<span class="n">itypsokern</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># Create an output directory, because the Fortran API does not create it itself.</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
+
+<span class="c1"># Run fortran code</span>
+<span class="n">check_call</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">subsetfile</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">cmtfile</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">outdir</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">itypsokern</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
@@ -422,6 +451,7 @@ database. Let’s load the downloaded subset using the Python API’s GFManager<
 <li><a class="reference internal" href="#">First example of client usage to create subset.</a><ul>
 <li><a class="reference internal" href="#gf3dclient">GF3DClient</a></li>
 <li><a class="reference internal" href="#retrieving-a-subset-using-the-client">Retrieving a subset using the client</a></li>
+<li><a class="reference internal" href="#using-the-fortran-api">Using the Fortran API</a></li>
 </ul>
 </li>
 </ul>

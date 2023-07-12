@@ -22,6 +22,8 @@ following:
 """
 # %%
 # Loading modules
+import os
+from subprocess import check_call
 from gf3d.client import GF3DClient
 from gf3d.seismograms import GFManager
 from gf3d.source import CMTSOLUTION
@@ -33,7 +35,7 @@ from gf3d.source import CMTSOLUTION
 # The client automatically knows about server locations of a given database,
 # i.e., they are hard coded.
 
-gfcl = GF3DClient('traverse')
+gfcl = GF3DClient('princeton')
 
 
 # %%
@@ -92,7 +94,7 @@ print(stations)
 latitude = -31.1300
 longitude = -72.0900
 depth_in_km = 17.3500
-radius_in_km = 50
+radius_in_km = 28.0  # -> Only chose 28.0 because it gets a single element.
 
 # Make query
 gfcl.get_subset('firstquery.h5', latitude=latitude, longitude=longitude,
@@ -133,3 +135,36 @@ print(rp)
 #     II.BFO..MXN  | 2015-09-16T22:51:12.900000Z - 2015-09-16T23:54:30.400027Z | 0.2 Hz, 776 samples
 #     II.BFO..MXE  | 2015-09-16T22:51:12.900000Z - 2015-09-16T23:54:30.400027Z | 0.2 Hz, 776 samples
 #     II.BFO..MXZ  | 2015-09-16T22:51:12.900000Z - 2015-09-16T23:54:30.400027Z | 0.2 Hz, 776 samples
+
+# %%
+# Using the Fortran API
+# +++++++++++++++++++++
+#
+# The download would still be made using the Python API
+#
+
+# Make query
+gfcl.get_subset('fortranquery.h5', latitude=latitude, longitude=longitude,
+                depth_in_km=depth_in_km, radius_in_km=radius_in_km, fortran=True)
+
+# %%
+#
+# For the lines below to work you do need to set the path to the build
+#
+# .. code:: bash
+#
+#     export PATH=/absolute/[...]/path/to/gf3df/build/bin:$PATH
+
+
+cmd = 'gf3d-get-sac-sdp'
+subsetfile = 'fortranquery.h5'
+cmtfile = '../DATA/single_element_read/CMTSOLUTION'
+outdir = 'OUTPUT'
+itypsokern = 3
+
+# Create an output directory, because the Fortran API does not create it itself.
+if not os.path.exists(outdir):
+    os.makedirs(outdir)
+
+# Run fortran code
+check_call(f'{cmd} {subsetfile} {cmtfile} {outdir} {itypsokern}', shell=True)

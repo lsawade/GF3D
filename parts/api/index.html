@@ -511,7 +511,10 @@ an obspy.Stream with traces from all stations.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.load_scalar_header_parameters" title="gf3d.seismograms.GFManager.load_scalar_header_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_scalar_header_parameters</span></code></a>()</p></td>
 <td><p>Small function that loads only the scalar header</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset" title="gf3d.seismograms.GFManager.write_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_subset</span></code></a>(outfile[, duration, fortran])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.load_subset_header_only" title="gf3d.seismograms.GFManager.load_subset_header_only"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_subset_header_only</span></code></a>()</p></td>
+<td><p>Given the files in the database, get a set of strains and write it into to a single file in a single epsilon array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset" title="gf3d.seismograms.GFManager.write_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_subset</span></code></a>(outfile[, duration, fortran])</p></td>
 <td><p>Given the files in the database, get a set of strains and write it into to a single file in a single epsilon array.</p></td>
 </tr>
 </tbody>
@@ -560,7 +563,10 @@ an obspy.Stream with traces from all stations.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.load_scalar_header_parameters" title="gf3d.seismograms.GFManager.load_scalar_header_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_scalar_header_parameters</span></code></a>()</p></td>
 <td><p>Small function that loads only the scalar header</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset" title="gf3d.seismograms.GFManager.write_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_subset</span></code></a>(outfile[, duration, fortran])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.load_subset_header_only" title="gf3d.seismograms.GFManager.load_subset_header_only"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_subset_header_only</span></code></a>()</p></td>
+<td><p>Given the files in the database, get a set of strains and write it into to a single file in a single epsilon array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset" title="gf3d.seismograms.GFManager.write_subset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_subset</span></code></a>(outfile[, duration, fortran])</p></td>
 <td><p>Given the files in the database, get a set of strains and write it into to a single file in a single epsilon array.</p></td>
 </tr>
 </tbody>
@@ -607,6 +613,16 @@ Where</p>
 <dt class="sig sig-object py" id="gf3d.seismograms.GFManager.load_scalar_header_parameters">
 <span class="sig-name descname"><span class="pre">load_scalar_header_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gf3d/seismograms.html#GFManager.load_scalar_header_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gf3d.seismograms.GFManager.load_scalar_header_parameters" title="Permalink to this definition">#</a></dt>
 <dd><p>Small function that loads only the scalar header</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gf3d.seismograms.GFManager.load_subset_header_only">
+<span class="sig-name descname"><span class="pre">load_subset_header_only</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gf3d/seismograms.html#GFManager.load_subset_header_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gf3d.seismograms.GFManager.load_subset_header_only" title="Permalink to this definition">#</a></dt>
+<dd><p>Given the files in the database, get a set of strains and write it
+into to a single file in a single epsilon array.
+Also write a list of stations and normal header info required for
+source location. This very same GFManager would be used to read the.
+Where</p>
 </dd></dl>
 
 <dl class="py method">
@@ -821,6 +837,7 @@ Where</p>
 <li><a class="reference internal" href="#gf3d.seismograms.GFManager.get_frechet"><code class="docutils literal notranslate"><span class="pre">GFManager.get_frechet()</span></code></a></li>
 <li><a class="reference internal" href="#gf3d.seismograms.GFManager.load"><code class="docutils literal notranslate"><span class="pre">GFManager.load()</span></code></a></li>
 <li><a class="reference internal" href="#gf3d.seismograms.GFManager.load_scalar_header_parameters"><code class="docutils literal notranslate"><span class="pre">GFManager.load_scalar_header_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#gf3d.seismograms.GFManager.load_subset_header_only"><code class="docutils literal notranslate"><span class="pre">GFManager.load_subset_header_only()</span></code></a></li>
 <li><a class="reference internal" href="#gf3d.seismograms.GFManager.write_subset"><code class="docutils literal notranslate"><span class="pre">GFManager.write_subset()</span></code></a></li>
 </ul>
 </li>

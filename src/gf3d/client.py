@@ -1,12 +1,41 @@
 
-
+from urllib.error import URLError
 from .utils import downloadfile, get_url_content
 import ast
+import functools
 try:
     from tqdm import tqdm
     from .utils import downloadfile_progress as downloadfile
 except ImportError:
     from .utils import downloadfile
+
+urlerrorans = \
+    """
+If the Error below is
+    "<urlopen error [Errno 61] Connection refused>"
+you probably don't have access to the database. Make sure you setup the ssh
+tunnel correctly if you do.
+
+ssh -f -N -F 'none' -L 5000:127.0.0.1:5000 <username>@vrientius.princeton.edu
+
+If the error below shows:
+    "[Errno 54] Connection reset by peer"
+you probably have to re-login to your VPN, or check you multiplexed connection
+
+Here's the error in case it's not that:
+"""
+
+
+def catch_exceptions(job_func):
+    @functools.wraps(job_func)
+    def wrapper(*args, **kwargs):
+        try:
+            return job_func(*args, **kwargs)
+        except Exception as e:
+            print(urlerrorans)
+            print(e)
+            return None
+    return wrapper
 
 
 class GF3DClient:
@@ -36,19 +65,21 @@ class GF3DClient:
 
         self.db = db
 
+    @catch_exceptions
     def stations_avail(self):
         url = f'http://{self.base_url}:{self.port:d}/{self.avail_route}?'
         url += f"db={self.db}"
         return get_url_content(url).decode().split(',')
 
+    @catch_exceptions
     def get_info(self):
         url = f'http://{self.base_url}:{self.port:d}/{self.info_route}?'
         url += f"db={self.db}"
 
         result = get_url_content(url).decode()
-        print(result)
         return ast.literal_eval(result)
 
+    @catch_exceptions
     def get_subset(self, outputfile: str,
                    latitude: float, longitude: float, depth_in_km: float, radius_in_km: float = 100,
                    NGLL: int = 5, netsta: list | None = None, fortran: bool = False):

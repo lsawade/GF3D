@@ -25,7 +25,7 @@ ssh -o "ServerAliveInterval=60" -N -f -F 'none' -L 5000:127.0.0.1:5000 lsawade@v
 
 Call signature to query synthetic from a subsetfile:
 
-gf3d extract subset -- SUBSETFILENAME YYYY MM DD HH MM SS MRR MTT MPP MRT MRP MTP LATITUDE LONGITUDE DEPTH
+gf3d subset extract -- SUBSETFILENAME YYYY MM DD HH MM SS MRR MTT MPP MRT MRP MTP LATITUDE LONGITUDE DEPTH
                              TIME_SHIFT HDUR ITYPSOKERN OUTDIR
 
 Example:
@@ -69,8 +69,10 @@ def query():
 def query_info(databasename: str):
     '''Query info from a hosted database server.'''
     from gf3d.client import GF3DClient
+    from pprint import pprint
     gfcl = GF3DClient(databasename)
-    gfcl.get_info()
+    info = gfcl.get_info()
+    pprint(info)
 
 
 @query.command(name='stations')
@@ -80,8 +82,9 @@ def query_stations(databasename: str):
     from gf3d.client import GF3DClient
     gfcl = GF3DClient(databasename)
     stations = gfcl.stations_avail()
-    for station in stations:
-        print(station)
+    if stations:
+        for station in stations:
+            print(station)
 
 
 @query.command(name='extract')
@@ -119,7 +122,6 @@ def query_subset(
     """
 
     from gf3d.client import GF3DClient
-    print(ngll)
 
     gfcl = GF3DClient(databasename)
     gfcl.get_subset(
@@ -146,7 +148,7 @@ def subset():
 
 
 @subset.command(name='info')
-@click.argument('subsetfilename', type=str)
+@click.argument('subsetfilename', type=click.Path(exists=True))
 def subset_info(subsetfilename: str):
     """Prints all relevant subset info.
     """
@@ -159,7 +161,7 @@ def subset_info(subsetfilename: str):
 
 
 @subset.command(name='stations')
-@click.argument('subsetfilename', type=str)
+@click.argument('subsetfilename', type=click.Path(exists=True))
 def subset_stations(subsetfilename: str):
     """Prints all relevant subset info.
     """
@@ -179,7 +181,7 @@ def subset_stations(subsetfilename: str):
 
 
 @subset.command(name='extract')
-@click.argument('subsetfilename', type=str)
+@click.argument('subsetfilename', type=click.Path(exists=True))
 @click.argument('yr', type=int)
 @click.argument('mo', type=int)
 @click.argument('da', type=int)

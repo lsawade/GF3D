@@ -17,6 +17,93 @@ and subsequently can be queried, for cmt locations. The use of the
 :class:`gf3d.seismograms.GFManager` is extensively demonstrated in the gallery
 below.
 
+Command Line Interface (CLI)
+============================
+
+We implemented a command line interface to interface with the database, query
+from a hosted interface, and extract seismograms from generated subsets.
+Make sure that your environment is activated, and gf3d is installed.
+
+Run the CLI like so:
+
+.. code:: bash
+
+  gf3d COMMAND [SUBCOMMAND [SUBSUBCOMMAND] ...] [OPTIONS] ARG1 ARG2
+
+Maybe start with ``gf3d --help``. Which should output:
+
+.. code:: bash
+
+    Usage: gf3d [OPTIONS] COMMAND [ARGS]...
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      database  Interface to a GF3D database
+      subset    Interface to generated subset.
+
+As you can see at the bottom of the output, there are sub commands. These
+indicate a call structure as follows:
+
+.. code:: bash
+
+    gf3d
+    - database
+        - query
+            - info
+            - stations
+            - subset
+            - extract [NOT IMPLEMENTED]
+        - extract [NOT IMPLEMENTED]
+    - subset
+        - info
+        - stations
+        - extract
+
+So, if you want to query a subset and want to know how to make the query
+
+.. code:: bash
+
+    gf3d database query subset --help
+
+which would print
+
+.. code:: bash
+
+    Usage: gf3d database query subset [OPTIONS] DATABASENAME SUBSETFILENAME
+                                      LATITUDE LONGITUDE DEPTH_IN_KM RADIUS_IN_KM
+
+      Query a subset from a hosted database server.
+
+      IMPORTANT: For negative latitudes and longitudes use following setup:
+
+          gf3d query subset [--option = value] -- DATABASENAME SUBSETFILENAME
+          LATITUDE ...
+
+    Options:
+      --fortran BOOLEAN  number of greetings
+      --ngll INTEGER     Number of GLL points 5 or 3
+      --netsta TEXT      Station subselection. NOT IMPLEMENTED
+      --help             Show this message and exit.
+
+A normal query for a subset from a hosted database would look like this
+
+.. code:: bash
+
+    gf3d database query subset -- princeton testquery.h5 -31.1300 -72.0900 17.3500 28.0
+
+.. warning::
+
+    The ``--`` is important for entering negative numbers. It's hard for CLI to
+    distinguish ``-option`` and a negative number. Hence, ``click`` implements the ``--`` which tells the CLI to take all following command line arguments are, in fact, arguments and not options. For details, please visit: `click: option-like-arguments <https://click.palletsprojects.com/en/8.1.x/arguments/#option-like-arguments>`_.
+
+
+
+OLD command line tool
+=====================
+
+This is only here for posterity please use the tool above.
 The other tool that is immensely powerful is the command-line tool to query a
 specific subset file for a specific moment tensor. The command-line tool
 is automatically installed when you install ``GF3D`` and can be called using

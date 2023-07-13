@@ -244,7 +244,78 @@ tools. The two main tools that you are going to need are the python <code class=
 and subsequently can be queried, for cmt locations. The use of the
 <a class="reference internal" href="../api/index.html#gf3d.seismograms.GFManager" title="gf3d.seismograms.GFManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">gf3d.seismograms.GFManager</span></code></a> is extensively demonstrated in the gallery
 below.</p>
-<p>The other tool that is immensely powerful is the command-line tool to query a
+<section id="command-line-interface-cli">
+<h2>Command Line Interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Permalink to this heading">#</a></h2>
+<p>We implemented a command line interface to interface with the database, query
+from a hosted interface, and extract seismograms from generated subsets.
+Make sure that your environment is activated, and gf3d is installed.</p>
+<p>Run the CLI like so:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gf3d<span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>SUBCOMMAND<span class="w"> </span><span class="o">[</span>SUBSUBCOMMAND<span class="o">]</span><span class="w"> </span>...<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>ARG1<span class="w"> </span>ARG2
+</pre></div>
+</div>
+<p>Maybe start with <code class="docutils literal notranslate"><span class="pre">gf3d</span> <span class="pre">--help</span></code>. Which should output:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Usage:<span class="w"> </span>gf3d<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
+
+Options:
+<span class="w">  </span>--help<span class="w">  </span>Show<span class="w"> </span>this<span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span>exit.
+
+Commands:
+<span class="w">  </span>database<span class="w">  </span>Interface<span class="w"> </span>to<span class="w"> </span>a<span class="w"> </span>GF3D<span class="w"> </span>database
+<span class="w">  </span>subset<span class="w">    </span>Interface<span class="w"> </span>to<span class="w"> </span>generated<span class="w"> </span>subset.
+</pre></div>
+</div>
+<p>As you can see at the bottom of the output, there are sub commands. These
+indicate a call structure as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gf3d
+-<span class="w"> </span>database
+<span class="w">    </span>-<span class="w"> </span>query
+<span class="w">        </span>-<span class="w"> </span>info
+<span class="w">        </span>-<span class="w"> </span>stations
+<span class="w">        </span>-<span class="w"> </span>subset
+<span class="w">        </span>-<span class="w"> </span>extract<span class="w"> </span><span class="o">[</span>NOT<span class="w"> </span>IMPLEMENTED<span class="o">]</span>
+<span class="w">    </span>-<span class="w"> </span>extract<span class="w"> </span><span class="o">[</span>NOT<span class="w"> </span>IMPLEMENTED<span class="o">]</span>
+-<span class="w"> </span>subset
+<span class="w">    </span>-<span class="w"> </span>info
+<span class="w">    </span>-<span class="w"> </span>stations
+<span class="w">    </span>-<span class="w"> </span>extract
+</pre></div>
+</div>
+<p>So, if you want to query a subset and want to know how to make the query</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gf3d<span class="w"> </span>database<span class="w"> </span>query<span class="w"> </span>subset<span class="w"> </span>--help
+</pre></div>
+</div>
+<p>which would print</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Usage:<span class="w"> </span>gf3d<span class="w"> </span>database<span class="w"> </span>query<span class="w"> </span>subset<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>DATABASENAME<span class="w"> </span>SUBSETFILENAME
+<span class="w">                                  </span>LATITUDE<span class="w"> </span>LONGITUDE<span class="w"> </span>DEPTH_IN_KM<span class="w"> </span>RADIUS_IN_KM
+
+<span class="w">  </span>Query<span class="w"> </span>a<span class="w"> </span>subset<span class="w"> </span>from<span class="w"> </span>a<span class="w"> </span>hosted<span class="w"> </span>database<span class="w"> </span>server.
+
+<span class="w">  </span>IMPORTANT:<span class="w"> </span>For<span class="w"> </span>negative<span class="w"> </span>latitudes<span class="w"> </span>and<span class="w"> </span>longitudes<span class="w"> </span>use<span class="w"> </span>following<span class="w"> </span>setup:
+
+<span class="w">      </span>gf3d<span class="w"> </span>query<span class="w"> </span>subset<span class="w"> </span><span class="o">[</span>--option<span class="w"> </span><span class="o">=</span><span class="w"> </span>value<span class="o">]</span><span class="w"> </span>--<span class="w"> </span>DATABASENAME<span class="w"> </span>SUBSETFILENAME
+<span class="w">      </span>LATITUDE<span class="w"> </span>...
+
+Options:
+<span class="w">  </span>--fortran<span class="w"> </span>BOOLEAN<span class="w">  </span>number<span class="w"> </span>of<span class="w"> </span>greetings
+<span class="w">  </span>--ngll<span class="w"> </span>INTEGER<span class="w">     </span>Number<span class="w"> </span>of<span class="w"> </span>GLL<span class="w"> </span>points<span class="w"> </span><span class="m">5</span><span class="w"> </span>or<span class="w"> </span><span class="m">3</span>
+<span class="w">  </span>--netsta<span class="w"> </span>TEXT<span class="w">      </span>Station<span class="w"> </span>subselection.<span class="w"> </span>NOT<span class="w"> </span>IMPLEMENTED
+<span class="w">  </span>--help<span class="w">             </span>Show<span class="w"> </span>this<span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span>exit.
+</pre></div>
+</div>
+<p>A normal query for a subset from a hosted database would look like this</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gf3d<span class="w"> </span>database<span class="w"> </span>query<span class="w"> </span>subset<span class="w"> </span>--<span class="w"> </span>princeton<span class="w"> </span>testquery.h5<span class="w"> </span>-31.1300<span class="w"> </span>-72.0900<span class="w"> </span><span class="m">17</span>.3500<span class="w"> </span><span class="m">28</span>.0
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">--</span></code> is important for entering negative numbers. It’s hard for CLI to
+distinguish <code class="docutils literal notranslate"><span class="pre">-option</span></code> and a negative number. Hence, <code class="docutils literal notranslate"><span class="pre">click</span></code> implements the <code class="docutils literal notranslate"><span class="pre">--</span></code> which tells the CLI to take all following command line arguments are, in fact, arguments and not options. For details, please visit: <a class="reference external" href="https://click.palletsprojects.com/en/8.1.x/arguments/#option-like-arguments">click: option-like-arguments</a>.</p>
+</div>
+</section>
+<section id="old-command-line-tool">
+<h2>OLD command line tool<a class="headerlink" href="#old-command-line-tool" title="Permalink to this heading">#</a></h2>
+<p>This is only here for posterity please use the tool above.
+The other tool that is immensely powerful is the command-line tool to query a
 specific subset file for a specific moment tensor. The command-line tool
 is automatically installed when you install <code class="docutils literal notranslate"><span class="pre">GF3D</span></code> and can be called using
 standard <code class="docutils literal notranslate"><span class="pre">CMTSOLUTION</span></code> parameters. The standard call signature is</p>
@@ -300,7 +371,7 @@ tshift)</p></li>
 are stored in <code class="docutils literal notranslate"><span class="pre">&lt;outdir&gt;/synt</span></code>, and the kernels are stored in the
 <code class="docutils literal notranslate"><span class="pre">&lt;outdir&gt;/[par]</span></code></p>
 <section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">#</a></h2>
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">#</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/extraction/database/index.html">Database Extraction Tutorials</a></li>
@@ -308,6 +379,7 @@ are stored in <code class="docutils literal notranslate"><span class="pre">&lt;o
 <li class="toctree-l1"><a class="reference internal" href="../../examples/client/index.html">Using the client to retrieve database subsets and seimograms</a></li>
 </ul>
 </div>
+</section>
 </section>
 </section>
 
@@ -367,7 +439,11 @@ are stored in <code class="docutils literal notranslate"><span class="pre">&lt;o
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">3D Green Function Extraction</a><ul>
+<li><a class="reference internal" href="#command-line-interface-cli">Command Line Interface (CLI)</a></li>
+<li><a class="reference internal" href="#old-command-line-tool">OLD command line tool</a><ul>
 <li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

@@ -1,13 +1,22 @@
+import os
 import numpy as np
 import pickle
 from ..source import CMTSOLUTION
 from typing import List, Iterable
 from ..source import CMTSOLUTION
 from .utils import cmts2dir, cmts2file
+from .download import download_gcmt_catalog
+from obspy import read_events, Catalog as obspycat
 
 class CMTCatalog(List[CMTSOLUTION]):
 
-    def __init__(self, cmts: Iterable[CMTSOLUTION]):
+    def __init__(self, cmts: Iterable[CMTSOLUTION] | obspycat):
+
+        # Make actual cmts from obspy catalog
+        if isinstance(cmts, obspycat):
+            cmts = [CMTSOLUTION.from_event(event) for event in cmts]
+
+        # Return CMTcatalog
         super().__init__(cmts)
 
     def filter(self, param: str, low=-np.inf, high=np.inf):
@@ -68,6 +77,19 @@ class CMTCatalog(List[CMTSOLUTION]):
 
         with open(filename, 'wb') as f:
             pickle.dump(self, f)
+
+    @classmethod
+    def from_gcmt(cls, gcmtndkfilename: str):
+
+        # First
+        if not os.path.exists(gcmtndkfilename):
+            download_gcmt_catalog(gcmtndkfilename)
+
+        # load obspy catalog
+        cat = read_events(gcmtndkfilename)
+
+        return cls(cat)
+
 
     @classmethod
     def load(cls, filename: str):
@@ -171,8 +193,46 @@ class CMTCatalog(List[CMTSOLUTION]):
     def ms(self):
         return np.array([cmt.ms for cmt in self])
 
+    @property
+    def Mrr(self):
+        return np.array([cmt.Mrr for cmt in self])
 
+    @property
+    def Mtt(self):
+        return np.array([cmt.Mtt for cmt in self])
 
+    @property
+    def Mpp(self):
+        return np.array([cmt.Mpp for cmt in self])
+
+    @property
+    def Mrt(self):
+        return np.array([cmt.Mrt for cmt in self])
+
+    @property
+    def Mrp(self):
+        return np.array([cmt.Mrp for cmt in self])
+
+    @property
+    def Mtp(self):
+        return np.array([cmt.Mtp for cmt in self])
+
+    @property
+    def tensor(self):
+        return np.vstack([cmt.tensor for cmt in self])
+
+    def plot_global_map(self, outfile='global_eventmap.pdf', *args, **kwargs):
+        """Plot global map of events in catalog.
+
+        Parameters
+        ----------
+        outfile : str, optional
+            filename to save figure to, by default 'global_eventmap.pdf'
+        """
+
+        from .plot import plot_global_gmt_map
+
+        plot_global_gmt_map(self, outfile=outfile, *args, **kwargs)
 
 
 

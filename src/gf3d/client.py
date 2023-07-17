@@ -138,5 +138,7 @@ class GF3DClient:
         if isinstance(fortran, bool) and fortran:
             url += f"&fortran={fortran}"
 
+        # print(url)
+        # return
         # return get_url_content(url).decode().split(',')
         downloadfile(url, outputfile, desc='Downloading created subset')

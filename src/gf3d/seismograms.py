@@ -712,6 +712,8 @@ class GFManager(object):
         self.lon = lon
         self.depth = depth
 
+        logger.info("Locating source ...")
+
         x_target, y_target, z_target = source2xyz(
             lat, lon, depth, M=None,
             topography=self.header['topography'],
@@ -733,12 +735,12 @@ class GFManager(object):
         r = dist_in_km/6371.0
 
         # Get elements
+        logger.info("Querying KDTree ...")
         point_target = np.array([x_target, y_target, z_target])
         self.ispec_subset = self.fullkdtree.query_ball_point(point_target, r=r)
 
-        logger.debug('queried the kdtree')
 
-        # Sort for reading HDF5
+        # Catch single element query
         if isinstance(self.ispec_subset, np.int64):
             self.ispec_subset = np.array([self.ispec_subset], dtype='i')
         else:
@@ -777,7 +779,7 @@ class GFManager(object):
         else:
 
             # Get number of files
-
+            logger.info("Opening h5 files ...")
             with contextlib.ExitStack() as stack:
 
                 # Open Stack of files
@@ -813,13 +815,15 @@ class GFManager(object):
                         f'NGLL {NGLL} is not valid. Choose 3 or 5.')
 
                 # Read ibool
+                logger.info("Getting ibool subset ...")
                 ibool = self.ibool[
                     iboolslice, iboolslice, iboolslice,
                     self.ispec_subset]
 
                 # Get unique elements
+                logger.info("Uniqueing ibool ...")
                 self.nglob2sub, inv = np.unique(ibool, return_inverse=True)
-                logger.debug('Done uniqueing')
+
 
                 # Get new index array of length of the unique values
                 indeces = np.arange(len(self.nglob2sub))
@@ -848,12 +852,15 @@ class GFManager(object):
                 self.longitudes = []
 
                 if self.do_adjacency_search:
+                    logger.info("Making Adjacency ...")
+
                     self.xadj = np.zeros(len(self.ispec_subset) + 1, dtype='i')
                     MAX_NEIGHBORS = 50
                     tmp_adjacency = np.zeros(
                         MAX_NEIGHBORS*len(self.ispec_subset), dtype='i')
 
                     inum_neighbor = 0
+
                     for _j in range(len(self.ispec_subset)):
 
                         ispec = self.ispec_subset[_j]
@@ -892,6 +899,7 @@ class GFManager(object):
 
                 # Initialize big array for aaaalll the strains at aaall
                 # the stations
+                logger.info("Initializing Displacement array ...")
                 self.displacement = np.zeros((
                     self.Ndb,
                     len(self.components),
@@ -910,10 +918,11 @@ class GFManager(object):
                 self.burials = self.Ndb * [None]
                 self.NGLL
 
+                logger.info("Getting displacement from the individual stations")
                 def read_stuff(args):
                     _i, db = args
 
-                    logger.debug(f'{_i}: {db}')
+                    print(f'{_i}: {db}')
                     network = db['Network'][()].decode("utf-8")
                     station = db['Station'][()].decode("utf-8")
                     self.networks[_i] = network

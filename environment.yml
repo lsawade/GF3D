@@ -13,6 +13,8 @@ dependencies:
   - gdal
   - obspy
   - joblib
+  - tqdm
+  - click
   - toml
   - pip
   - pip:

@@ -148,7 +148,7 @@ def subset():
 
 
 @subset.command(name='info')
-@click.argument('subsetfilename', type=click.Path(exists=True))
+@click.argument('subsetfilenamesaf', type=click.Path(exists=True))
 def subset_info(subsetfilename: str):
     """Prints all relevant subset info.
     """

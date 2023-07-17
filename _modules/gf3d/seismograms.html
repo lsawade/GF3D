@@ -947,6 +947,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lon</span> <span class="o">=</span> <span class="n">lon</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
 
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Locating source ...&quot;</span><span class="p">)</span>
+
         <span class="n">x_target</span><span class="p">,</span> <span class="n">y_target</span><span class="p">,</span> <span class="n">z_target</span> <span class="o">=</span> <span class="n">source2xyz</span><span class="p">(</span>
             <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">topography</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">],</span>
@@ -968,12 +970,12 @@
         <span class="n">r</span> <span class="o">=</span> <span class="n">dist_in_km</span><span class="o">/</span><span class="mf">6371.0</span>
 
         <span class="c1"># Get elements</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Querying KDTree ...&quot;</span><span class="p">)</span>
         <span class="n">point_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x_target</span><span class="p">,</span> <span class="n">y_target</span><span class="p">,</span> <span class="n">z_target</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullkdtree</span><span class="o">.</span><span class="n">query_ball_point</span><span class="p">(</span><span class="n">point_target</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;queried the kdtree&#39;</span><span class="p">)</span>
 
-        <span class="c1"># Sort for reading HDF5</span>
+        <span class="c1"># Catch single element query</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;i&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1012,7 +1014,7 @@
         <span class="k">else</span><span class="p">:</span>
 
             <span class="c1"># Get number of files</span>
-
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Opening h5 files ...&quot;</span><span class="p">)</span>
             <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">ExitStack</span><span class="p">()</span> <span class="k">as</span> <span class="n">stack</span><span class="p">:</span>
 
                 <span class="c1"># Open Stack of files</span>
@@ -1048,13 +1050,15 @@
                         <span class="sa">f</span><span class="s1">&#39;NGLL </span><span class="si">{</span><span class="n">NGLL</span><span class="si">}</span><span class="s1"> is not valid. Choose 3 or 5.&#39;</span><span class="p">)</span>
 
                 <span class="c1"># Read ibool</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting ibool subset ...&quot;</span><span class="p">)</span>
                 <span class="n">ibool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ibool</span><span class="p">[</span>
                     <span class="n">iboolslice</span><span class="p">,</span> <span class="n">iboolslice</span><span class="p">,</span> <span class="n">iboolslice</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span><span class="p">]</span>
 
                 <span class="c1"># Get unique elements</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Uniqueing ibool ...&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">nglob2sub</span><span class="p">,</span> <span class="n">inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ibool</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Done uniqueing&#39;</span><span class="p">)</span>
+
 
                 <span class="c1"># Get new index array of length of the unique values</span>
                 <span class="n">indeces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nglob2sub</span><span class="p">))</span>
@@ -1083,12 +1087,15 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">longitudes</span> <span class="o">=</span> <span class="p">[]</span>
 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_adjacency_search</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Making Adjacency ...&quot;</span><span class="p">)</span>
+
                     <span class="bp">self</span><span class="o">.</span><span class="n">xadj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;i&#39;</span><span class="p">)</span>
                     <span class="n">MAX_NEIGHBORS</span> <span class="o">=</span> <span class="mi">50</span>
                     <span class="n">tmp_adjacency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
                         <span class="n">MAX_NEIGHBORS</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;i&#39;</span><span class="p">)</span>
 
                     <span class="n">inum_neighbor</span> <span class="o">=</span> <span class="mi">0</span>
+
                     <span class="k">for</span> <span class="n">_j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span><span class="p">)):</span>
 
                         <span class="n">ispec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span><span class="p">[</span><span class="n">_j</span><span class="p">]</span>
@@ -1127,6 +1134,7 @@
 
                 <span class="c1"># Initialize big array for aaaalll the strains at aaall</span>
                 <span class="c1"># the stations</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initializing Displacement array ...&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">displacement</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span><span class="p">,</span>
                     <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">),</span>
@@ -1145,10 +1153,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">burials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span> <span class="o">*</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">NGLL</span>
 
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting displacement from the individual stations&quot;</span><span class="p">)</span>
                 <span class="k">def</span> <span class="nf">read_stuff</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
                     <span class="n">_i</span><span class="p">,</span> <span class="n">db</span> <span class="o">=</span> <span class="n">args</span>
 
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">_i</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">_i</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                     <span class="n">network</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Network&#39;</span><span class="p">][()]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
                     <span class="n">station</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Station&#39;</span><span class="p">][()]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">networks</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">network</span>

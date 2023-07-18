@@ -104,6 +104,7 @@ def query_extract():
 @click.argument('depth_in_km', type=float)
 @click.argument('radius_in_km', type=float)
 @click.option('--fortran', is_flag=True, default=False, help='Return Fortran ordered subset.', type=bool)
+@click.option('--local', is_flag=True, default=False, help='Makes subset from local database databasename -> database root.', type=bool)
 @click.option('--ngll', default=5, help='Number of GLL points 5 or 3', type=int)
 @click.option('--netsta', default=None, help='Station subselection. NOT IMPLEMENTED', type=str)
 @click.option('--debug',  is_flag=True, show_default=True, default=False, help='Only print query url', type=bool)
@@ -117,6 +118,7 @@ def query_subset(
         ngll: int = 5,
         netsta: list | None = None,
         fortran: bool = False,
+        local: bool = False,
         debug: bool = False):
     """Query a subset from a hosted database server.
 
@@ -126,18 +128,43 @@ def query_subset(
 
     """
 
-    from gf3d.client import GF3DClient
+    if local:
 
-    gfcl = GF3DClient(databasename, debug=debug)
-    gfcl.get_subset(
-        subsetfilename,
-        latitude=latitude,
-        longitude=longitude,
-        depth_in_km=depth_in_km,
-        radius_in_km=radius_in_km,
-        NGLL=ngll,
-        netsta=netsta,
-        fortran=fortran)
+        import os
+        from glob import glob
+        from gf3d.seismograms import GFManager
+
+        # Check for files given database path
+        db_globstr = os.path.join(database, '*', '*.h5')
+
+        # Get all files
+        db_files = glob(db_globstr)
+
+        # Check if there are any files
+        if len(db_files) == 0:
+            raise ValueError(f'No files found in {database} directory. '
+                             'Please check path.')
+
+        # Get subset
+        GFM = GFManager(db_files)
+        GFM.load_header_variables()
+        GFM.get_elements(
+            latitude, longitude, depth_in_km, radius_in_km, NGLL=ngll)
+        GFM.write_subset(subsetfilename, fortran=fortran)
+
+    else:
+        from gf3d.client import GF3DClient
+
+        gfcl = GF3DClient(databasename, debug=debug)
+        gfcl.get_subset(
+            subsetfilename,
+            latitude=latitude,
+            longitude=longitude,
+            depth_in_km=depth_in_km,
+            radius_in_km=radius_in_km,
+            NGLL=ngll,
+            netsta=netsta,
+            fortran=fortran)
 
 
 @database.command(name='extract')

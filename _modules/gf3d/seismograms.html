@@ -935,7 +935,7 @@
                             <span class="s1">&#39;Dont have buffer elements for doing the &#39;</span><span class="p">)</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">do_adjacency_search</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">get_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">dist_in_km</span><span class="o">=</span><span class="mf">125.0</span><span class="p">,</span> <span class="n">NGLL</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">dist_in_km</span><span class="o">=</span><span class="mf">125.0</span><span class="p">,</span> <span class="n">NGLL</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">threading</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subset</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -973,7 +973,6 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Querying KDTree ...&quot;</span><span class="p">)</span>
         <span class="n">point_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x_target</span><span class="p">,</span> <span class="n">y_target</span><span class="p">,</span> <span class="n">z_target</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullkdtree</span><span class="o">.</span><span class="n">query_ball_point</span><span class="p">(</span><span class="n">point_target</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
-
 
         <span class="c1"># Catch single element query</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ispec_subset</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">):</span>
@@ -1159,7 +1158,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">burials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span> <span class="o">*</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">NGLL</span>
 
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting displacement from the individual stations&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Getting displacement from the individual stations&quot;</span><span class="p">)</span>
+
                 <span class="k">def</span> <span class="nf">read_stuff</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
                     <span class="n">_i</span><span class="p">,</span> <span class="n">db</span> <span class="o">=</span> <span class="n">args</span>
 
@@ -1186,9 +1187,13 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">displacement</span><span class="p">[</span><span class="n">_i</span><span class="p">,</span> <span class="n">_j</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;displacement/</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">/array&#39;</span><span class="p">][:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nglob2sub</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
                             <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">norm</span> <span class="o">/</span> <span class="n">factor</span>
 
-                <span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s1">&#39;threading&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span><span class="p">):</span>
-                    <span class="n">Parallel</span><span class="p">()(</span><span class="n">delayed</span><span class="p">(</span><span class="n">read_stuff</span><span class="p">)(</span><span class="n">i</span><span class="p">)</span>
-                               <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span><span class="p">),</span> <span class="n">dbs</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">threading</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s1">&#39;threading&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span><span class="p">):</span>
+                        <span class="n">Parallel</span><span class="p">()(</span><span class="n">delayed</span><span class="p">(</span><span class="n">read_stuff</span><span class="p">)(</span><span class="n">i</span><span class="p">)</span>
+                                   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span><span class="p">),</span> <span class="n">dbs</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span><span class="p">),</span> <span class="n">dbs</span><span class="p">):</span>
+                        <span class="n">read_stuff</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_seismograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmt</span><span class="p">:</span> <span class="n">CMTSOLUTION</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">:</span>
 
@@ -1666,13 +1671,17 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nsteps&#39;</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">fortran</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing Fortran order displacement array&#39;</span><span class="p">)</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
                     <span class="s1">&#39;displacement&#39;</span><span class="p">,</span>
                     <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">displacement</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">nsteps</span><span class="p">]</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing C order displacement array&#39;</span><span class="p">)</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
-                    <span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">displacement</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">nsteps</span><span class="p">])</span>  <span class="c1"># ,</span></div>
+                    <span class="s1">&#39;displacement&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">displacement</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">nsteps</span><span class="p">])</span>  <span class="c1"># ,</span>
             <span class="c1"># shuffle=True, compression=&#39;lzf&#39;)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Done.&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GFManager.load"><a class="viewcode-back" href="../../parts/api/index.html#gf3d.seismograms.GFManager.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Given the files in the database, get a set of strains and write it</span>

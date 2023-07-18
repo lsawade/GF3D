@@ -98,6 +98,28 @@ A normal query for a subset from a hosted database would look like this
     The ``--`` is important for entering negative numbers. It's hard for CLI to
     distinguish ``-option`` and a negative number. Hence, ``click`` implements the ``--`` which tells the CLI to take all following command line arguments are, in fact, arguments and not options. For details, please visit: `click: option-like-arguments <https://click.palletsprojects.com/en/8.1.x/arguments/#option-like-arguments>`_.
 
+Other examples are:
+
+.. code:: bash
+
+    # Query info
+    gf3d database query info princeton
+
+    # Get query URL
+    gf3d database query info --debug princeton
+
+    # Get available stations query url
+    gf3d database query stations --debug princeton
+
+    # Get query URL for subset
+    gf3d database query subset --debug -- princeton testquery.h5 -31.1300 -72.0900 17.3500 28.0
+
+    # Get query URL for fortran ordered subset
+    gf3d database query subset --debug -- princeton testquery.h5 -31.1300 -72.0900 17.3500 28.0
+
+    # Get query URL for fortran ordered subset
+    gf3d database query subset --debug -- princeton testquery.h5 -31.1300 -72.0900 17.3500 28.0
+
 
 
 OLD command line tool

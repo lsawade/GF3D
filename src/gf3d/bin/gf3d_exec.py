@@ -234,8 +234,20 @@ def subset_extract(
         gf3d query synthetics - - ARG1 ARG2
 
     \b
-    PARAMETERS
-    ----------
+    OUTPUT FORMAT:
+    --------------
+    \b
+                                                   #                          itypsokern
+        <outdir>/NET.STA.S3.MX{N,E,Z}.mseed        # for the synthetic        0
+        <outdir>/NET.STA.S3.MX{N,E,Z}.<par>.mseed  # for the kernels
+                                                   # par = mrr, mtt, mpp,     1
+                                                   #         mrt, mrp, mtp,
+                                                   #       lat, lon, dep,     2
+                                                   #       cmt, hdr           3
+
+    \b
+    PARAMETERS:
+    -----------
 
     \b
     SUBSETFILENAME = file containing Green functions of a subset of elements

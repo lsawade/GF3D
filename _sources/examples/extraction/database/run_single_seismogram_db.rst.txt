@@ -210,7 +210,7 @@ The seismograms are offset for clarity so that they are easy to read.s
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.426 seconds)
+   **Total running time of the script:** ( 0 minutes  0.489 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_database_run_single_seismogram_db.py:

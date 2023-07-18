@@ -1436,13 +1436,17 @@ class GFManager(object):
             print('nsteps', nsteps)
 
             if fortran:
+                logger.info('Writing Fortran order displacement array')
                 db.create_dataset(
                     'displacement',
                     data=self.displacement[:, :, :, :, :nsteps].transpose((4, 3, 2, 1, 0)))
             else:
+                logger.info('Writing C order displacement array')
                 db.create_dataset(
                     'displacement', data=self.displacement[:, :, :, :, :nsteps])  # ,
             # shuffle=True, compression='lzf')
+
+            logger.info('Done.')
 
     def load(self):
         """Given the files in the database, get a set of strains and write it

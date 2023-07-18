@@ -110,7 +110,7 @@ class GF3DClient:
         url += f"&longitude={longitude:f}"
         url += f"&depth={depth_in_km:f}"
         url += f"&radius={radius_in_km:f}"
-        url += f"&NGLL={5:d}"
+        url += f"&NGLL={NGLL:d}"
 
         # Check whether we can get selected stations only
         if netsta is not None:

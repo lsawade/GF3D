@@ -124,6 +124,7 @@ def query_subset(
     from gf3d.client import GF3DClient
 
     gfcl = GF3DClient(databasename)
+    print(ngll)
     gfcl.get_subset(
         subsetfilename,
         latitude=latitude,

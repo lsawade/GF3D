@@ -824,6 +824,12 @@ class GFManager(object):
                 logger.info("Uniqueing ibool ...")
                 self.nglob2sub, inv = np.unique(ibool, return_inverse=True)
 
+                # HDF5 can only access indeces in incresing order. So, we have to
+                # sort the globs, and after we retreive the array unsort it and
+                # reshape it
+                # For later I'll need to test this before I can implement it.
+                # sglob = np.argsort(self.nglob2sub)
+                # rsglob = np.argsort(sglob)
 
                 # Get new index array of length of the unique values
                 indeces = np.arange(len(self.nglob2sub))

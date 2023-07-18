@@ -135,7 +135,7 @@ def query_subset(
         from gf3d.seismograms import GFManager
 
         # Check for files given database path
-        db_globstr = os.path.join(database, '*', '*.h5')
+        db_globstr = os.path.join(databasename, '*', '*.h5')
 
         # Get all files
         db_files = glob(db_globstr)

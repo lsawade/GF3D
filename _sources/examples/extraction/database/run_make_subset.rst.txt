@@ -95,8 +95,8 @@ Read database files
  .. code-block:: none
 
     0: <HDF5 file "II.BFO.h5" (mode r)>
-    2: <HDF5 file "IU.ANMO.h5" (mode r)>
     1: <HDF5 file "IU.HRV.h5" (mode r)>
+    2: <HDF5 file "IU.ANMO.h5" (mode r)>
 
 
 
@@ -175,7 +175,7 @@ Finally you can read the seismograms.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.285 seconds)
+   **Total running time of the script:** ( 0 minutes  0.246 seconds)
 
 
 .. _sphx_glr_download_examples_extraction_database_run_make_subset.py:

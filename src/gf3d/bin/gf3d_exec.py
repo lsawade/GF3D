@@ -66,21 +66,24 @@ def query():
 
 @query.command(name='info')
 @click.argument('databasename', type=str)
-def query_info(databasename: str):
+@click.option('--debug',  is_flag=True, show_default=True, default=False, help='Only print query url', type=bool)
+def query_info(databasename: str, debug: bool = False):
     '''Query info from a hosted database server.'''
     from gf3d.client import GF3DClient
     from pprint import pprint
-    gfcl = GF3DClient(databasename)
+    gfcl = GF3DClient(databasename, debug=debug)
     info = gfcl.get_info()
-    pprint(info)
+    if info:
+        pprint(info)
 
 
 @query.command(name='stations')
 @click.argument('databasename', type=str)
-def query_stations(databasename: str):
+@click.option('--debug',  is_flag=True, show_default=True, default=False, help='Only print query url', type=bool)
+def query_stations(databasename: str, debug: bool):
     """Query available stations from a hosted database server."""
     from gf3d.client import GF3DClient
-    gfcl = GF3DClient(databasename)
+    gfcl = GF3DClient(databasename, debug=debug)
     stations = gfcl.stations_avail()
     if stations:
         for station in stations:
@@ -100,9 +103,10 @@ def query_extract():
 @click.argument('longitude', type=float)
 @click.argument('depth_in_km', type=float)
 @click.argument('radius_in_km', type=float)
-@click.option('--fortran', default=False, help='number of greetings', type=bool)
+@click.option('--fortran', is_flag=True, default=False, help='Return Fortran ordered subset.', type=bool)
 @click.option('--ngll', default=5, help='Number of GLL points 5 or 3', type=int)
 @click.option('--netsta', default=None, help='Station subselection. NOT IMPLEMENTED', type=str)
+@click.option('--debug',  is_flag=True, show_default=True, default=False, help='Only print query url', type=bool)
 def query_subset(
         databasename: str,
         subsetfilename: str,
@@ -112,7 +116,8 @@ def query_subset(
         radius_in_km: float = 100,
         ngll: int = 5,
         netsta: list | None = None,
-        fortran: bool = False):
+        fortran: bool = False,
+        debug: bool = False):
     """Query a subset from a hosted database server.
 
     IMPORTANT: For negative latitudes and longitudes use following setup:
@@ -123,8 +128,7 @@ def query_subset(
 
     from gf3d.client import GF3DClient
 
-    gfcl = GF3DClient(databasename)
-    print(ngll)
+    gfcl = GF3DClient(databasename, debug=debug)
     gfcl.get_subset(
         subsetfilename,
         latitude=latitude,

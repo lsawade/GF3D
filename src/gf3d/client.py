@@ -54,7 +54,7 @@ class GF3DClient:
 
     def __init__(self,
                  db: str = 'example-db',
-                 ):
+                 debug: bool = False):
         """Initializes a client class that you can get a
 
         Parameters
@@ -64,20 +64,28 @@ class GF3DClient:
         """
 
         self.db = db
+        self.debug = debug
 
     @catch_exceptions
     def stations_avail(self):
         url = f'http://{self.base_url}:{self.port:d}/{self.avail_route}?'
         url += f"db={self.db}"
-        return get_url_content(url).decode().split(',')
+
+        if self.debug:
+            print(url)
+        else:
+            return get_url_content(url).decode().split(',')
 
     @catch_exceptions
     def get_info(self):
         url = f'http://{self.base_url}:{self.port:d}/{self.info_route}?'
         url += f"db={self.db}"
 
-        result = get_url_content(url).decode()
-        return ast.literal_eval(result)
+        if self.debug:
+            print(url)
+        else:
+            result = get_url_content(url).decode()
+            return ast.literal_eval(result)
 
     @catch_exceptions
     def get_subset(self, outputfile: str,
@@ -138,7 +146,7 @@ class GF3DClient:
         if isinstance(fortran, bool) and fortran:
             url += f"&fortran={fortran}"
 
-        # print(url)
-        # return
-        # return get_url_content(url).decode().split(',')
-        downloadfile(url, outputfile, desc='Downloading created subset')
+        if self.debug:
+            print(url)
+        else:
+            downloadfile(url, outputfile, desc='Downloading created subset')

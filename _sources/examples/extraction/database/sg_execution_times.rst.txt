@@ -6,12 +6,12 @@
 
 Computation times
 =================
-**00:02.278** total execution time for **examples_extraction_database** files:
+**00:02.416** total execution time for **examples_extraction_database** files:
 
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_extraction_database_run_station_section_db.py` (``run_station_section_db.py``)     | 00:01.630 | 0.0 MB |
+| :ref:`sphx_glr_examples_extraction_database_run_station_section_db.py` (``run_station_section_db.py``)     | 00:01.680 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_extraction_database_run_single_seismogram_db.py` (``run_single_seismogram_db.py``) | 00:00.405 | 0.0 MB |
+| :ref:`sphx_glr_examples_extraction_database_run_single_seismogram_db.py` (``run_single_seismogram_db.py``) | 00:00.426 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_examples_extraction_database_run_make_subset.py` (``run_make_subset.py``)                   | 00:00.244 | 0.0 MB |
+| :ref:`sphx_glr_examples_extraction_database_run_make_subset.py` (``run_make_subset.py``)                   | 00:00.311 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+

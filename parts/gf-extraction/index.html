@@ -311,6 +311,26 @@ Options:
 <p>The <code class="docutils literal notranslate"><span class="pre">--</span></code> is important for entering negative numbers. It’s hard for CLI to
 distinguish <code class="docutils literal notranslate"><span class="pre">-option</span></code> and a negative number. Hence, <code class="docutils literal notranslate"><span class="pre">click</span></code> implements the <code class="docutils literal notranslate"><span class="pre">--</span></code> which tells the CLI to take all following command line arguments are, in fact, arguments and not options. For details, please visit: <a class="reference external" href="https://click.palletsprojects.com/en/8.1.x/arguments/#option-like-arguments">click: option-like-arguments</a>.</p>
 </div>
+<p>Other examples are:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Query info</span>
+gf3d<span class="w"> </span>database<span class="w"> </span>query<span class="w"> </span>info<span class="w"> </span>princeton
+
+<span class="c1"># Get query URL</span>
+gf3d<span class="w"> </span>database<span class="w"> </span>query<span class="w"> </span>info<span class="w"> </span>--debug<span class="w"> </span>princeton
+
+<span class="c1"># Get available stations query url</span>
+gf3d<span class="w"> </span>database<span class="w"> </span>query<span class="w"> </span>stations<span class="w"> </span>--debug<span class="w"> </span>princeton
+
+<span class="c1"># Get query URL for subset</span>
+gf3d<span class="w"> </span>database<span class="w"> </span>query<span class="w"> </span>subset<span class="w"> </span>--debug<span class="w"> </span>--<span class="w"> </span>princeton<span class="w"> </span>testquery.h5<span class="w"> </span>-31.1300<span class="w"> </span>-72.0900<span class="w"> </span><span class="m">17</span>.3500<span class="w"> </span><span class="m">28</span>.0
+
+<span class="c1"># Get query URL for fortran ordered subset</span>
+gf3d<span class="w"> </span>database<span class="w"> </span>query<span class="w"> </span>subset<span class="w"> </span>--debug<span class="w"> </span>--<span class="w"> </span>princeton<span class="w"> </span>testquery.h5<span class="w"> </span>-31.1300<span class="w"> </span>-72.0900<span class="w"> </span><span class="m">17</span>.3500<span class="w"> </span><span class="m">28</span>.0
+
+<span class="c1"># Get query URL for fortran ordered subset</span>
+gf3d<span class="w"> </span>database<span class="w"> </span>query<span class="w"> </span>subset<span class="w"> </span>--debug<span class="w"> </span>--<span class="w"> </span>princeton<span class="w"> </span>testquery.h5<span class="w"> </span>-31.1300<span class="w"> </span>-72.0900<span class="w"> </span><span class="m">17</span>.3500<span class="w"> </span><span class="m">28</span>.0
+</pre></div>
+</div>
 </section>
 <section id="old-command-line-tool">
 <h2>OLD command line tool<a class="headerlink" href="#old-command-line-tool" title="Permalink to this heading">#</a></h2>

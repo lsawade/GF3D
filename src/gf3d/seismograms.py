@@ -700,7 +700,7 @@ class GFManager(object):
                             'Dont have buffer elements for doing the ')
                         self.do_adjacency_search = False
 
-    def get_elements(self, lat, lon, depth, dist_in_km=125.0, NGLL=5):
+    def get_elements(self, lat, lon, depth, dist_in_km=125.0, NGLL=5, threading: bool = True):
 
         if self.subset:
             logging.warning(
@@ -738,7 +738,6 @@ class GFManager(object):
         logger.info("Querying KDTree ...")
         point_target = np.array([x_target, y_target, z_target])
         self.ispec_subset = self.fullkdtree.query_ball_point(point_target, r=r)
-
 
         # Catch single element query
         if isinstance(self.ispec_subset, np.int64):
@@ -924,7 +923,9 @@ class GFManager(object):
                 self.burials = self.Ndb * [None]
                 self.NGLL
 
-                logger.info("Getting displacement from the individual stations")
+                logger.info(
+                    "Getting displacement from the individual stations")
+
                 def read_stuff(args):
                     _i, db = args
 
@@ -951,9 +952,13 @@ class GFManager(object):
                         self.displacement[_i, _j, :, :, :] = db[f'displacement/{comp}/array'][:, self.nglob2sub, :].astype(
                             np.float32) * norm / factor
 
-                with parallel_backend('threading', n_jobs=self.Ndb):
-                    Parallel()(delayed(read_stuff)(i)
-                               for i in zip(range(self.Ndb), dbs))
+                if threading:
+                    with parallel_backend('threading', n_jobs=self.Ndb):
+                        Parallel()(delayed(read_stuff)(i)
+                                   for i in zip(range(self.Ndb), dbs))
+                else:
+                    for i in zip(range(self.Ndb), dbs):
+                        read_stuff(i)
 
     def get_seismograms(self, cmt: CMTSOLUTION) -> Stream:
 

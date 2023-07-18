@@ -104,10 +104,11 @@ def query_extract():
 @click.argument('depth_in_km', type=float)
 @click.argument('radius_in_km', type=float)
 @click.option('--fortran', is_flag=True, default=False, help='Return Fortran ordered subset.', type=bool)
-@click.option('--local', is_flag=True, default=False, help='Makes subset from local database databasename -> database root.', type=bool)
 @click.option('--ngll', default=5, help='Number of GLL points 5 or 3', type=int)
 @click.option('--netsta', default=None, help='Station subselection. NOT IMPLEMENTED', type=str)
 @click.option('--debug',  is_flag=True, show_default=True, default=False, help='Only print query url', type=bool)
+@click.option('--local', is_flag=True, default=False, help='Makes subset from local database databasename -> database root.', type=bool)
+@click.option('--nothreading', is_flag=True, default=False, help='When loading the data, not using joblib. Only if --local set.', type=bool)
 def query_subset(
         databasename: str,
         subsetfilename: str,
@@ -119,7 +120,8 @@ def query_subset(
         netsta: list | None = None,
         fortran: bool = False,
         local: bool = False,
-        debug: bool = False):
+        debug: bool = False,
+        nothreading: bool = False):
     """Query a subset from a hosted database server.
 
     IMPORTANT: For negative latitudes and longitudes use following setup:
@@ -149,7 +151,8 @@ def query_subset(
         GFM = GFManager(db_files)
         GFM.load_header_variables()
         GFM.get_elements(
-            latitude, longitude, depth_in_km, radius_in_km, NGLL=ngll)
+            latitude, longitude, depth_in_km, radius_in_km, NGLL=ngll,
+            threading=not nothreading)
         GFM.write_subset(subsetfilename, fortran=fortran)
 
     else:

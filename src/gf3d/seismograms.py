@@ -952,7 +952,7 @@ class GFManager(object):
                         norm = db[f'displacement/{comp}/norm'][()]
 
                         # Get displacement getting the output in ascending order
-                        displacement[_i, _j, :, :, :] = \
+                        self.displacement[_i, _j, :, :, :] = \
                             db[f'displacement/{comp}/array'][:, self.nglob2sub[sglob], :].astype(
                             np.float32)[:, rsglob, :] * norm / factor
 

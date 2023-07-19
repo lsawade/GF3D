@@ -1195,7 +1195,7 @@
                         <span class="c1">#         :, iglob[sglob], :].astype(np.float64)[:, rsglob, :].reshape(3, NGLLX, NGLLY, NGLLZ, NT) * norm_disp / factor</span>
 
                 <span class="k">if</span> <span class="n">threading</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s1">&#39;threading&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span><span class="p">):</span>
+                    <span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s1">&#39;threading&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
                         <span class="n">Parallel</span><span class="p">()(</span><span class="n">delayed</span><span class="p">(</span><span class="n">read_stuff</span><span class="p">)(</span><span class="n">i</span><span class="p">)</span>
                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ndb</span><span class="p">),</span> <span class="n">dbs</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>

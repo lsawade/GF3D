@@ -952,7 +952,7 @@ class GFManager(object):
                         norm = db[f'displacement/{comp}/norm'][()]
 
                         # Get displacement getting the output in ascending order
-                        self.displacement[_i, _j, :, :, :] = \
+                        displacement[_i, _j, :, :, :] = \
                             db[f'displacement/{comp}/array'][:, self.nglob2sub[sglob], :].astype(
                             np.float32)[:, rsglob, :] * norm / factor
 
@@ -960,7 +960,7 @@ class GFManager(object):
                         #         :, iglob[sglob], :].astype(np.float64)[:, rsglob, :].reshape(3, NGLLX, NGLLY, NGLLZ, NT) * norm_disp / factor
 
                 if threading:
-                    with parallel_backend('threading', n_jobs=self.Ndb):
+                    with parallel_backend('threading', n_jobs=10):
                         Parallel()(delayed(read_stuff)(i)
                                    for i in zip(range(self.Ndb), dbs))
                 else:

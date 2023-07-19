@@ -147,13 +147,18 @@ def query_subset(
             raise ValueError(f'No files found in {database} directory. '
                              'Please check path.')
 
-        # Get subset
-        GFM = GFManager(db_files)
-        GFM.load_header_variables()
-        GFM.get_elements(
-            latitude, longitude, depth_in_km, radius_in_km, NGLL=ngll,
-            threading=not nothreading)
-        GFM.write_subset(subsetfilename, fortran=fortran)
+        if debug:
+            print('Found files:')
+            for file in db_files:
+                print(file)
+        else:
+            # Get subset
+            GFM = GFManager(db_files)
+            GFM.load_header_variables()
+            GFM.get_elements(
+                latitude, longitude, depth_in_km, radius_in_km, NGLL=ngll,
+                threading=not nothreading)
+            GFM.write_subset(subsetfilename, fortran=fortran)
 
     else:
         from gf3d.client import GF3DClient
@@ -174,6 +179,54 @@ def query_subset(
 def database_extract():
     """To extract traces directly from the database. NOT YET IMPLEMENTED!"""
     print('NOT YET IMPLEMENTED!')
+
+
+@database.group()
+def plot():
+    '''Interface to database plotting tools.'''
+    pass
+
+
+@plot.group()
+def station():
+    '''Interface to station plotting tools.'''
+    pass
+
+
+@station.command(name='seismogram')
+@click.argument('databaseroot', type=click.Path(exists=True))
+@click.argument('cmtsolutionfilename', type=click.Path(exists=True))
+@click.argument('network', type=str)
+@click.argument('station', type=str)
+def plot_station(databaseroot, cmtsolutionfilename, network, station):
+
+    # External
+    import os
+    import matplotlib.pyplot as plt
+
+    # Internal
+    from gf3d.source import CMTSOLUTION
+    from gf3d.seismograms import get_seismograms
+    from gf3d.plot.seismogram import plotseismogram
+
+    # CMTSOLUTION
+    cmt = CMTSOLUTION.read(cmtsolutionfilename)
+    print(cmt)
+
+    # %%
+    # Loading the subset database
+    file = os.path.join(databaseroot, network, station,
+                        f'{network}.{station}.h5')
+
+    if not os.path.exists(file):
+        raise ValueError(f'File {file} does not exist. Please check path.')
+
+    rp = get_seismograms(file, cmt)
+
+    limits = rp[0].stats.starttime, rp[0].stats.endtime
+
+    plotseismogram(rp, None, cmt, limits=limits)
+    plt.show(block=True)
 
 
 @cli.group()
@@ -365,6 +418,51 @@ def subset_extract(
             for tr in kern:
                 tr.write(os.path.join(
                     outdir, tr.id + f'.{pypars[par]}.mseed'), format='MSEED')
+
+
+@subset.group()
+def plot():
+    '''Interface to database plotting tools.'''
+    pass
+
+
+@plot.group()
+def station():
+    '''Interface to database plotting tools.'''
+    pass
+
+
+@station.command(name='seismogram')
+@click.argument('subsetfilename', type=click.Path(exists=True))
+@click.argument('cmtsolutionfilename', type=click.Path(exists=True))
+@click.argument('network', type=str)
+@click.argument('station', type=str)
+def plot_station_seismogram(subsetfilename, cmtsolutionfilename, network, station):
+
+    # External
+    import matplotlib.pyplot as plt
+
+    # Internal
+    from gf3d.source import CMTSOLUTION
+    from gf3d.seismograms import GFManager
+    from gf3d.plot.seismogram import plotseismogram
+
+    # CMTSOLUTION
+    cmt = CMTSOLUTION.read(cmtsolutionfilename)
+    print(cmt)
+
+    # %%
+    # Loading the subset database
+
+    gfsub = GFManager(subsetfilename)
+    gfsub.load()
+
+    rp = gfsub.get_seismograms(cmt)
+
+    limits = rp[0].stats.starttime, rp[0].stats.endtime
+
+    plotseismogram(rp, None, cmt, limits=limits)
+    plt.show(block=True)
 
 
 if __name__ == "__main__":

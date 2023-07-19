@@ -738,12 +738,15 @@ class GFManager(object):
         logger.info("Querying KDTree ...")
         point_target = np.array([x_target, y_target, z_target])
         self.ispec_subset = self.fullkdtree.query_ball_point(point_target, r=r)
-
         # Catch single element query
         if isinstance(self.ispec_subset, np.int64):
             self.ispec_subset = np.array([self.ispec_subset], dtype='i')
-        else:
-            self.ispec_subset = np.sort(self.ispec_subset)
+        elif isinstance(self.ispec_subset, list):
+            if len(self.ispec_subset) == 0:
+                raise ValueError(
+                    "Could not find any elements within the radius.")
+            else:
+                self.ispec_subset = np.sort(self.ispec_subset)
 
         if self.subset:
 

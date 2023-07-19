@@ -830,8 +830,8 @@ class GFManager(object):
                 # sort the globs, and after we retreive the array unsort it and
                 # reshape it
                 # For later I'll need to test this before I can implement it.
-                # sglob = np.argsort(self.nglob2sub)
-                # rsglob = np.argsort(sglob)
+                sglob = np.argsort(self.nglob2sub)
+                rsglob = np.argsort(sglob)
 
                 # Get new index array of length of the unique values
                 indeces = np.arange(len(self.nglob2sub))
@@ -951,9 +951,13 @@ class GFManager(object):
                         # Get norm and displacement
                         norm = db[f'displacement/{comp}/norm'][()]
 
-                        # Get displacement
-                        self.displacement[_i, _j, :, :, :] = db[f'displacement/{comp}/array'][:, self.nglob2sub, :].astype(
-                            np.float32) * norm / factor
+                        # Get displacement getting the output in ascending order
+                        self.displacement[_i, _j, :, :, :] = \
+                            db[f'displacement/{comp}/array'][:, self.nglob2sub[sglob], :].astype(
+                            np.float32)[:, rsglob, :] * norm / factor
+
+                        #  displacementd[comp] = db[f'displacement/{comp}/array'][
+                        #         :, iglob[sglob], :].astype(np.float64)[:, rsglob, :].reshape(3, NGLLX, NGLLY, NGLLZ, NT) * norm_disp / factor
 
                 if threading:
                     with parallel_backend('threading', n_jobs=self.Ndb):

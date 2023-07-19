@@ -449,7 +449,6 @@ def plot_station_seismogram(subsetfilename, cmtsolutionfilename, network, statio
 
     # CMTSOLUTION
     cmt = CMTSOLUTION.read(cmtsolutionfilename)
-    print(cmt)
 
     # %%
     # Loading the subset database

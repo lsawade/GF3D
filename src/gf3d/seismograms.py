@@ -16,6 +16,7 @@ from .utils import timeshift, next_power_of_2
 from .stf import create_stf
 from .logger import logger
 from scipy import fft
+from time import time
 
 
 def get_frechet(cmt, stationfile):
@@ -952,9 +953,22 @@ class GFManager(object):
                         norm = db[f'displacement/{comp}/norm'][()]
 
                         # Get displacement getting the output in ascending order
-                        self.displacement[_i, _j, :, :, :] = \
-                            db[f'displacement/{comp}/array'][:, self.nglob2sub[sglob], :].astype(
-                            np.float32)[:, rsglob, :] * norm / factor
+                        t0 = time()
+                        array = db[f'displacement/{comp}/array'][:,
+                                                                 self.nglob2sub[sglob], :]
+                        print(f"{i: > 05d} reading: {time()-t0}")
+                        t0 = time()
+                        array = array.astype(np.float32)
+                        print(f"{i: > 05d} ocnvert: {time()-t0}")
+                        t0 = time()
+                        array = array[:, rsglob, :] * norm / factor
+                        print(f"{i: > 05d} resort:  {time()-t0}")
+                        t0 = time()
+                        self.displacement[_i, _j, :, :, :] = array
+                        print(f"{i: > 05d} assign:  {time()-t0}")
+
+                        # self.displacement[_i, _j, :, :, :]  = db[f'displacement/{comp}/array'][:, self.nglob2sub[sglob], :].astype(
+                        #     np.float32)[:, rsglob, :] * norm / factor
 
                         #  displacementd[comp] = db[f'displacement/{comp}/array'][
                         #         :, iglob[sglob], :].astype(np.float64)[:, rsglob, :].reshape(3, NGLLX, NGLLY, NGLLZ, NT) * norm_disp / factor

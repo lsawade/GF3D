@@ -460,7 +460,8 @@ def plot_station_seismogram(subsetfilename, cmtsolutionfilename, network, statio
 
     limits = rp[0].stats.starttime, rp[0].stats.endtime
 
-    plotseismogram(rp, None, cmt, limits=limits)
+    plotseismogram(rp.select(network=network, station=station),
+                   None, cmt, limits=limits)
     plt.show(block=True)
 
 

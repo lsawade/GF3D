@@ -36,6 +36,10 @@ gf3d extract subset -- subset.h5 2015 9 16 22 54 32.90 \
                             2 OUTPUT
 
 """
+from gf3d.plot.section import plotsection
+from gf3d.seismograms import GFManager
+from gf3d.source import CMTSOLUTION
+import matplotlib.pyplot as plt
 import click
 
 
@@ -463,6 +467,42 @@ def plot_station_seismogram(subsetfilename, cmtsolutionfilename, network, statio
     plotseismogram(rp.select(network=network, station=station),
                    None, cmt, limits=limits)
     plt.show(block=True)
+
+
+@station.command(name='section')
+@click.argument('subsetfilename', type=click.Path(exists=True))
+@click.argument('cmtsolutionfilename', type=click.Path(exists=True))
+@click.argument('component', type=str)
+def plot_subset_section(
+        subsetfilename: str,
+        cmtsolutionfilename: str,
+        component: str):
+
+    # External
+
+    # Internal
+
+    # CMTSOLUTION
+    cmt = CMTSOLUTION.read(cmtsolutionfilename)
+
+    # Load subset
+    gfsub = GFManager(subsetfilename)
+    gfsub.load()
+
+    # Get seismograms from the database
+
+    rp = gfsub.get_seismograms(cmt)
+
+    # Get time limits
+    starttime = rp[0].stats.starttime
+    endtime = rp[0].stats.starttime + 3800  # rp[0].stats.endtime
+    limits = (starttime, endtime)
+
+    # Plots a section of observed and synthetic
+    plotsection(rp, rp, cmt, comp=component, lw=0.75,
+                limits=limits, sync='k', scale=3)
+
+    plt.show()
 
 
 if __name__ == "__main__":

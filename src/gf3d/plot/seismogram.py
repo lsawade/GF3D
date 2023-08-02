@@ -17,7 +17,7 @@ def plotseismogram(
         ax: matplotlib.axes.Axes | None = None,
         limits: tp.Tuple[UTCDateTime] | None = None,
         newsyn: Stream or None = None, bandpass=None,
-        obsc='k', sync='r', newsync='b', nooffset=False, lw = 1,
+        obsc='k', sync='r', newsync='b', nooffset=False, lw=1,
         **kwargs):
 
     if ax is None:
@@ -27,8 +27,6 @@ def plotseismogram(
         axnone = True
     else:
         axnone = False
-
-
 
     if limits is not None:
         starttime, endtime = limits
@@ -56,15 +54,19 @@ def plotseismogram(
         else:
             absmax_off = 0.1*absmax
 
-        ax = plt.subplot(3, 1, _i+1)
+        # To sync x axes of the 3 plots.
+        if _i == 0:
+            ax = None
+
+        ax = plt.subplot(3, 1, _i+1, sharex=ax)
         plt.plot(observed.times("matplotlib"), observed.data+absmax_off,
                  '-', *args, c=obsc, lw=lw, label='Observed', **kwargs)
 
         plt.plot([np.min(observed.times("matplotlib")), np.max(observed.times("matplotlib"))],
-                 [0,0], 'k--', lw=lw)
+                 [0, 0], 'k--', lw=lw)
         if syn is not None:
             plt.plot(synthetic.times("matplotlib"), synthetic.data-absmax_off,
-                    '-', *args, c=sync, lw=lw, label='Synthetic', **kwargs)
+                     '-', *args, c=sync, lw=lw, label='Synthetic', **kwargs)
 
         if newsyn is not None:
             plt.plot(newsynthetic.times("matplotlib"), newsynthetic.data,

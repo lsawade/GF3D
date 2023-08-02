@@ -179,6 +179,65 @@ def query_subset(
             fortran=fortran)
 
 
+@query.command(name='subset-feature')
+@click.argument('databasename', type=str)
+@click.argument('subsetfilename', type=str)
+@click.argument('latitude', type=float)
+@click.argument('longitude', type=float)
+@click.argument('depth_in_km', type=float)
+@click.argument('radius_in_km', type=float)
+@click.option('--fortran', is_flag=True, default=False, help='Return Fortran ordered subset.', type=bool)
+@click.option('--ngll', default=5, help='Number of GLL points 5 or 3', type=int)
+@click.option('--netsta', default=None, help='Station subselection. NOT IMPLEMENTED', type=str)
+@click.option('--debug',  is_flag=True, show_default=True, default=False, help='Only print query url', type=bool)
+@click.option('--nothreading', is_flag=True, default=False, help='When loading the data, not using joblib. Only if --local set.', type=bool)
+def query_subset_feature(
+        databasename: str,
+        subsetfilename: str,
+        latitude: float,
+        longitude: float,
+        depth_in_km: float,
+        radius_in_km: float = 100,
+        ngll: int = 5,
+        netsta: list | None = None,
+        fortran: bool = False,
+        debug: bool = False,
+        nothreading: bool = False):
+    """Query a subset from a hosted database server.
+
+    IMPORTANT: For negative latitudes and longitudes use following setup:
+
+        gf3d query subset [--option = value] - - DATABASENAME SUBSETFILENAME LATITUDE ...
+
+    """
+
+    import os
+    from glob import glob
+    from gf3d.seismograms import GFManager
+
+    # Check for files given database path
+    db_globstr = os.path.join(databasename, '*', '*', '*.h5')
+
+    # Get all files
+    db_files = glob(db_globstr)
+
+    # Check if there are any files
+    if len(db_files) == 0:
+        raise ValueError(f'No files found in {database} directory. '
+                         'Please check path.')
+
+    if debug:
+        print('Found files:')
+        for file in db_files:
+            print(file)
+    else:
+        # Get subset
+        GFM = GFManager(db_files)
+        GFM.load_header_variables()
+        GFM.write_subset_directIO(subsetfilename, latitude, longitude, depth_in_km,
+                                  radius_in_km, NGLL=ngll, fortran=fortran)
+
+
 @database.command(name='extract')
 def database_extract():
     """To extract traces directly from the database. NOT YET IMPLEMENTED!"""

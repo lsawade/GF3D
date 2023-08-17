@@ -1,6 +1,7 @@
 import logging
 import h5py
 import contextlib
+import typing as tp
 from copy import deepcopy
 from obspy import Trace, Stream
 from obspy.core.trace import Stats
@@ -1527,7 +1528,7 @@ class GFManager(object):
         logger.debug('Outputting traces')
         return Stream(traces)
 
-    def get_mt_frechet(self, cmt: CMTSOLUTION) -> Stream:
+    def get_mt_frechet(self, cmt: CMTSOLUTION) -> tp.Dict[str, Stream]:
 
         # Get moment tensor
         x_target, y_target, z_target = source2xyz(
@@ -1685,9 +1686,182 @@ class GFManager(object):
             compdict[mtc] = Stream(traces)
 
         logger.debug('Outputting traces')
+
         return compdict
 
-    def get_frechet(self, cmt: CMTSOLUTION, rtype=3):
+    def get_mt_frechet_station(
+            self, cmt: CMTSOLUTION,
+            network: str, station: str) -> tp.Dict[str, Stream]:
+
+        idx = None
+        for _i, (net, sta) in enumerate(zip(self.networks, self.stations)):
+            if net == network and sta == station:
+                idx = _i
+                break
+
+        if idx is None:
+            raise ValueError(
+                f'Station {network}.{station} not found in database.')
+
+        # Get moment tensor
+        x_target, y_target, z_target = source2xyz(
+            cmt.latitude, cmt.longitude, cmt.depth, M=None,
+            topography=self.header['topography'],
+            ellipticity=self.header['ellipticity'],
+            ibathy_topo=self.header['itopo'],
+            NX_BATHY=self.header['nx_topo'],
+            NY_BATHY=self.header['ny_topo'],
+            RESOLUTION_TOPO_FILE=self.header['res_topo'],
+            rspl=self.header['rspl'],
+            ellipicity_spline=self.header['ellipticity_spline'],
+            ellipicity_spline2=self.header['ellipticity_spline2'],
+        )
+
+        # Get rotated moment tensors
+        pertdict = dict(
+            Mrr=1e23, Mtt=1e23, Mpp=1e23,
+            Mrt=1e23, Mrp=1e23, Mtp=1e23,
+        )
+        mx = []
+        for _i, (_key, pert) in enumerate(pertdict.items()):
+            m = np.zeros(6)
+            m[_i] = pert
+            mx.append(rotate_mt(cmt.latitude, cmt.longitude, m))
+
+        if self.do_adjacency_search:
+            logger.debug("DOING ADJACENCY SEARCH")
+
+        ispec_selected, xi, eta, gamma, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz, _, _, _, _ = locate_point(
+            x_target, y_target, z_target, cmt.latitude, cmt.longitude,
+            self.xyz[self.ibool[self.NGLL//2, self.NGLL//2, self.NGLL//2, :],
+                     :], self.xyz[:, 0], self.xyz[:, 1],
+            self.xyz[:, 2], self.ibool,
+            xadj=self.xadj, adjacency=self.adjacency,
+            POINT_CAN_BE_BURIED=True, kdtree=self.kdtree,
+            do_adjacent_search=self.do_adjacency_search, NGLL=self.NGLL)
+
+        # Get global indeces.
+        iglob = self.ibool[:, :, :, ispec_selected]
+
+        # Get displacement for interpolation
+        displacement = self.displacement[:, :, :, iglob, :]
+
+        # GLL points and weights (degree)
+        npol = self.NGLL - 1
+        xigll, _, _ = gll_nodes(npol)
+
+        # Get lagrange values at specific GLL poins
+        hxi, hpxi = lagrange_any(xi, xigll, npol)
+        heta, hpeta = lagrange_any(eta, xigll, npol)
+        hgamma, hpgamma = lagrange_any(gamma, xigll, npol)
+
+        # Initialize epsilon array
+        epsilon = np.zeros((3, 6, self.header['nsteps']))
+
+        for k in range(self.NGLL):
+            for j in range(self.NGLL):
+                for i in range(self.NGLL):
+
+                    hlagrange_xi = hpxi[i] * heta[j] * hgamma[k]
+                    hlagrange_eta = hxi[i] * hpeta[j] * hgamma[k]
+                    hlagrange_gamma = hxi[i] * heta[j] * hpgamma[k]
+                    hlagrange_x = hlagrange_xi * xix + hlagrange_eta * etax + hlagrange_gamma * gammax
+                    hlagrange_y = hlagrange_xi * xiy + hlagrange_eta * etay + hlagrange_gamma * gammay
+                    hlagrange_z = hlagrange_xi * xiz + hlagrange_eta * etaz + hlagrange_gamma * gammaz
+
+                    for _c in range(3):
+                        epsilon[_c, 0, :] += (
+                            displacement[idx, _c, 0, i, j, k, :] * hlagrange_x)
+                        epsilon[_c, 1, :] += (
+                            displacement[idx, _c, 1, i, j, k, :] * hlagrange_y)
+                        epsilon[_c, 2, :] += (
+                            displacement[idx, _c, 2, i, j, k, :] * hlagrange_z)
+                        epsilon[_c, 3, :] += 0.5 * (
+                            displacement[idx, _c, 1, i,
+                                         j, k, :] * hlagrange_x
+                            + displacement[idx, _c, 0, i, j, k, :] * hlagrange_y)
+                        epsilon[_c, 4, :] += 0.5 * (
+                            displacement[idx, _c, 2, i,
+                                         j, k, :] * hlagrange_x
+                            + displacement[idx, _c, 0, i, j, k, :] * hlagrange_z)
+                        epsilon[_c, 5, :] += 0.5 * (
+                            displacement[idx, _c, 2, i,
+                                         j, k, :] * hlagrange_y
+                            + displacement[idx, _c, 1, i, j, k, :] * hlagrange_z)
+
+        # For following FFTs
+        NP2 = next_power_of_2(2 * self.header['nsteps'])
+
+        # This computes the differential half duration for the new STF from
+        # the cmt half duration and the half duration of the database that the
+        # database was computed with
+        if (cmt.hdur / 1.628)**2 <= self.header['hdur']**2:
+            hdur_diff = 0.000001
+            logger.warn(
+                f"Requested half duration smaller than what was simulated.\n"
+                f"Half duration set to {hdur_diff}s to simulate a Heaviside function.")
+        else:
+            hdur_diff = np.sqrt((cmt.hdur / 1.628)**2 - self.header['hdur']**2)
+
+        # Heaviside STF to reproduce SPECFEM stf
+        _, stf_r = create_stf(0, 400.0, self.header['nsteps'],
+                              self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
+
+        STF_R = fft.fft(stf_r, n=NP2)
+
+        shift = -400.0 + cmt.time_shift
+        phshift = np.exp(-1.0j*shift*np.fft.fftfreq(NP2,
+                                                    self.header['dt'])*2*np.pi)
+
+        logger.debug(f"Lengths: {self.header['nsteps']}, {NP2}")
+
+        # Add traces to the
+        compdict = dict()
+        for _j, mtc in enumerate(['Mrr', 'Mtt', 'Mpp', 'Mrt', 'Mrp', 'Mtp']):
+
+            # Get lagrange values at specific GLL points
+            M = mx[_j] * np.array([1., 1., 1., 2., 2., 2.])
+
+            # Since the database is the same for all
+            seismograms = np.einsum('ijo,j->io', epsilon[:, :, :], M)
+
+            logger.debug(f"SEISUM: {np.sum(seismograms)}")
+
+            traces = []
+
+            for _i, comp in enumerate(['N', 'E', 'Z']):
+
+                data = np.real(
+                    fft.ifft(
+                        STF_R * fft.fft(seismograms[_i, :], n=NP2)
+                        * phshift
+                    ))[:self.header['nsteps']] * self.header['dt']/1e23
+
+                stats = Stats()
+                stats.delta = self.header['dt']
+                stats.network = self.networks[idx]
+                stats.station = self.stations[idx]
+                stats.location = 'S3'
+                stats.latitude = self.latitudes[idx]
+                stats.longitude = self.longitudes[idx]
+                stats.coordinates = AttribDict(
+                    latitude=self.latitudes[idx], longitude=self.longitudes[idx])
+                stats.channel = f'MX{comp}'
+                stats.starttime = cmt.origin_time - self.header['tc']
+                print(stats.starttime)
+                stats.npts = self.header['nsteps']
+                tr = Trace(data=data, header=stats)
+
+                traces.append(tr)
+
+            # Add traces to dictionary
+            compdict[mtc] = Stream(traces)
+
+        logger.debug('Outputting traces')
+
+        return compdict
+
+    def get_frechet(self, cmt: CMTSOLUTION, rtype=3) -> tp.Dict[str, Stream]:
         """Computes centered finite difference using 10m perturbations"""
 
         mtpar = ['Mrr', 'Mtt', 'Mpp', 'Mrt', 'Mrp', 'Mtp']
@@ -1887,6 +2061,7 @@ class GFManager(object):
             self.stations = db['Stations'][:].astype('U13').tolist()
             self.latitudes = db['latitudes'][:]
             self.longitudes = db['longitudes'][:]
+            self.burials = db['burials'][:]
             self.ibool = db['ibool'][:]
             self.xyz = db['xyz'][:]
             self.kdtree = KDTree(self.xyz[self.ibool[

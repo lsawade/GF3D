@@ -84,14 +84,51 @@ def query_info(databasename: str, debug: bool = False):
 @query.command(name='stations')
 @click.argument('databasename', type=str)
 @click.option('--debug',  is_flag=True, show_default=True, default=False, help='Only print query url', type=bool)
-def query_stations(databasename: str, debug: bool):
+@click.option('--local', is_flag=True, default=False, help='Makes subset from local database databasename -> database root.', type=bool)
+def query_stations(databasename: str, debug: bool, local: bool):
     """Query available stations from a hosted database server."""
-    from gf3d.client import GF3DClient
-    gfcl = GF3DClient(databasename, debug=debug)
-    stations = gfcl.stations_avail()
-    if stations:
-        for station in stations:
-            print(station)
+
+    if local:
+
+        import os
+        from glob import glob
+        from gf3d.seismograms import GFManager
+
+        # Check for files given database path
+        db_globstr = os.path.join(databasename, '*', '*', '*.h5')
+
+        # Get all files
+        db_files = glob(db_globstr)
+
+        # Check if there are any files
+        if len(db_files) == 0:
+            raise ValueError(f'No files found in {database} directory. '
+                             'Please check path.')
+
+        if debug:
+            print('Found files:')
+            for file in db_files:
+                print(file)
+        else:
+            # Get subset
+            GFM = GFManager(db_files)
+            GFM.load_header_variables()
+
+            for net, sta, lat, lon, bur in zip(
+                    GFM.networks
+                    GFM.stations
+                    GFM.latitudes
+                    GFM.longitudes
+                    GFM.burials):
+                print(f"[{net},{sta},{lat},{lon},{bur}]")
+
+    else:
+        from gf3d.client import GF3DClient
+        gfcl = GF3DClient(databasename, debug=debug)
+        stations = gfcl.stations_avail()
+        if stations:
+            for station in stations:
+                print(station)
 
 
 @query.command(name='extract')
@@ -299,7 +336,7 @@ def subset():
 
 
 @subset.command(name='info')
-@click.argument('subsetfilenamesaf', type=click.Path(exists=True))
+@click.argument('subsetfilename', type=click.Path(exists=True))
 def subset_info(subsetfilename: str):
     """Prints all relevant subset info.
     """
@@ -489,6 +526,22 @@ def plot():
     pass
 
 
+# @plot.command(name='elements')
+# @click.argument('subsetfilename', type=click.Path(exists=True))
+# @click.option('--cmt', default=None, help='Locate source and plot it in the mesh',
+#               type=bool)
+# def plot_subset_elements(subsetfilename):
+#     from gf3d.seismograms import GFManager
+#     from gf3d.plot.mesh import meshplot
+#     from gf3d.locate_point import locate_point
+#     # Loading the subset database
+
+#     gfsub = GFManager(subsetfilename)
+#     gfsub.load()
+
+#     meshplot(subsetfilename, outfile="mesh.html")
+
+
 @plot.group()
 def station():
     '''Interface to database plotting tools.'''
@@ -520,6 +573,7 @@ def plot_station_seismogram(subsetfilename, cmtsolutionfilename, network, statio
     gfsub.load()
 
     rp = gfsub.get_seismograms(cmt)
+    rp.filter('lowpass', freq=1.0/90.0)
 
     limits = rp[0].stats.starttime, rp[0].stats.endtime
 

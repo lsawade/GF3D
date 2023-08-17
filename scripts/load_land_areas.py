@@ -5,15 +5,18 @@ import pickle
 import shapefile
 from gf3d.geoutils import geo2cart
 from gf3d.coordinate.ingeopoly import ingeopoly
-from gf3d.utils import downloadfile, unzip
+from gf3d.utils import downloadfile, unzip, downloadfile_progress
+
 
 def msgeo(resolution=20):
     """Return the coordinates for plotting a sphere centered at (x,y,z)"""
-    lon, lat = np.meshgrid(np.linspace(-180,180,2*resolution), np.linspace(-90,90, resolution))
+    lon, lat = np.meshgrid(
+        np.linspace(-180, 180, 2*resolution), np.linspace(-90, 90, resolution))
     return lon, lat
 
 
-DIRNAME = f'{os.getenv("HOME")}/GF3D/scripts'
+DIRNAME = f'.'
+
 
 def read_land():
     fname = os.path.join(DIRNAME, 'DATA', 'ne_50m_land')
@@ -25,7 +28,7 @@ def read_land():
             print('Downloading landareas')
             try:
                 # downloadfile(url, zipname)
-                download_file(url, zipname)
+                downloadfile_progress(url, zipname)
             except Exception as e:
                 print(e)
                 print('Download failed')
@@ -36,6 +39,7 @@ def read_land():
     land = shapefile.Reader(os.path.join(fname, 'ne_50m_land.shp'))
 
     return land
+
 
 continents_file = './landareas.pkl'
 
@@ -85,7 +89,6 @@ for _i, shape in enumerate(land.shapes()):
 
     print(_i, 'of', nl, np.sum(flags.astype(int)))
 
-
     xl.extend([*xt, None])
     yl.extend([*yt, None])
     zl.extend([*zt, None])
@@ -102,10 +105,6 @@ coord = dict(
 )
 
 
-
 with open(continents_file, 'wb') as f:
 
     pickle.dump(coord, f)
-
-
-

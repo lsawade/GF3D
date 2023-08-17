@@ -16,9 +16,8 @@ def ms(x, y, z, radius, resolution=20):
     Z = radius * np.cos(v) + z
     return (X, Y, Z)
 
+
 def meshplot(stationfile, outfile, land=None):
-
-
 
     with h5py.File(stationfile, 'r') as db:
 
@@ -33,7 +32,7 @@ def meshplot(stationfile, outfile, land=None):
     z = []
 
     # for i in range(NSPEC):
-    for i in range(0,NSPEC):
+    for i in range(0, NSPEC):
 
         x.extend([
             xyz[ibool[0, 0, 0, i], 0], xyz[ibool[4, 0, 0, i], 0], None,
@@ -80,8 +79,8 @@ def meshplot(stationfile, outfile, land=None):
             xyz[ibool[4, 4, 4, i], 2], xyz[ibool[4, 0, 4, i], 2], None,
         ])
 
-
     continents_file = './landareas.pkl'
+
     if os.path.exists(continents_file):
         land = True
         with open(continents_file, 'rb') as f:
@@ -94,27 +93,30 @@ def meshplot(stationfile, outfile, land=None):
         'showgrid': False,  # thin lines in the background
         'zeroline': False,  # thick line at x=0
         'visible': False,  # numbers below
-        'showgrid': False
+        'showgrid': False,
+        "showspikes": False,
     }
 
     data = [
-        go.Scatter3d(x=x, y=y, z=z, mode='lines', line={'color': 'rgb(0, 0, 0)'}, name='Elements'),
-        ]
+        go.Scatter3d(x=x, y=y, z=z, mode='lines', line={
+                     'color': 'rgb(0, 0, 0)'}, name='Elements'),
+    ]
 
     if land:
         data.append(
             go.Surface(
                 x=landareas['x'], y=landareas['y'], z=landareas['z'],
                 showscale=False,
-                colorscale=[[0, '#0000FF'], [1,'#0000FF']],
-                surfacecolor=np.zeros_like(np.array(landareas['x']), dtype=float),
+                colorscale=[[0, '#0000FF'], [1, '#0000FF']],
+                surfacecolor=np.zeros_like(
+                    np.array(landareas['x']), dtype=float),
                 name='Lands',
                 opacity=0.25,
                 contours=go.surface.Contours(
                     x=go.surface.contours.X(highlight=False),
                     y=go.surface.contours.Y(highlight=False),
                     z=go.surface.contours.Z(highlight=False),
-                    ),
+                ),
                 lightposition=dict(x=0, y=0, z=0),
                 lighting=dict(ambient=1.0),
                 hoverinfo='skip',
@@ -129,27 +131,27 @@ def meshplot(stationfile, outfile, land=None):
         #         name='Continents'),)
 
     # Inner sphere
-    X,Y,Z = ms(0.0, 0.0, 0.0, (6371-750)/6371, 180)
+    X, Y, Z = ms(0.0, 0.0, 0.0, (6371-750)/6371, 180)
     colorscale = [[0, '#FFFFFF'],
                   [1, '#FFFFFF']]
 
     data.append(
         go.Surface(
-                x=X, y=Y, z=Z, showscale=False, surfacecolor=[0 for _ in range(len(Z))],
-                colorscale=colorscale, #[[0, 'white'], [1,'white']],
-                name='Inner Sph.',
-                opacity=1.0,
-                contours=go.surface.Contours(
+            x=X, y=Y, z=Z, showscale=False, surfacecolor=[0 for _ in range(len(Z))],
+            colorscale=colorscale,  # [[0, 'white'], [1,'white']],
+            name='Inner Sph.',
+            opacity=1.0,
+            contours=go.surface.Contours(
                 x=go.surface.contours.X(highlight=False),
                 y=go.surface.contours.Y(highlight=False),
                 z=go.surface.contours.Z(highlight=False),
-                    ),
-                lightposition=dict(x=0, y=0, z=0),
-                lighting=dict(ambient=1.0),
-                hoverinfo='skip',
-                hovertemplate=None
-            )
+            ),
+            lightposition=dict(x=0, y=0, z=0),
+            lighting=dict(ambient=1.0),
+            hoverinfo='skip',
+            hovertemplate=None
         )
+    )
 
     print('data length', len(data))
 
@@ -160,7 +162,7 @@ def meshplot(stationfile, outfile, land=None):
             xaxis=axdict, yaxis=axdict, zaxis=axdict),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        width=1920, height=1080,
+        width=800, height=800,
     )
     # fig.update_scences(
     #     scene=dict(
@@ -171,4 +173,4 @@ def meshplot(stationfile, outfile, land=None):
     #     )
     # )
 
-    plotly.offline.plot(fig, filename=outfile)
+    fig.show()

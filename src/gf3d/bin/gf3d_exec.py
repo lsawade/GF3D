@@ -114,15 +114,25 @@ def query_stations(databasename: str, debug: bool, local: bool):
             GFM = GFManager(db_files)
             GFM.load_header_variables()
 
-            for net, sta, lat, lon, bur in zip(
-                    GFM.networks,
-                    GFM.stations,
-                    GFM.latitudes,
-                    GFM.longitudes,
-                    GFM.burials):
-                print(f"[{net},{sta},{lat},{lon},{bur}]")
+            # Get station info:
+            stations = GFM.get_stations()
+            Nsta = len(stations)
 
+            # Print copyable string array
+            endofline = '\n'
+
+            print('[', end="")
+            for _i, (net, sta, lat, lon, bur) in enumerate(stations):
+
+                # Remove newline character for the last station
+                if _i == Nsta-1:
+                    endofline = ''
+                print(f"['{net}', '{sta}', {lat}, {lon}, {bur}],",
+                      end=endofline)
+
+            print(']')
     else:
+
         from gf3d.client import GF3DClient
         gfcl = GF3DClient(databasename, debug=debug)
         stations = gfcl.stations_avail()

@@ -800,6 +800,43 @@ class GFManager(object):
                             'Dont have buffer elements for doing the ')
                         self.do_adjacency_search = False
 
+    def get_stations(self):
+
+        # Check if KDtree is loaded
+        if not self.header:
+            self.load_header_variables()
+
+        if self.subset:
+            networks = self.networks
+            stations = self.stations
+            latitudes = self.latitudes
+            longitudes = self.longitudes
+            burials = self.burials
+
+        else:
+
+            networks = []
+            stations = []
+            latitudes = []
+            longitudes = []
+            burials = []
+            # Get number of files
+            logger.info("Opening h5 files ...")
+            with contextlib.ExitStack() as stack:
+                # Open Stack of files
+                dbs = [stack.enter_context(h5py.File(fname, 'r'))
+                       for fname in self.db]
+
+                for db in dbs:
+                    networks.append(db['Network'][()].decode())
+                    stations.append(db['Station'][()].decode())
+                    latitudes.append(db['latitude'][()])
+                    longitudes.append(db['longitude'][()])
+                    burials.append(db['burial'][()])
+
+        return [sta_tup for sta_tup in zip(
+            networks, stations, latitudes, longitudes, burials)]
+
     def get_elements(self, lat, lon, depth, dist_in_km=125.0, NGLL=5, threading: bool = True):
 
         if self.subset:
@@ -1805,7 +1842,8 @@ class GFManager(object):
 
         # Heaviside STF to reproduce SPECFEM stf
         _, stf_r = create_stf(0, 400.0, self.header['nsteps'],
-                              self.header['dt'], hdur_diff, cutoff=None, gaussian=False, lpfilter='butter')
+                              self.header['dt'], hdur_diff, cutoff=None,
+                              gaussian=False, lpfilter='butter')
 
         STF_R = fft.fft(stf_r, n=NP2)
 

@@ -115,10 +115,10 @@ def query_stations(databasename: str, debug: bool, local: bool):
             GFM.load_header_variables()
 
             for net, sta, lat, lon, bur in zip(
-                    GFM.networks
-                    GFM.stations
-                    GFM.latitudes
-                    GFM.longitudes
+                    GFM.networks,
+                    GFM.stations,
+                    GFM.latitudes,
+                    GFM.longitudes,
                     GFM.burials):
                 print(f"[{net},{sta},{lat},{lon},{bur}]")
 

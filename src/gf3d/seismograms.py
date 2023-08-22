@@ -16,6 +16,7 @@ from .source import CMTSOLUTION
 from .utils import timeshift, next_power_of_2
 from .stf import create_stf
 from .logger import logger
+from .signal.filter import butter_band_two_pass_filter
 from scipy import fft
 from time import time
 from multiprocessing import Process, Lock
@@ -1539,12 +1540,12 @@ class GFManager(object):
             for _i, comp in enumerate(['N', 'E', 'Z']):
 
                 # Convolution with the STF and correctional timeshift
+                # data = butter_band_two_pass_filter(
+                #     seismograms[_h, _i, :], [0.001, 1/self.header['dt']/2.1], 1/self.header['dt'])
+
                 data = np.real(
-                    fft.ifft(
-                        fft.fft(seismograms[_h, _i, :], n=NP2)
-                        * STF_R
-                        * phshift
-                    )[:self.header['nsteps']]) * self.header['dt']
+                    fft.ifft(fft.fft(seismograms[_h, _i, :], n=NP2) * STF_R * phshift
+                             )[:self.header['nsteps']]) * self.header['dt']
 
                 stats = Stats()
                 stats.delta = self.header['dt']

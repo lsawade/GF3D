@@ -1,6 +1,10 @@
 from scipy.signal import butter, bessel, cheby1, cheby2, sosfilt, sosfiltfilt
 
 
+def butter_bandpass(cutoffs, fs, order=5):
+    return butter(order, cutoffs, fs=fs, btype='bandpass', output='sos')
+
+
 def butter_lowpass(cutoff, fs, order=5):
     return butter(order, cutoff, fs=fs, btype='low', output='sos')
 
@@ -13,6 +17,12 @@ def butter_lowpass_filter(data, cutoff, fs, order: int | None = 5):
 
 def butter_low_two_pass_filter(data, cutoff, fs, order: int | None = 5):
     sos = butter_lowpass(cutoff, fs, order=order)
+    y = sosfiltfilt(sos, data)
+    return y
+
+
+def butter_band_two_pass_filter(data, cutoffs, fs, order: int | None = 5):
+    sos = butter_bandpass(cutoffs, fs, order=order)
     y = sosfiltfilt(sos, data)
     return y
 

@@ -128,8 +128,8 @@ def processing(node: Node):
     # Getting the command script
     cmd = str(os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        'scripts', 'processadios.py'
-    ))
+        'scripts', 'processadios.py'))
+
     args = f"{h5file} {filedict['N']} {filedict['E']} " \
            f"{filedict['Z']} {config_file} {precision} {compression}"
 

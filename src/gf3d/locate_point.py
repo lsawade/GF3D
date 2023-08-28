@@ -206,9 +206,9 @@ def locate_point(
                 logger.debug('    Doing Adjacent Search...')
                 # searches for better position in neighboring elements
                 logger.debug(
-                    "   REALYY DOING THE ADJACENCY SEARCH   on boundary")
+                    "   REALLY DOING THE ADJACENCY SEARCH   on boundary")
 
-                xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz = find_best_neighbor(
+                xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz, ispec_selected = find_best_neighbor(
                     x_target, y_target, z_target, xi, eta, gamma, x, y, z,
                     xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz,
                     x_store, y_store, z_store, ibool, ispec_selected, distmin_squared,
@@ -610,4 +610,4 @@ def find_best_neighbor(
         logger.debug(f'neighbors: final {ispec_selected}   {xi}, {eta}, {gamma},'
                      f'distance: {np.sqrt(distmin_squared)*R_PLANET_KM}')
 
-    return xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz
+    return xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz, ispec_selected

@@ -1,3 +1,4 @@
+import os
 import logging
 import h5py
 import contextlib
@@ -119,6 +120,142 @@ def stationIO(
     lock.release()
 
 
+def stationIO_DB(
+        _i: int, stationfilename: str, outDBdir: str,
+        nsteps: int, ibool: np.ndarray, xyz: np.ndarray, NGLL: int,
+        nglob2sub: np.ndarray, sglob: np.ndarray, rsglob: np.ndarray,
+        do_adjacency_search: bool, xadj, adjacency):
+    """Station IO function this function is executed on a worker and reads in
+    the station information and subset displacement data and writes it to the
+    subset file if no other worker is writing to the file.
+
+
+    Parameters
+    ----------
+    _i : int
+        station index
+    q : Queue
+        multiprocessing queue containing a writing lock
+    stationfilename : str
+        subset file name
+    outstationfilename : str
+        station filename
+    nsteps : int
+        number of time steps
+    ibool : np.ndarray
+        index array
+    xyz : np.ndarray
+        coordinates
+    NGLL : int
+        number of GLL points in one direction
+    nglob2sub : np.ndarray
+        index array mapping global to subset
+    sglob : np.ndarray
+        sorting the indeces to read in ascending order
+    rsglob : np.ndarray
+        reverse sorting the indeces to read in ascending order
+    """
+
+    header = dict()
+    # Just get network and station name to create both file handles
+    # (less indentation)
+    with h5py.File(stationfilename, 'r') as db:
+        header['Network'] = db['Network'][()].decode("utf-8")
+        header['Station'] = db['Station'][()].decode("utf-8")
+
+    # Make filename
+    outstationfilename = os.path.join(
+        outDBdir, header['Network'], header['Station'],
+        f"{header['Network']}.{header['Station']}.h5")
+
+    print(f'{_i:03d}: {stationfilename} -> {outstationfilename}')
+
+    if os.path.exists(outstationfilename) is False:
+        os.makedirs(os.path.dirname(outstationfilename), exist_ok=True)
+
+    with h5py.File(stationfilename, 'r') as db, h5py.File(outstationfilename, 'w') as dbout:
+
+        # station = db['Station'][()].decode("utf-8")
+        # network = db['Network'][()].decode("utf-8")
+        header['TOPOGRAPHY'] = db['TOPOGRAPHY'][()]
+        header['ELLIPTICITY'] = db['ELLIPTICITY'][()]
+
+        if header['TOPOGRAPHY']:
+            header['BATHY'] = db['BATHY'][:]
+            header['NX_BATHY'] = db['NX_BATHY'][()]
+            header['NY_BATHY'] = db['NY_BATHY'][()]
+            header['RESOLUTION_TOPO_FILE'] = db['RESOLUTION_TOPO_FILE'][()]
+
+        if header['ELLIPTICITY']:
+            header['rspl'] = db['rspl'][:]
+            header['ellipticity_spline'] = db['ellipticity_spline'][:]
+            header['ellipticity_spline2'] = db['ellipticity_spline2'][:]
+
+        # Only read midpoints for now
+        header['DT'] = db['DT'][()]
+        header['TC'] = db['TC'][()]
+        header['FACTOR'] = db['FACTOR'][()]
+        header['HDUR'] = db['HDUR'][()]
+
+        # Load station info
+        header['latitude'] = db['latitude'][()]
+        header['longitude'] = db['longitude'][()]
+        header['burial'] = db['burial'][()]
+
+        # Get force factor specific to file
+        header['FACTOR'] = db['FACTOR'][()]
+
+        # Nglob
+        header['NGLOB'] = len(nglob2sub)
+        header['NGLLX'] = NGLL
+        header['NGLLY'] = NGLL
+        header['NGLLZ'] = NGLL
+        header['NSTEPS'] = nsteps
+
+        # Coordinates and index array
+        header['ibool'] = ibool
+        header['xyz'] = xyz
+
+        # Add adjacency or not
+        if do_adjacency_search:
+            header['do_adjacency_search'] = 1
+            header['xadj'] = xadj
+            header['adjacency'] = adjacency
+            header['USE_BUFFER_ELEMENTS'] = 1
+        else:
+            header['do_adjacency_search'] = 0
+            header['USE_BUFFER_ELEMENTS'] = 0
+
+        # Write everything to the file except the displacement
+        for key, value in header.items():
+            dbout.create_dataset(key, data=value)
+
+        components = ['N', 'E', 'Z']
+
+        # Get norm and displacement
+        for comp in components:
+
+            # Write norm to new file
+            key = f'displacement/{comp}/norm'
+            dbout.create_dataset(key, data=db[key][()])
+
+            # Get displacement getting the output in ascending order
+            t0 = time()
+            key = f'displacement/{comp}/array'
+            array = db[key][:, nglob2sub[sglob], :header['NSTEPS']]
+            print(f"{_i: > 05d} reading: {time()-t0}")
+
+            t0 = time()
+            array = array.astype(np.float32)
+            print(f"{_i: > 05d} convert: {time()-t0}")
+
+            t0 = time()
+            array = array[:, rsglob, :]
+            print(f"{_i: > 05d} resort:  {time()-t0}")
+
+            dbout.create_dataset(key, data=array)
+
+
 def get_frechet(cmt, stationfile):
     """Computes centered finite difference using 10m perturbations"""
 
@@ -192,7 +329,7 @@ def get_frechet(cmt, stationfile):
     return frechets
 
 
-def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
+def get_seismograms(stationfile: str, cmt: CMTSOLUTION, ispec: int | None = None):
     """
 
     This function takes in the path to a station file and a CMTSOLUTION and
@@ -251,10 +388,35 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
             xadj = None
             adjacency = None
 
-    # Create KDTree
-    logger.debug('Building KDTree ...')
-    kdtree = KDTree(xyz[ibool[2, 2, 2, :], :])
-    logger.debug('... Done')
+    if ispec is not None:
+        print(ibool.shape)
+
+        ibool = ibool[:, :, :, ispec:ispec+1]
+        ibool_orig = deepcopy(ibool)
+
+        # Get unique elements
+        uni, inv = np.unique(ibool, return_inverse=True)
+
+        # Get new index array of length of the unique values
+        indeces = np.arange(len(uni))
+
+        # Get fixed ibool array for the interpolation and source location
+        ibool = indeces[inv].reshape(ibool.shape)
+
+        # Then finally get sub set of coordinates
+        xyz = xyz[uni, :]
+
+        # Mini kdtree
+        kdtree = KDTree(xyz[ibool[NGLLX//2, NGLLY//2, NGLLZ//2, :]])
+
+        do_adjacency_search = False
+
+    else:
+
+        # Create KDTree
+        logger.debug('Building KDTree ...')
+        kdtree = KDTree(xyz[ibool[2, 2, 2, :], :])
+        logger.debug('... Done')
 
     # Get location in mesh
     logger.debug('Conversion geo -> xyz')
@@ -278,6 +440,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
 
     # logger.debug('xadj', np.min(xadj), np.max(xadj))
     # logger.debug('adjacency', np.min(adjacency), np.max(adjacency))
+    logger.debug(f' xyz.shape: {xyz.shape}')
 
     # Locate the point in mesh
     logger.debug('Locating the point ...')
@@ -288,6 +451,7 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
         POINT_CAN_BE_BURIED=True, kdtree=kdtree,
         do_adjacent_search=do_adjacency_search, NGLL=NGLLX)
     logger.debug('...Done')
+    logger.debug(f'SELECTED ELEMENT: {ispec_selected}')
 
     # Read strains from the file
     logger.debug('Loading strains ...')
@@ -295,18 +459,26 @@ def get_seismograms(stationfile: str, cmt: CMTSOLUTION):
 
         factor = db['FACTOR'][()]
         displacementd = dict()
-        for _i, comp in enumerate(['N', 'E', 'Z']):
 
-            norm_disp = db[f'displacement/{comp}/norm'][()]
+        if ispec is not None:
+
+            # Get global indeces.
+            iglob = ibool_orig[:, :, :, ispec_selected].flatten()
+
+        else:
 
             # Get global indeces.
             iglob = ibool[:, :, :, ispec_selected].flatten()
 
-            # HDF5 can only access indeces in incresing order. So, we have to
-            # sort the globs, and after we retreive the array unsort it and
-            # reshape it
-            sglob = np.argsort(iglob)
-            rsglob = np.argsort(sglob)
+        # HDF5 can only access indeces in incresing order. So, we have to
+        # sort the globs, and after we retreive the array unsort it and
+        # reshape it
+        sglob = np.argsort(iglob)
+        rsglob = np.argsort(sglob)
+
+        for _i, comp in enumerate(['N', 'E', 'Z']):
+
+            norm_disp = db[f'displacement/{comp}/norm'][()]
 
             displacementd[comp] = db[f'displacement/{comp}/array'][
                 :, iglob[sglob], :].astype(np.float64)[:, rsglob, :].reshape(3, NGLLX, NGLLY, NGLLZ, NT) * norm_disp / factor
@@ -525,9 +697,8 @@ def get_seismograms_sub(stationfile: str, cmt: CMTSOLUTION):
             sglob = np.argsort(iglob)
             rsglob = np.argsort(sglob)
 
-            displacementd[comp] = \
-                db[f'displacement/{comp}/array'][
-                    :, iglob[sglob], :].astype(np.float64)[:, rsglob, :].reshape(3, NGLLX-2, NGLLY-2, NGLLZ-2, NT) * norm_disp / factor
+            displacementd[comp] = db[f'displacement/{comp}/array'][
+                :, iglob[sglob], :].astype(np.float64)[:, rsglob, :].reshape(3, NGLLX-2, NGLLY-2, NGLLZ-2, NT) * norm_disp / factor
 
     logger.debug('... Done')
 
@@ -876,6 +1047,7 @@ class GFManager(object):
         logger.info("Querying KDTree ...")
         point_target = np.array([x_target, y_target, z_target])
         self.ispec_subset = self.fullkdtree.query_ball_point(point_target, r=r)
+
         # Catch single element query
         if isinstance(self.ispec_subset, np.int64):
             self.ispec_subset = np.array([self.ispec_subset], dtype='i')
@@ -1222,17 +1394,6 @@ class GFManager(object):
         # Then finally get sub set of coordinates
         self.xyz = self.xyz[self.nglob2sub, :]
 
-        # Mini kdtree
-        # self.kdtree = KDTree(
-        #     self.xyz[
-        #         self.ibool[
-        #             self.header['NGLLX']//2,
-        #             self.header['NGLLY']//2,
-        #             self.header['NGLLZ']//2,
-        #             :]
-        #     ]
-        # )
-
         # Read strains into big array
         self.networks = []
         self.stations = []
@@ -1409,6 +1570,188 @@ class GFManager(object):
                 i, lock, subsetfilename, self.db[i], nsteps,
                 self.nglob2sub, sglob, rsglob,
                 fortran))
+            processes.append(p)
+            p.start()
+
+        for process in processes:
+            process.join()
+
+    def write_DB_directIO(
+            self, DBdir, lat, lon, depth, dist_in_km=125.0, duration=None,
+            NGLL=5):
+
+        if self.subset:
+            logging.warning('Note that you already loaded a subset. Exiting')
+            return
+
+        # Check if KDtree is loaded
+        if not self.header:
+            self.load_header_variables()
+
+        logger.info("Locating source ...")
+
+        x_target, y_target, z_target = source2xyz(
+            lat, lon, depth, M=None,
+            topography=self.header['topography'],
+            ellipticity=self.header['ellipticity'],
+            ibathy_topo=self.header['itopo'],
+            NX_BATHY=self.header['nx_topo'],
+            NY_BATHY=self.header['ny_topo'],
+            RESOLUTION_TOPO_FILE=self.header['res_topo'],
+            rspl=self.header['rspl'],
+            ellipicity_spline=self.header['ellipticity_spline'],
+            ellipicity_spline2=self.header['ellipticity_spline2'],
+        )
+
+        # Get normalized distance
+        r = dist_in_km/6371.0
+
+        # Get elements
+        logger.info("Querying KDTree ...")
+        point_target = np.array([x_target, y_target, z_target])
+        self.ispec_subset = self.fullkdtree.query_ball_point(point_target, r=r)
+
+        # Catch single element query
+        if isinstance(self.ispec_subset, np.int64):
+            self.ispec_subset = np.array([self.ispec_subset], dtype='i')
+        elif isinstance(self.ispec_subset, list):
+            if len(self.ispec_subset) == 0:
+                raise ValueError(
+                    "Could not find any elements within the radius.")
+            else:
+                self.ispec_subset = np.sort(self.ispec_subset)
+
+        # Number of database files
+        self.Ndb = len(self.db)
+
+        # Depending on choice here we can create a subset with 3 GLL point from
+        # one with 5!
+        if NGLL == 3:
+            if self.header['NGLLX'] == 3:
+                iboolslice = slice(0, NGLL)
+                self.NGLL = 3
+            else:
+                iboolslice = slice(0, 5, 2)
+                self.NGLL = 3
+        elif NGLL == 5:
+            if self.header['NGLLX'] == 3:
+                iboolslice = slice(0, 3)
+                self.NGLL = 3
+                print(72*'=')
+                print(
+                    'The original database was only save using 3 GLL points.\n'
+                    'You requested 5. Setting GLL to 3.')
+                print(72*'=')
+            else:
+                iboolslice = slice(0, 5)
+                self.NGLL = 5
+        else:
+            raise ValueError(
+                f'NGLL {NGLL} is not valid. Choose 3 or 5.')
+
+        print(self.ibool)
+        print(iboolslice)
+        print(self.ibool.shape)
+
+        # Read ibool
+        logger.info("Getting ibool subset ...")
+        ibool = self.ibool[
+            iboolslice, iboolslice, iboolslice,
+            self.ispec_subset]
+
+        # Get unique elements
+        logger.info("Uniqueing ibool ...")
+        self.nglob2sub, inv = np.unique(ibool, return_inverse=True)
+
+        # HDF5 can only access indeces in incresing order. So, we have to
+        # sort the globs, and after we retreive the array unsort it and
+        # reshape it
+        # For later I'll need to test this before I can implement it.
+        sglob = np.argsort(self.nglob2sub)
+        rsglob = np.argsort(sglob)
+
+        print("N2S", self.nglob2sub)
+        # Get new index array of length of the unique values
+        indeces = np.arange(len(self.nglob2sub))
+
+        # Get fixed ibool array for the interpolation and source location
+        self.ibool = indeces[inv].reshape(ibool.shape)
+
+        # Then finally get sub set of coordinates
+        self.xyz = self.xyz[self.nglob2sub, :]
+
+        if self.do_adjacency_search:
+            logger.info("Making Adjacency ...")
+
+            self.xadj = np.zeros(len(self.ispec_subset) + 1, dtype='i')
+            MAX_NEIGHBORS = 50
+            tmp_adjacency = np.zeros(
+                MAX_NEIGHBORS*len(self.ispec_subset), dtype='i')
+
+            inum_neighbor = 0
+
+            for _j in range(len(self.ispec_subset)):
+
+                ispec = self.ispec_subset[_j]
+
+                # Get neighbors
+                num_neighbors = self.header['xadj'][ispec +
+                                                    1] - self.header['xadj'][ispec]
+
+                # Loop over neighbors in full mesh
+                for i in range(num_neighbors):
+
+                    # get neighbor from global adjacency
+                    ispec_neighbor = self.header['adjacency'][self.header['xadj'][ispec] + i]
+
+                    # Check whether global neighbor is also a local neighbor.
+                    if ispec_neighbor in self.ispec_subset:
+
+                        # If is neighbor increase total neighbor counter.
+                        inum_neighbor = inum_neighbor + 1
+
+                        # Get indeces of neighbors
+                        idx = np.where(ispec_neighbor ==
+                                       self.ispec_subset)[0]
+
+                        # Add neighbor to adjacency vector
+                        tmp_adjacency[inum_neighbor] = idx
+
+                # Add total event counter to adjacency vetor
+                self.xadj[_j+1] = inum_neighbor
+
+                # Define final adjacency array
+                self.adjacency = tmp_adjacency[:inum_neighbor]
+
+                # Define neighbor counter
+                num_neighbors_all_gf = inum_neighbor
+        else:
+            do_adjacency_search = False
+            xadj = None
+            adjacency = None
+
+        # Header Variables
+        if duration is not None:
+            nsteps = int(
+                np.ceil((self.header['tc'] + duration)/self.header['dt']))
+
+            # Can only store as many steps as we have...
+            if nsteps > self.header['nsteps']:
+                nsteps = self.header['nsteps']
+        else:
+            nsteps = self.header['nsteps']
+
+        # Process lock
+        lock = Lock()
+        processes = []
+
+        # Loop over stations and start I/O for each station.
+        for i in range(self.Ndb):
+
+            p = Process(target=stationIO_DB, args=(
+                i, self.db[i], DBdir,
+                nsteps, self.ibool, self.xyz, NGLL, self.nglob2sub, sglob, rsglob,
+                self.do_adjacency_search, xadj, adjacency))
             processes.append(p)
             p.start()
 

@@ -20,3 +20,11 @@ examples/extras/stations_gcmt.txt
 scripts/DATA
 scripts/*.pkl
 scripts/*.html
+tempDB
+OUTSEIS
+OUTPUT
+dbfiles
+client
+*.ndk
+*.pkl
+*.txt

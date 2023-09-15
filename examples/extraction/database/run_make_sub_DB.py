@@ -33,6 +33,8 @@ gfm.write_DB_directIO('tempDB', cmt.latitude, cmt.longitude, cmt.depth,
 
 gfsub = GFManager(glob('tempDB/*/*/*.*.h5'))
 gfsub.load_header_variables()
+gfsub.get_elements(cmt.latitude, cmt.longitude, cmt.depth, dist_in_km=125,
+                   NGLL=3)
 
 # %%
 # Finally you can read the seismograms.

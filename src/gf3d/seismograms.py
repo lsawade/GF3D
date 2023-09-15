@@ -4,7 +4,7 @@ import h5py
 import contextlib
 import typing as tp
 from copy import deepcopy
-from obspy import Trace, Stream
+from obspy import Trace, Stream, Inventory
 from obspy.core.trace import Stats
 from scipy.spatial import KDTree
 import numpy as np
@@ -86,22 +86,24 @@ def stationIO(
             t0 = time()
             array = db[f'displacement/{comp}/array'][:,
                                                      nglob2sub[sglob], :]
-            print(f"{_i: > 05d} reading: {time()-t0}")
+            print(f"{_i:>05d} reading: {time()-t0}")
 
             t0 = time()
             array = array.astype(np.float32)
-            print(f"{_i: > 05d} convert: {time()-t0}")
+            print(f"{_i:>05d} convert: {time()-t0}")
 
             t0 = time()
             array = array[:, rsglob, :] * norm / factor
-            print(f"{_i: > 05d} resort:  {time()-t0}")
+            print(f"{_i:>05d} resort:  {time()-t0}")
 
             t0 = time()
             displacement[_j, :, :, :] = array
-            print(f"{_i: > 05d} assign:  {time()-t0}")
+            print(f"{_i:>05d} assign:  {time()-t0}")
 
     lock.acquire()
+    t0 = time()
 
+    print(f"{_i:>05d} writing: ")
     with h5py.File(subsetfilename, 'r+') as db:
 
         # Store fixed length strings for fortran
@@ -117,6 +119,7 @@ def stationIO(
         else:
             db[f'displacement'][_i, :, :, :, :] = displacement[:, :, :, :]
 
+    print(f"{_i:>05d} writing: ")
     lock.release()
 
 
@@ -2529,3 +2532,58 @@ class GFManager(object):
 
             if self.header['ellipticity']:
                 self.header['nspl'] = len(db['rspl'][:])
+
+    def get_inventory(self) -> Inventory:
+        """Generates inventory from stations in subset
+
+        Returns
+        -------
+        obspy.Inventory
+            Inventory containing the networks and stations and locations
+            of the stations. Note that "elevation" is the burial used for the
+            station and is given as negative down.
+
+        Raises
+        ------
+        ValueError
+            if trying to access from database.
+        """
+
+        if self.subset is False:
+            raise ValueError('Must be subset. Not implemented for database')
+
+        from obspy.core.inventory.inventory import Inventory
+        from obspy.core.inventory.station import Station
+        from obspy.core.inventory.network import Network
+
+        # First get unique networks
+        unique_networks = set(self.networks)
+
+        # Init networks list
+        networks = []
+
+        for net in unique_networks:
+
+            # Get all stations from the same network
+            idxs = [_i for _i, _net in enumerate(self.networks) if _net == net]
+
+            stations = []
+            for _i in idxs:
+
+                # Create obspy.Station
+                station = Station(self.stations[_i], self.latitudes[_i],
+                                  self.longitudes[_i], -self.burials[_i])
+
+                # append to list of stations belonging to the network
+                stations.append(station)
+
+            # Create Network
+            network = Network(net, stations=stations)
+
+            # Append to list of networks
+            networks.append(network)
+
+        # Create inventory
+        inv = Inventory(networks=networks)
+
+        return inv

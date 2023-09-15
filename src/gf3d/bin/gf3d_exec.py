@@ -530,6 +530,108 @@ def subset_extract(
                     outdir, tr.id + f'.{pypars[par]}.mseed'), format='MSEED')
 
 
+@subset.command(name='extract-cmt')
+@click.argument('subsetfilename', type=click.Path(exists=True))
+@click.argument('cmtsolutionfilename', type=click.Path(exists=True))
+@click.argument('itypsokern', type=int)
+@click.argument('outdir', type=str)
+@click.option('--inv', is_flag=True, default=False, help='Write inventory', type=bool)
+def subset_extract_cmt(
+        subsetfilename: str,
+        cmtsolutionfilename: str,
+        itypsokern: int,
+        outdir: str,
+        inv: bool = False):
+    """Gets synthetics from subset file.
+
+        gf3d subset extract-cmt subsetfilename cmtsolutionfilename itypsokern outdir
+
+    \b
+    OUTPUT FORMAT:
+    --------------
+    \b
+                                                   #                          itypsokern
+        <outdir>/NET.STA.S3.MX{N,E,Z}.mseed        # for the synthetic        0
+        <outdir>/NET.STA.S3.MX{N,E,Z}.<par>.mseed  # for the kernels
+                                                   # par = mrr, mtt, mpp,     1
+                                                   #       mrt, mrp, mtp,
+                                                   #       lat, lon, dep,     2
+                                                   #       cmt, hdr           3
+
+    \b
+    PARAMETERS:
+    -----------
+
+    \b
+    SUBSETFILENAME = file containing Green functions of a subset of elements
+    CMTSOLUTIONFILENAME = file with a cmtsolution
+    ITYPSOKERN = which seismograms to make, see below
+    OUTDIR = directory to write synthetics to
+
+    \b
+    OUTPUT:
+    -------
+
+    \b
+    if itypsokern = 0, the subroutine only returns the synthetic seismogram
+       itypsokern = 1, the subroutine returns the synthetic seismogram,
+                     and the 6 moment-tensor kernels
+       itypsokern = 2, the subroutine returns the synthetic seismogram, the
+                     6 moment-tensor kernels and 4 centroid kernels
+
+    """
+    import os
+    from gf3d.seismograms import GFManager
+    from gf3d.source import CMTSOLUTION
+
+    # Create CMT source
+    cmt = CMTSOLUTION.read(cmtsolutionfilename)
+
+    GFM = GFManager(subsetfilename)
+    GFM.load()
+
+    if itypsokern >= 0:
+        # Get seismograms
+        synt = GFM.get_seismograms(cmt)
+
+        # Create synthetic output directory if it doesn't exist
+        if os.path.exists(outdir) == False:
+            os.makedirs(outdir)
+
+        for tr in synt:
+            tr.write(os.path.join(outdir, tr.id + '.sac'), format='SAC')
+
+    if itypsokern >= 1:
+
+        # pypars to F90
+        pypars = {
+            "Mrr": "mrr",
+            "Mtt": "mtt",
+            "Mpp": "mpp",
+            "Mrt": "mrr",
+            "Mrp": "mrp",
+            "Mtp": "mtp",
+            "latitude": "lat",
+            "longitude": "lon",
+            "depth": "dep",
+            "time_shift": "cmt",
+            "hdur": "hdr"
+        }
+
+        pardict = GFM.get_frechet(cmt, rtype=itypsokern)
+
+        for par, kern in pardict.items():
+
+            for tr in kern:
+                tr.write(os.path.join(
+                    outdir, tr.id + f'.{pypars[par]}.mseed'), format='SAC')
+
+    if inv:
+        inventory = GFM.get_inventory()
+        inventory.write(os.path.join(outdir, 'station.xml'),
+                        format='STATIONXML')
+
+
 @subset.group()
 def plot():
     '''Interface to database plotting tools.'''
@@ -618,7 +720,7 @@ def plot_subset_section(
 
     # Get time limits
     starttime = rp[0].stats.starttime
-    endtime = rp[0].stats.starttime + 3800  # rp[0].stats.endtime
+    endtime = rp[0].stats.endtime
     limits = (starttime, endtime)
 
     # Plots a section of observed and synthetic

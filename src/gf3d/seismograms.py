@@ -119,7 +119,7 @@ def stationIO(
         else:
             db[f'displacement'][_i, :, :, :, :] = displacement[:, :, :, :]
 
-    print(f"{_i:>05d} writing: ")
+    print(f"{_i:>05d} writing: {time()-t0}")
     lock.release()
 
 
@@ -2452,7 +2452,7 @@ class GFManager(object):
             self.kdtree = KDTree(self.xyz[self.ibool[
                 self.NGLL//2,
                 self.NGLL//2,
-                self.NGLL//2, :]])
+                self.NGLL//2, :], :])
 
             self.do_adjacency_search = db['do_adjacency_search'][()]
 

@@ -685,7 +685,6 @@ def plot_station_seismogram(subsetfilename, cmtsolutionfilename, network, statio
     gfsub.load()
 
     rp = gfsub.get_seismograms(cmt)
-    rp.filter('lowpass', freq=1.0/90.0)
 
     limits = rp[0].stats.starttime, rp[0].stats.endtime
 

@@ -90,7 +90,7 @@ def locate_point(
     # initializes located target
     # if we have not located a target element, the receiver is not in this slice
     # therefore use first element only for fictitious iterative search
-    ispec_selected = 1
+    ispec_selected = 0
     ix_initial_guess = NGLL//2
     iy_initial_guess = NGLL//2
     iz_initial_guess = NGLL//2
@@ -207,13 +207,13 @@ def locate_point(
                 # searches for better position in neighboring elements
                 logger.debug(
                     "   REALLY DOING THE ADJACENCY SEARCH   on boundary")
-
+                logger.debug(f'    Starting ispec: {ispec_selected}')
                 xi, eta, gamma, x, y, z, xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz, ispec_selected = find_best_neighbor(
                     x_target, y_target, z_target, xi, eta, gamma, x, y, z,
                     xix, xiy, xiz, etax, etay, etaz, gammax, gammay, gammaz,
                     x_store, y_store, z_store, ibool, ispec_selected, distmin_squared,
                     xadj, adjacency, POINT_CAN_BE_BURIED, NGLL=NGLL)
-
+                logger.debug(f'    Final ispec: {ispec_selected}')
                 # raise ValueError(
                 #     'Point found is outside element. and adjacent search is'
                 #     'not yet implmenented.')

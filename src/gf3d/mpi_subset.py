@@ -168,16 +168,16 @@ class MPISubset(object):
 
         # Broadcast all header variables
         self.header = self.comm.bcast(self.header, root=0)
-        self.NGLL = self.comm.bcast(self.NGLL , root=0)
-        self.networks = self.comm.bcast(self.networks , root=0)
-        self.stations = self.comm.bcast(self.stations , root=0)
-        self.latitudes = self.comm.bcast(self.latitudes , root=0)
-        self.longitudes = self.comm.bcast(self.longitudes , root=0)
-        self.burials = self.comm.bcast(self.burials , root=0)
-        self.ibool = self.comm.bcast(self.ibool , root=0)
-        self.xyz = self.comm.bcast(self.xyz , root=0)
-        self.kdtree = self.comm.bcast(self.kdtree , root=0)
-        self.do_adjacency_search = self.comm.bcast(self.do_adjacency_search , root=0)
+        self.NGLL = self.comm.bcast(self.NGLL, root=0)
+        self.networks = self.comm.bcast(self.networks, root=0)
+        self.stations = self.comm.bcast(self.stations, root=0)
+        self.latitudes = self.comm.bcast(self.latitudes, root=0)
+        self.longitudes = self.comm.bcast(self.longitudes, root=0)
+        self.burials = self.comm.bcast(self.burials, root=0)
+        self.ibool = self.comm.bcast(self.ibool, root=0)
+        self.xyz = self.comm.bcast(self.xyz, root=0)
+        self.kdtree = self.comm.bcast(self.kdtree, root=0)
+        self.do_adjacency_search = self.comm.bcast(self.do_adjacency_search, root=0)
 
         if self.do_adjacency_search:
             self.xadj = self.comm.bcast(self.xadj , root=0)
@@ -256,7 +256,7 @@ class MPISubset(object):
         indeces = np.arange(len(iglobf))
 
 
-        if False:
+        if True:
             # Read from the HDF5 file in serial
             for _rank in range(self.size):
 

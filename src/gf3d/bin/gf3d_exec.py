@@ -206,10 +206,9 @@ def query_subset(
             # Get subset
             GFM = GFManager(db_files)
             GFM.load_header_variables()
-            GFM.get_elements(
-                latitude, longitude, depth_in_km, radius_in_km, NGLL=ngll,
-                threading=not nothreading)
-            GFM.write_subset(subsetfilename, fortran=fortran)
+            GFM.write_subset_directIO(subsetfilename, latitude, longitude,
+                                      depth_in_km, radius_in_km, NGLL=ngll,
+                                      fortran=fortran)
 
     else:
         from gf3d.client import GF3DClient

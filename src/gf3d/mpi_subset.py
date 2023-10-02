@@ -206,7 +206,7 @@ class MPISubset(object):
             self.header['ellipticity_spline2'] = self.comm.bcast(self.header['ellipticity_spline2'], root = 0)
 
 
-    def get_seismograms(self, cmt: CMTSOLUTION) -> Stream:
+    def get_seismograms(self, cmt: CMTSOLUTION) -> np.ndarray:
 
         # Get moment tensor
         x_target, y_target, z_target, Mx = source2xyz(
@@ -255,8 +255,7 @@ class MPISubset(object):
         # Finally just a list of ascneding indeces to grap from the database
         indeces = np.arange(len(iglobf))
 
-
-        if True:
+        if False:
             # Read from the HDF5 file in serial
             for _rank in range(self.size):
 
@@ -363,6 +362,17 @@ class MPISubset(object):
 
         logger.debug(f"Lengths: {self.header['nsteps']}, {NP2}")
 
+        # Same as loop?
+        data = np.real(
+            fft.ifft(fft.fft(seismograms, n=NP2, axis=2)
+                     * STF_R[None, None, :]
+                     * phshift[None, None, :]
+                        )[:, :, :self.header['nsteps']]) * self.header['dt']
+
+        return data
+
+    def get_stream(self, cmt, data):
+
         # Add traces to the
         traces = []
         for _h in range(len(self.stations)):
@@ -371,10 +381,6 @@ class MPISubset(object):
                 # Convolution with the STF and correctional timeshift
                 # data = butter_band_two_pass_filter(
                 #     seismograms[_h, _i, :], [0.001, 1/self.header['dt']/2.1], 1/self.header['dt'])
-
-                data = np.real(
-                    fft.ifft(fft.fft(seismograms[_h, _i, :], n=NP2) * STF_R * phshift
-                             )[:self.header['nsteps']]) * self.header['dt']
 
                 stats = Stats()
                 stats.delta = self.header['dt']
@@ -388,7 +394,7 @@ class MPISubset(object):
                 stats.channel = f'MX{comp}'
                 stats.starttime = cmt.origin_time - self.header['tc']
                 stats.npts = self.header['nsteps']
-                tr = Trace(data=data, header=stats)
+                tr = Trace(data=data[_h, _i, :], header=stats)
 
                 traces.append(tr)
 

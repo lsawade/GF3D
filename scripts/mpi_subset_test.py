@@ -1,4 +1,4 @@
-
+import numpy as np
 from copy import deepcopy
 from gf3d.mpi_subset import MPISubset
 from gf3d.source import CMTSOLUTION
@@ -83,9 +83,9 @@ def test_mpi_perturb():
             os.mkdir(outdir)
 
         parameters = [
-            'synt',
-            'Mrr',
-            # 'Mtt',
+            # 'synt',
+            # 'Mrr',
+            'Mtt',
             # 'Mpp',
             # 'Mrt',
             # 'Mrp',
@@ -93,7 +93,7 @@ def test_mpi_perturb():
             # 'latitude',
             # 'longitude',
             'depth',
-            # 'time_shift'
+            'time_shift'
         ]
 
         # Make local version that includes only the wanted parameters
@@ -192,61 +192,62 @@ def test_mpi_perturb():
 
     # Get the seismograms
     print(f"{rank}/{size} -- Getting seismograms", flush=True)
-    st = MS.get_seismograms(cmt)
+    data = MS.get_seismograms(cmt)
 
     print(f"{rank}/{size} --     Got seismograms", flush=True)
     # Compute final seismograms
     if par == 'synt':
-        pass
+        st = MS.get_stream(cmt, data)
         # station = st.select(network='II', station='ARU', component='Z')
         # station.filter('lowpass', freq=1.0/90.0)
         # station.plot(outfile='synthetics.png')
 
     elif local_pertdict[par]['type'] == 'CFD':
 
-
         if pert == 1:
+
+            neg = np.empty_like(data)
             print(f"{rank}/{size} -- waiting to receive", flush=True)
-            neg = comm.recv(source=sr_rank)
+            comm.Recv(neg, source=sr_rank)
             print(f"{rank}/{size} -- received", flush=True)
+
         elif pert == -1:
             print(f"{rank}/{size} -- waiting to send", flush=True)
-            comm.send(st, dest=sr_rank)
+            comm.Send(data, dest=sr_rank)
             print(f"{rank}/{size} -- sent", flush=True)
+
         else:
             raise ValueError('Only 1 and -1 can be used for pert since it '
                              'indicates sending or receiving streams')
 
         if pert == 1:
-            for _postr, _negtr in zip(st, neg):
 
-                # Subtract and divide by twice the perturbation
-                _postr.data = (_postr.data - _negtr.data) \
-                    / (2 * local_pertdict[par]['pert'])
+            data = (data - neg) / (2 * local_pertdict[par]['pert'])
+
+            st = MS.get_stream(cmt, data)
 
     elif local_pertdict[par]['type'] == 'grad':
 
         # Take the gradient
-        st.differentiate()
-
-        # Multiply by -1
-        for _tr in st:
-            _tr.data *= -1
+        data = np.gradient(data, MS.header['dt'], axis=2)
+        st = MS.get_stream(cmt, data*-1)
 
     elif local_pertdict[par]['type'] == 'FFD':
 
-        # Divide the perturbed seismogram by the perturbation
-        for tr in st:
-            tr.data *= 1/local_pertdict[par]['pert']
+        # Take the gradient
+        st = MS.get_stream(cmt, data/local_pertdict[par]['pert'])
 
     else:
         raise ValueError(f'Unknown perturbation type. Abort for par: {par}')
 
 
     # Write the seismograms
-    if par == 'synt' or par == 'time_shift' or pert == 1 or local_pertdict[par]['type']:
+    if par == 'synt' or par == 'time_shift' or pert == 1 or local_pertdict[par]['type']=='grad':
+        print(rank, size, par, flush=True)
         st.write(f'{outdir}/{par}.mseed', format='MSEED')
 
+    # Making sure all processes are done before exiting
+    comm.Barrier()
 
 if __name__ == '__main__':
     # sys.excepthook = mpiabort_excepthook

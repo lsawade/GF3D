@@ -49,7 +49,7 @@ def test_mpi_subset():
     size = comm.Get_size()
     rank = comm.Get_rank()
 
-    MS = MPISubset('subset.h5')
+    MS = MPISubset('/gpfs/alpine/geo111/scratch/lsawade/subset.h5')
 
     # Print the rank and the type of the kdtree
     print(f'{rank}/{size}', type(MS.kdtree))
@@ -79,6 +79,8 @@ def test_mpi_perturb():
 
 
     if rank == 0:
+
+        print(os.getcwd())
         if os.path.exists(outdir) is False:
             os.mkdir(outdir)
 
@@ -188,7 +190,7 @@ def test_mpi_perturb():
     print(f"{rank}/{size}", par, pert, sr_rank, flush=True)
 
     # Get the seismograms
-    MS = MPISubset('subset.h5')
+    MS = MPISubset('/gpfs/alpine/geo111/scratch/lsawade/subset.h5')
 
     # Get the seismograms
     print(f"{rank}/{size} -- Getting seismograms", flush=True)
@@ -239,6 +241,7 @@ def test_mpi_perturb():
 
     else:
         raise ValueError(f'Unknown perturbation type. Abort for par: {par}')
+
 
 
     # Write the seismograms

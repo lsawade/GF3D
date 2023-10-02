@@ -107,6 +107,7 @@ def stationIO(
     with h5py.File(subsetfilename, 'r+') as db:
 
         # Store fixed length strings for fortran
+        print(network, station)
         db['Networks'][_i] = network
         db['Stations'][_i] = station
         db['latitudes'][_i] = latitude
@@ -1473,7 +1474,7 @@ class GFManager(object):
                 db.create_dataset('Stations', (self.Ndb,), dtype="S32")
             else:
                 # For python subsets this does not matter.
-                db.create_dataset('Networks', (self.Ndb,), dtype="S32")
+                db.create_dataset('Networks', (self.Ndb,), dtype="S8")
                 db.create_dataset('Stations', (self.Ndb,), dtype="S32")
 
             db.create_dataset('latitudes', (self.Ndb,), dtype='f')

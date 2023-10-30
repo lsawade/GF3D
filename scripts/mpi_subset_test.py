@@ -49,7 +49,8 @@ def test_mpi_subset():
     size = comm.Get_size()
     rank = comm.Get_rank()
 
-    MS = MPISubset('/gpfs/alpine/geo111/scratch/lsawade/subset.h5')
+    # MS = MPISubset('/gpfs/alpine/geo111/scratch/lsawade/subset.h5')
+    MS = MPISubset('/Users/lucassawade/PDrive/Python/Codes/GF3D/subset.h5')
 
     # Print the rank and the type of the kdtree
     print(f'{rank}/{size}', type(MS.kdtree))
@@ -85,17 +86,17 @@ def test_mpi_perturb():
             os.mkdir(outdir)
 
         parameters = [
-            # 'synt',
+            'synt',
             # 'Mrr',
-            'Mtt',
+            # 'Mtt',
             # 'Mpp',
             # 'Mrt',
             # 'Mrp',
             # 'Mtp',
             # 'latitude',
             # 'longitude',
-            'depth',
-            'time_shift'
+            # 'depth',
+            # 'time_shift'
         ]
 
         # Make local version that includes only the wanted parameters
@@ -190,7 +191,8 @@ def test_mpi_perturb():
     print(f"{rank}/{size}", par, pert, sr_rank, flush=True)
 
     # Get the seismograms
-    MS = MPISubset('/gpfs/alpine/geo111/scratch/lsawade/subset.h5')
+    # MS = MPISubset('/gpfs/alpine/geo111/scratch/lsawade/subset.h5')
+    MS = MPISubset('/Users/lucassawade/PDrive/Python/Codes/GF3D/subset.h5')
 
     # Get the seismograms
     print(f"{rank}/{size} -- Getting seismograms", flush=True)

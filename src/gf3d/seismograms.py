@@ -2344,9 +2344,9 @@ class GFManager(object):
                 db.create_dataset('Networks', data=self.networks)
                 db.create_dataset('Stations', data=self.stations)
 
-            db.create_dataset('latitudes', data=self.latitudes)
-            db.create_dataset('longitudes', data=self.longitudes)
-            db.create_dataset('burials', data=self.burials)
+            db.create_dataset('latitudes', data=self.latitudes, dtype="f")
+            db.create_dataset('longitudes', data=self.longitudes, dtype="f")
+            db.create_dataset('burials', data=self.burials, dtype="f")
 
             if fortran:
                 db.create_dataset('fortran', data=1)

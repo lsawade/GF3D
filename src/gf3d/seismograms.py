@@ -89,7 +89,7 @@ def stationIO(
             print(f"{_i:>05d} reading: {time()-t0}")
 
             t0 = time()
-            array = array.astype(np.float32)
+            array = array.astype(np.float64)
             print(f"{_i:>05d} convert: {time()-t0}")
 
             t0 = time()
@@ -1553,11 +1553,10 @@ class GFManager(object):
 
             if fortran:
                 logger.info('Initializing Fortran order displacement array')
-                db.create_dataset('displacement', dispshape[::-1], dtype='f')
+                db.create_dataset('displacement', dispshape[::-1], dtype='f8')
             else:
                 logger.info('Initializing C order displacement array')
-                db.create_dataset(
-                    'displacement', dispshape, dtype='f')
+                db.create_dataset('displacement', dispshape, dtype='f8')
             # shuffle=True, compression='lzf')
 
             logger.info('Done.')

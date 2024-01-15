@@ -307,7 +307,8 @@ def station():
 @click.argument('cmtsolutionfilename', type=click.Path(exists=True))
 @click.argument('network', type=str)
 @click.argument('station', type=str)
-def plot_station(databaseroot, cmtsolutionfilename, network, station):
+@click.option("-o", "--outfile", type=str)
+def plot_station(databaseroot, cmtsolutionfilename, network, station, outfile=None):
 
     # External
     import os
@@ -335,7 +336,11 @@ def plot_station(databaseroot, cmtsolutionfilename, network, station):
     limits = rp[0].stats.starttime, rp[0].stats.endtime
 
     plotseismogram(rp, None, cmt, limits=limits)
-    plt.show(block=True)
+    
+    if outfile:
+        plt.savefig(outfile, dpi=300)
+    else:
+        plt.show(block=True)
 
 
 @cli.group()
@@ -664,7 +669,8 @@ def station():
 @click.argument('cmtsolutionfilename', type=click.Path(exists=True))
 @click.argument('network', type=str)
 @click.argument('station', type=str)
-def plot_station_seismogram(subsetfilename, cmtsolutionfilename, network, station):
+@click.option("-o", "--outfile", type=str, default=None)
+def plot_station_seismogram(subsetfilename, cmtsolutionfilename, network, station, outfile=None):
 
     # External
     import matplotlib.pyplot as plt
@@ -689,7 +695,10 @@ def plot_station_seismogram(subsetfilename, cmtsolutionfilename, network, statio
 
     plotseismogram(rp.select(network=network, station=station),
                    None, cmt, limits=limits)
-    plt.show(block=True)
+    if outfile:
+        plt.savefig(outfile, dpi=300)
+    else:
+        plt.show(block=True)
 
 
 @station.command(name='section')

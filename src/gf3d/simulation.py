@@ -20,7 +20,7 @@ class Simulation:
 
     def __init__(
             self,
-            specfemdir,
+            specfemdir: str,
             stationdir: str | None = None,
             station_latitude: float | None = None,
             station_longitude: float | None = None,
@@ -42,6 +42,7 @@ class Simulation:
             ndt: None | float = None,
             lpfilter: str = 'butter',
             forward_test: bool = False,
+            forwardspecfemdir: str | None = None,
             forwardoutdir: str | None = None,
             broadcast_mesh_model: bool = False,
             simultaneous_runs: bool = False,
@@ -170,6 +171,7 @@ class Simulation:
 
         self.specfemdir = specfemdir
         self.stationdir = stationdir
+        self.forwardspecfemdir = forwardspecfemdir
         self.forwardoutdir = forwardoutdir
         self.station_latitude = station_latitude   # degree
         self.station_longitude = station_longitude # degree
@@ -271,7 +273,7 @@ class Simulation:
                 --exclude='obj/*' \
                 --exclude='bin/*' \
                 --delete \
-                {self.specfemdir}/ {self.specfemdir_forward}"""
+                {self.forwardspecfemdir}/ {self.specfemdir_forward}"""
 
             subprocess.check_call(copytreecmd, shell=True)
 
@@ -322,6 +324,43 @@ class Simulation:
                     os.symlink(BINS_SOURCE, BINS_TARGET)
 
         # Create Write all the files
+        if self.forward_test:
+
+            # Remove pre-existing directory
+            if (os.path.exists(self.specfemdir_forward) and self.overwrite) or \
+                not os.path.exists(self.specfemdir_forward):
+
+                subprocess.check_call(f'rm -rf {self.specfemdir_forward}', shell=True)
+
+                # Make dir
+                os.makedirs(self.specfemdir_forward)
+
+                # DATA DIR
+                DATADIR = os.path.join(self.specfemdir_forward, 'DATA')
+                os.makedirs(DATADIR)
+
+                # OUTPUT DIR
+                OUTPUT_DIR = os.path.join(self.specfemdir_forward, 'OUTPUT_FILES')
+                os.makedirs(OUTPUT_DIR)
+
+                if self.simultaneous_runs is False:
+
+                    # Link DATABASES
+                    DATABASES_MPI_SOURCE = os.path.join(
+                        self.forwardspecfemdir, "DATABASES_MPI")
+                    DATABASES_MPI_TARGET = os.path.join(
+                        self.specfemdir_forward, "DATABASES_MPI")
+
+                    os.symlink(DATABASES_MPI_SOURCE, DATABASES_MPI_TARGET)
+
+                    # Link BINs
+                    BINS_SOURCE = os.path.join(
+                        self.forwardspecfemdir, "bin")
+                    BINS_TARGET = os.path.join(
+                        self.specfemdir_forward, "bin")
+
+                    os.symlink(BINS_SOURCE, BINS_TARGET)
+
 
         # Write Rotation files
         self.logger.debug('Updating constants.h.in ...')

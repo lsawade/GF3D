@@ -78,11 +78,15 @@ class MPISubset(object):
 
     adjacency: np.ndarray | None = None
 
-    def __init__(self, subset) -> None:
+    def __init__(self, subset, comm=None, verbose=True) -> None:
         """Initializes the gfm manager"""
 
-        import mpi4py.MPI as MPI
-        self.comm = MPI.COMM_WORLD
+        if comm is not None:
+            self.comm = comm
+        else:
+            import mpi4py.MPI as MPI
+            self.comm = MPI.COMM_WORLD
+
         self.rank = self.comm.Get_rank()
         self.size = self.comm.Get_size()
 
@@ -91,6 +95,9 @@ class MPISubset(object):
         self.subset = True
         self.headerfile = self.db
 
+        # Verbosity
+        self.verbose = verbose
+
         # Load header
         self.load_bcast_header()
 
@@ -98,6 +105,9 @@ class MPISubset(object):
     def load_bcast_header(self):
 
         if self.rank == 0:
+
+            if self.verbose:
+                print("MPISubset: --> reading header", flush=True)
 
             self.header = dict()
 
@@ -167,6 +177,10 @@ class MPISubset(object):
 
 
         # Broadcast all header variables
+        if self.rank == 0 and self.verbose:
+            print("MPISubset: --> broadcasting header", flush=True)
+            t0 = time()
+
         self.header = self.comm.bcast(self.header, root=0)
         self.NGLL = self.comm.bcast(self.NGLL, root=0)
         self.networks = self.comm.bcast(self.networks, root=0)
@@ -205,9 +219,13 @@ class MPISubset(object):
             self.header['ellipticity_spline'] = self.comm.bcast(self.header['ellipticity_spline'], root = 0)
             self.header['ellipticity_spline2'] = self.comm.bcast(self.header['ellipticity_spline2'], root = 0)
 
+        if self.rank == 0 and self.verbose:
+            print("MPISubset: --> header broadcasted in", time()-t0, "seconds", flush=True)
+
 
     def get_seismograms(self, cmt: CMTSOLUTION) -> np.ndarray:
 
+        t0 = time()
         # Get moment tensor
         x_target, y_target, z_target, Mx = source2xyz(
             cmt.latitude, cmt.longitude, cmt.depth, M=cmt.tensor,
@@ -256,9 +274,19 @@ class MPISubset(object):
         indeces = np.arange(len(iglobf))
 
         # Hello
+        if self.verbose:
+            t0_read = time()
+            print(f"MPI Subset[{self.rank}]: --> Start reading from HDF5 subset", flush=True)
+
+        # Read displacement
         with h5py.File(self.headerfile, 'r') as db:
             # Get displacement for interpolation
             displacement = db['displacement'][:, :, :, iglobf[sglobf], :]
+
+        if self.verbose:
+            t1_read = time()
+            print(f"MPI Subset[{self.rank}]: --> reading took {t1_read-t0_read} seconds.", flush=True)
+
 
         # Loaded displacement is in weird order so we have to redo it
         displacement = displacement[:, :, :, indeces[rsglob], :]
@@ -354,6 +382,11 @@ class MPISubset(object):
                      * STF_R[None, None, :]
                      * phshift[None, None, :]
                         )[:, :, :self.header['nsteps']]) * self.header['dt']
+
+        t1 = time()
+
+        if self.verbose:
+            print(f"MPI Subset[{self.rank}]: --> Seismograms computed in {t1-t0} seconds", flush=True)
 
         return data
 

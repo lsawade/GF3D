@@ -13,11 +13,17 @@ from gf3d.plot.util import plot_label
 
 
 def get_azimuth_distance_traveltime(
-        cmt, obs, syn,
-        traveltime_window: None | tp.Tuple[str, tp.Tuple[float, float]],
-        comp='Z', newsyn=None, vlove=4.4, vrayleigh=3.7, orbit=1,
-        model: str = "ak135"):
-
+    cmt,
+    obs,
+    syn,
+    traveltime_window: None | tp.Tuple[str, tp.Tuple[float, float]],
+    comp="Z",
+    newsyn=None,
+    vlove=4.4,
+    vrayleigh=3.7,
+    orbit=1,
+    model: str = "ak135",
+):
     # Get a single component
     pobs = obs.select(component=comp).copy()
     psyn = syn.select(component=comp).copy()
@@ -29,7 +35,6 @@ def get_azimuth_distance_traveltime(
 
     # Get station event distances, labels
     for _i, (_obs, _syn) in enumerate(zip(pobs, psyn)):
-
         # Assign lats/lons
         latA = cmt.latitude
         lonA = cmt.longitude
@@ -57,52 +62,57 @@ def get_azimuth_distance_traveltime(
             pnewsyn[_i].stats.backazimuth = az_B2A_deg
 
     # Sort the stream
-    pobs.sort(keys=['distance', 'network', 'station'])
-    psyn.sort(keys=['distance', 'network', 'station'])
+    pobs.sort(keys=["distance", "network", "station"])
+    psyn.sort(keys=["distance", "network", "station"])
 
     if pnewsyn:
-        pnewsyn.sort(keys=['distance', 'network', 'station'])
+        pnewsyn.sort(keys=["distance", "network", "station"])
 
     if traveltime_window is not None:
         # Phase
         phase = traveltime_window[0]
         trims = traveltime_window[1]
 
-        if phase.lower() == 'love':
-
-            for _i, _tr in enumerate(pobs):
-                dist = (orbit - 1) * 180.0 + ((orbit-1) % 2) * \
-                    180 + (-1)**(orbit-1) * _tr.stats.distance
+        if phase.lower() == "love":
+            for _i, _trd in enumerate(pobs):
+                dist = (
+                    (orbit - 1) * 180.0
+                    + ((orbit - 1) % 2) * 180
+                    + (-1) ** (orbit - 1) * _tr.stats.distance
+                )
                 distkm = dist * 111.11  # km/deg
-                _tr.stats.traveltime = distkm/vlove
-                _tr.stats.tt_correction_type = 'linear'
+                _tr.stats.traveltime = distkm / vlove
+                _tr.stats.tt_correction_type = "linear"
                 _tr.stats.tt_correction_velocity = vlove
-                _tr.stats.label = f'L{orbit}({vlove:.2f} km/s)'
+                _tr.stats.label = f"L{orbit}({vlove:.2f} km/s)"
 
-        elif phase.lower() == 'rayleigh':
-
+        elif phase.lower() == "rayleigh":
             for _i, _tr in enumerate(pobs):
-                dist = (orbit - 1) * 180.0 + ((orbit-1) % 2) * \
-                    180 + (-1)**(orbit-1) * _tr.stats.distance
+                dist = (
+                    (orbit - 1) * 180.0
+                    + ((orbit - 1) % 2) * 180
+                    + (-1) ** (orbit - 1) * _tr.stats.distance
+                )
 
                 distkm = dist * 111.11  # km/deg
-                _tr.stats.traveltime = distkm/vrayleigh
-                _tr.stats.tt_correction_type = 'linear'
+                _tr.stats.traveltime = distkm / vrayleigh
+                _tr.stats.tt_correction_type = "linear"
                 _tr.stats.tt_correction_velocity = vrayleigh
-                _tr.stats.label = f'R{orbit}({vrayleigh:.2f} km/s)'
+                _tr.stats.label = f"R{orbit}({vrayleigh:.2f} km/s)"
 
         else:
-
             # Initialize Taup model
             model = TauPyModel(model=model)
 
             poppable = []
             for _i, _tr in enumerate(pobs):
-
                 arrivals = model.get_travel_times(
                     source_depth_in_km=cmt.depth,
                     distance_in_degree=_tr.stats.distance,
-                    phase_list=[phase, ])
+                    phase_list=[
+                        phase,
+                    ],
+                )
 
                 if len(arrivals) == 0:
                     _tr.stats.traveltime = None
@@ -110,28 +120,27 @@ def get_azimuth_distance_traveltime(
                     _tr.stats.label = None
                 else:
                     _tr.stats.traveltime = arrivals[0].time
-                    _tr.stats.tt_correction_type = 'phase'
+                    _tr.stats.tt_correction_type = "phase"
                     _tr.stats.tt_correction_velocity = None
-                    _tr.stats.label = f'{phase}-Wave'
+                    _tr.stats.label = f"{phase}-Wave"
 
             for _pop in poppable[::-1]:
-
                 pobs.pop(_pop)
                 psyn.pop(_pop)
                 if pnewsyn:
                     pnewsyn.pop(_pop)
 
         for _i, (_obstr, _syntr) in enumerate(zip(pobs, psyn)):
-
             # Set up trace by trace interpolation
             dt = 0.1
             starttime = cmt.origin_time + _obstr.stats.traveltime + trims[0]
-            npts = int(np.round((trims[1] - trims[0])/dt))
+            npts = int(np.round((trims[1] - trims[0]) / dt))
 
             # Interpolation arguments for the inteprolation
-            iargs = 1.0/dt,
-            ikwargs = dict(method='lanczos', starttime=starttime,
-                           npts=npts, time_shift=0.0, a=20)
+            iargs = (1.0 / dt,)
+            ikwargs = dict(
+                method="lanczos", starttime=starttime, npts=npts, time_shift=0.0, a=20
+            )
 
             # Interpolation
             _obstr.interpolate(*iargs, **ikwargs)
@@ -157,16 +166,23 @@ def filter_stations(obs1, obs2):
     return selection
 
 
-def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
-                        traveltime_window: None | tp.Tuple[str, tp.Tuple[float, float]],
-                        *args,
-                        ax: matplotlib.axes.Axes | None = None, comp='Z',
-                        newsyn: Stream | None = None,
-                        labels: bool = True,
-                        labelright: bool = True, labelleft: bool = True,
-                        obsc='k', sync='r', newsync='b',
-                        **kwargs):
-
+def plotsection_aligned(
+    obs: Stream,
+    syn: Stream,
+    cmt: CMTSOLUTION,
+    traveltime_window: None | tp.Tuple[str, tp.Tuple[float, float]],
+    *args,
+    ax: matplotlib.axes.Axes | None = None,
+    comp="Z",
+    newsyn: Stream | None = None,
+    labels: bool = True,
+    labelright: bool = True,
+    labelleft: bool = True,
+    obsc="k",
+    sync="r",
+    newsync="b",
+    **kwargs,
+):
     if ax is None:
         plt.figure(figsize=(9, 6))
         ax = plt.axes()
@@ -192,46 +208,61 @@ def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
     absmax = np.max([np.max(np.abs(_tr.data)) for _tr in pobs])
 
     if labels:
-        plot_label(ax, f'max|u|: {absmax:.5g} m',
-                   fontsize='small', box=False, dist=0.0, location=7)
+        plot_label(
+            ax,
+            f"max|u|: {absmax:.5g} m",
+            fontsize="small",
+            box=False,
+            dist=0.0,
+            location=7,
+        )
 
         # Plot label
-        plot_label(ax, f'{comp}', fontweight='bold',
-                   fontsize='medium', box=False, dist=0.0, location=6)
+        plot_label(
+            ax,
+            f"{comp}",
+            fontweight="bold",
+            fontsize="medium",
+            box=False,
+            dist=0.0,
+            location=6,
+        )
     else:
         labelleft = False
         labelright = False
 
     # Number of stations
-    y = np.arange(1, len(pobs)+1)
+    y = np.arange(1, len(pobs) + 1)
 
     # Set ylabels
     # Set text labels and properties.
     # , rotation=20)
     ax.set_yticks(
-        y, [f"{tr.stats.network}.{tr.stats.station}" for tr in pobs],
-        verticalalignment='center',
-        horizontalalignment='right', fontsize='x-small',
-        color=obsc)
-    ax.tick_params(
-        left=False, right=False, labelleft=labelleft, pad=50.0)
+        y,
+        [f"{tr.stats.network}.{tr.stats.station}" for tr in pobs],
+        verticalalignment="center",
+        horizontalalignment="right",
+        fontsize="x-small",
+        color=obsc,
+    )
+    ax.tick_params(left=False, right=False, labelleft=labelleft, pad=50.0)
 
     # TO have epicentral distances on the right
     ax2 = ax.secondary_yaxis("right")
     ax2.set_yticks(
-        y, [f"D:{tr.stats.distance:>6.2f} A:{tr.stats.azimuth:>6.2f}" for tr in pobs],
-        verticalalignment='center',
-        horizontalalignment='left',
-        fontsize='x-small',
-        color=obsc)
+        y,
+        [f"D:{tr.stats.distance:>6.2f} A:{tr.stats.azimuth:>6.2f}" for tr in pobs],
+        verticalalignment="center",
+        horizontalalignment="left",
+        fontsize="x-small",
+        color=obsc,
+    )
     ax2.spines.right.set_visible(False)
-    ax2.tick_params(
-        left=False, right=False, labelright=labelright, pad=-10.0)
+    ax2.tick_params(left=False, right=False, labelright=labelright, pad=-10.0)
 
     # Normalize
     xlabel = None
     for _i, (_obs, _syn, _y) in enumerate(zip(pobs, psyn, y)):
-
         if _obs.stats.traveltime is None:
             continue
 
@@ -244,25 +275,33 @@ def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
 
         # Condition for "Planned sections"
         plt.plot(
-            _obs.times(type='relative', reftime=reftime),
-            _obs.data / absmax + _y, c=obsc,
-            *args, **kwargs)
+            _obs.times(type="relative", reftime=reftime),
+            _obs.data / absmax + _y,
+            c=obsc,
+            *args,
+            **kwargs,
+        )
         plt.plot(
-            _syn.times(type='relative', reftime=reftime),
-            _syn.data / absmax + _y, c=sync,
-            *args, **kwargs)
+            _syn.times(type="relative", reftime=reftime),
+            _syn.data / absmax + _y,
+            c=sync,
+            *args,
+            **kwargs,
+        )
 
         if pnewsyn:
             plt.plot(
-                pnewsyn[_i].times(type='relative', reftime=reftime),
-                pnewsyn[_i].data / absmax + _y, c=newsync,
-                *args, **kwargs)
+                pnewsyn[_i].times(type="relative", reftime=reftime),
+                pnewsyn[_i].data / absmax + _y,
+                c=newsync,
+                *args,
+                **kwargs,
+            )
 
     top = len(pobs) + 1.0
     bottom = -0.5
 
-    plt.plot([0, 0], [bottom, top], c=obsc,
-             lw=ax.spines.bottom.get_linewidth())
+    plt.plot([0, 0], [bottom, top], c=obsc, lw=ax.spines.bottom.get_linewidth())
 
     ax.set_ylim(bottom, top)
     ax.spines.bottom.set_bounds(trims[0], trims[1])
@@ -273,6 +312,130 @@ def plotsection_aligned(obs: Stream, syn: Stream, cmt: CMTSOLUTION,
     ax.tick_params(left=False, right=False, pad=0)
     ax.spines.left.set_visible(False)
 
-    plt.xlabel(f'{xlabel} offset [s]')
+    plt.xlabel(f"{xlabel} offset [s]")
+
+    return
+
+
+def plotsection_aligned_single(
+    syn: Stream,
+    cmt: CMTSOLUTION,
+    traveltime_window: None | tp.Tuple[str, tp.Tuple[float, float]],
+    *args,
+    ax: matplotlib.axes.Axes | None = None,
+    comp="Z",
+    labels: bool = True,
+    labelright: bool = True,
+    labelleft: bool = True,
+    sync="r",
+    **kwargs,
+):
+    if ax is None:
+        plt.figure(figsize=(9, 6))
+        ax = plt.axes()
+        plottitle = True
+    else:
+        plottitle = False
+
+    # Get window and phase
+    phase = traveltime_window[0]
+    trims = traveltime_window[1]
+
+    # Get a single component
+    psyn = syn.select(component=comp).copy()
+
+    # Get scaling
+    # absmax = np.max(pobs.max())
+    absmax = np.max([np.max(np.abs(_tr.data)) for _tr in psyn])
+
+    if labels:
+        plot_label(
+            ax,
+            f"max|u|: {absmax:.5g} m",
+            fontsize="small",
+            box=False,
+            dist=0.0,
+            location=7,
+        )
+
+        # Plot label
+        plot_label(
+            ax,
+            f"{comp}",
+            fontweight="bold",
+            fontsize="medium",
+            box=False,
+            dist=0.0,
+            location=6,
+        )
+    else:
+        labelleft = False
+        labelright = False
+
+    # Number of stations
+    y = np.arange(1, len(psyn) + 1)
+
+    # Set ylabels
+    # Set text labels and properties.
+    # , rotation=20)
+    ax.set_yticks(
+        y,
+        [f"{tr.stats.network}.{tr.stats.station}" for tr in psyn],
+        verticalalignment="center",
+        horizontalalignment="right",
+        fontsize="x-small",
+        color=sync,
+    )
+    ax.tick_params(left=False, right=False, labelleft=labelleft, pad=50.0)
+
+    # TO have epicentral distances on the right
+    ax2 = ax.secondary_yaxis("right")
+    ax2.set_yticks(
+        y,
+        [f"D:{tr.stats.distance:>6.2f} A:{tr.stats.azimuth:>6.2f}" for tr in psyn],
+        verticalalignment="center",
+        horizontalalignment="left",
+        fontsize="x-small",
+        color=sync,
+    )
+    ax2.spines.right.set_visible(False)
+    ax2.tick_params(left=False, right=False, labelright=labelright, pad=-10.0)
+
+    # Normalize
+    xlabel = None
+    for _i, (_syn, _y) in enumerate(zip(psyn, y)):
+        if _syn.stats.traveltime is None:
+            continue
+
+        if _syn.stats.label is not None:
+            xlabel = _syn.stats.label
+
+        # If the traveltime is used set the reference traveltime to the
+        # P arrival time
+        reftime = cmt.origin_time + _syn.stats.traveltime
+
+        plt.plot(
+            _syn.times(type="relative", reftime=reftime),
+            _syn.data / absmax + _y,
+            c=sync,
+            *args,
+            **kwargs,
+        )
+
+    top = len(psyn) + 1.0
+    bottom = -0.5
+
+    plt.plot([0, 0], [bottom, top], c="k", lw=ax.spines.bottom.get_linewidth())
+
+    ax.set_ylim(bottom, top)
+    ax.spines.bottom.set_bounds(trims[0], trims[1])
+
+    # Remove all spines
+    ax.spines.top.set_visible(False)
+    ax.spines.right.set_visible(False)
+    ax.tick_params(left=False, right=False, pad=0)
+    ax.spines.left.set_visible(False)
+
+    plt.xlabel(f"{xlabel} offset [s]")
 
     return

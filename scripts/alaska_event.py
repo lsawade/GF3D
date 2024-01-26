@@ -1,20 +1,26 @@
 # %%
 # Get data from syngine
+import os
 from gf3d.seismograms import GFManager
 from obspy.clients.syngine import Client
 from gf3d.source import CMTSOLUTION
 import matplotlib.pyplot as plt
 from gf3d.plot.seismogram import plotseismogram, add_header
 from gf3d.download import download_stream
+from gf3d.client import GF3DClient
 import obspy
 import numpy as np
 from obspy.geodetics.base import gps2dist_azimuth
 from gf3d.plot import util as putil
 import matplotlib as mpl
-mpl.rcParams["font.family"] = "monospace"
+import obsplotlib.plot as opl
+
+mpl.rcParams["font.family"] = "Times New Roman"
+
 # %%
-network = 'II'
-station = 'ARU'
+network = "II"
+station = "ARU"
+# %%
 
 cmtfile = """ PDEW2018  1 23  9 31 40.90  56.0000 -149.1700  14.1 0.0 7.9 GULF OF ALASKA
 event name:     201801230931A
@@ -33,59 +39,86 @@ Mtp:       7.910000e+27
 
 cmt = CMTSOLUTION.read(cmtfile)
 
-client = Client()
+# %%
+# Get data from database
+if not os.path.exists("alaska.h5"):
+    gfc = GF3DClient(db="glad-m25")
+    gfc.get_subset("alaska.h5", cmt.latitude, cmt.longitude, cmt.depth, radius_in_km=40)
 
 # %%
-models = client.get_available_models()
-
-# %%
-st = client.get_waveforms(model='prem_a_10s', network=network, station=station,
-                          eventid=f"GCMT:{cmt.eventname}",
-                          starttime=cmt.origin_time,
-                          endtime=cmt.origin_time+10800)
-
-# %%
-
-raw, inv = download_stream(cmt.origin_time, 10800,
-                           network=network, station=station, channel="LH*",)
-
-# %%
-
-gfm = GFManager('subset.h5')
+gfm = GFManager("alaska.h5")
 gfm.load()
 rp = gfm.get_seismograms(cmt)
 prp = rp.select(network=network, station=station)
 
+
+# %%
+client = Client()
+
+# %%
+models = client.get_available_models()
+print(models)
+
+# %%
+st = client.get_waveforms(
+    model="prem_a_10s",
+    network=network,
+    station=station,
+    eventid=f"GCMT:{cmt.eventname}",
+    starttime=cmt.origin_time,
+    endtime=cmt.origin_time + 10800,
+)
+
+# %%
+
+raw, inv = download_stream(
+    cmt.origin_time,
+    10800,
+    network=network,
+    station=station,
+    channel="LH*",
+)
+
 # %%
 
 
-def process(st, baz, inv: obspy.Inventory | None = None, remove_response=False,
-            starttime=None, npts=None, sampling_rate=1,
-            bandpass=[200, 500]):
-
+def process(
+    st,
+    baz,
+    inv: obspy.Inventory | None = None,
+    remove_response=False,
+    starttime=None,
+    npts=None,
+    sampling_rate=1,
+    bandpass=[200, 500],
+):
     out = st.copy()
-    out.detrend('demean')
-    out.detrend('linear')
-    out.taper(max_percentage=0.05, type='cosine')
+    out.detrend("demean")
+    out.detrend("linear")
+    out.taper(max_percentage=0.05, type="cosine")
 
     if inv is not None and remove_response:
-        out.remove_response(inventory=inv, output="DISP",
-                            pre_filt=(0.001, 0.005, 0.1, 0.2))
+        out.remove_response(
+            inventory=inv, output="DISP", pre_filt=(0.001, 0.005, 0.1, 0.2)
+        )
 
     if inv is not None:
-        out.rotate('->ZNE', inventory=inv)
+        out.rotate("->ZNE", inventory=inv)
 
-    out.filter('bandpass',
-               freqmin=1 / bandpass[1], freqmax=1 / bandpass[0],
-               corners=2, zerophase=True)
+    out.filter(
+        "bandpass",
+        freqmin=1 / bandpass[1],
+        freqmax=1 / bandpass[0],
+        corners=2,
+        zerophase=True,
+    )
 
-    out.rotate('NE->RT', back_azimuth=baz)
+    out.rotate("NE->RT", back_azimuth=baz)
 
-    if isinstance(starttime, obspy.UTCDateTime) \
-            and isinstance(npts, int):
+    if isinstance(starttime, obspy.UTCDateTime) and isinstance(npts, int):
         out.interpolate(starttime=starttime, npts=npts, sampling_rate=1)
 
-    out.taper(max_percentage=0.05, type='cosine')
+    out.taper(max_percentage=0.05, type="cosine")
 
     return out
 
@@ -93,20 +126,24 @@ def process(st, baz, inv: obspy.Inventory | None = None, remove_response=False,
 slat = inv.select(network=network, station=station)[0][0].latitude
 slon = inv.select(network=network, station=station)[0][0].longitude
 
-dist_in_m, az, baz = gps2dist_azimuth(
-    cmt.latitude, cmt.longitude, slat, slon)
+dist_in_m, az, baz = gps2dist_azimuth(cmt.latitude, cmt.longitude, slat, slon)
 
 # Bandpass
 bp = [200, 500]
 
-obs = process(raw, baz, inv=inv, remove_response=True,
-              starttime=raw[0].stats.starttime, npts=10800,
-              bandpass=bp)
-is_syn = process(st, baz, inv=inv,
-                 starttime=raw[0].stats.starttime, npts=10800,
-                 bandpass=bp)
-rp_syn = process(prp, baz, starttime=raw[0].stats.starttime, npts=10800,
-                 bandpass=bp)
+obs = process(
+    raw,
+    baz,
+    inv=inv,
+    remove_response=True,
+    starttime=raw[0].stats.starttime,
+    npts=10800,
+    bandpass=bp,
+)
+is_syn = process(
+    st, baz, inv=inv, starttime=raw[0].stats.starttime, npts=10800, bandpass=bp
+)
+rp_syn = process(prp, baz, starttime=raw[0].stats.starttime, npts=10800, bandpass=bp)
 
 # %%
 # obs.plot()
@@ -114,9 +151,9 @@ rp_syn = process(prp, baz, starttime=raw[0].stats.starttime, npts=10800,
 
 def traceL2(tr1, tr2, norm=True):
     if norm:
-        return np.sum((tr1.data - tr2.data)**2) / np.sum(tr1.data**2)
+        return np.sum((tr1.data - tr2.data) ** 2) / np.sum(tr1.data**2)
     else:
-        return 0.5 * np.sum((tr1.data - tr2.data)**2)
+        return 0.5 * np.sum((tr1.data - tr2.data) ** 2)
 
 
 def diffstream(st1, st2):
@@ -127,6 +164,7 @@ def diffstream(st1, st2):
         tr.data = tr.data - tr2.data
 
     return st
+
 
 # %%
 
@@ -142,7 +180,7 @@ headerdict = dict(
     station_longitude=slon,
     station_azimuth=az,
     station_back_azimuth=baz,
-    station_distance_in_degree=dist_in_m/1000.0/(40000/360.0),
+    station_distance_in_degree=dist_in_m / 1000.0 / (40000 / 360.0),
     location=6,
     # fontsize='small'
 )
@@ -150,40 +188,61 @@ headerdict = dict(
 plotdict = dict(
     limits=(0, 10800),
     nooffset=False,
-    components=['Z'],
+    components=["Z"],
     absmax=1.3e-4,
-    event_origin_time=cmt.origin_time
+    event_origin_time=cmt.origin_time,
 )
+
+# %%
 fig = plt.figure(figsize=(8, 4))
 
 
 ax1 = plt.subplot(2, 1, 1)
-plotseismogram([obs, is_syn], ax=ax1, labels=['Observed', 'Instaseis PREM 1D'],
-               headerdict=headerdict, **plotdict)
+opl.trace(
+    [obs, is_syn],
+    ax=ax1,
+    labels=["Observed", "Instaseis PREM 1D"],
+    # headerdict=headerdict,
+    **plotdict,
+)
 
-ax1.spines['bottom'].set_visible(False)
+# %%
+ax1.spines["bottom"].set_visible(False)
 ax1.tick_params(bottom=False, labelbottom=False)
 
-misfit = traceL2(obs.select(component='Z')[
-                 0], is_syn.select(component='Z')[0], norm=True)
+misfit = traceL2(
+    obs.select(component="Z")[0], is_syn.select(component="Z")[0], norm=True
+)
 
-putil.plot_label(ax1, f'L2_N: {misfit:4g}\nBP: {bp[0]:d}-{bp[1]:d}s',
-                 location=1, box=False, fontsize='small',  dist=0.0)
+putil.plot_label(
+    ax1,
+    f"L2_N: {misfit:4g}\nBP: {bp[0]:d}-{bp[1]:d}s",
+    location=1,
+    box=False,
+    fontsize="small",
+    dist=0.0,
+)
 
 
 ax2 = plt.subplot(2, 1, 2)
-plotseismogram([obs, rp_syn], ax=ax2,
-               labels=['Observed', 'SPECFEM3D_GLOBE GLAD-M25'],
-               **plotdict)
+plotseismogram(
+    [obs, rp_syn], ax=ax2, labels=["Observed", "SPECFEM3D_GLOBE GLAD-M25"], **plotdict
+)
 
-misfit = traceL2(obs.select(component='Z')[
-                 0], rp_syn.select(component='Z')[0], norm=True)
+misfit = traceL2(
+    obs.select(component="Z")[0], rp_syn.select(component="Z")[0], norm=True
+)
 
-putil.plot_label(ax2, f'L2_N: {misfit:4g}\nBP: {bp[0]:d}-{bp[1]:d}s',
-                 location=1, box=False, dist=0.0,
-                 fontsize='small')
+putil.plot_label(
+    ax2,
+    f"L2_N: {misfit:4g}\nBP: {bp[0]:d}-{bp[1]:d}s",
+    location=1,
+    box=False,
+    dist=0.0,
+    fontsize="small",
+)
 
-plt.subplots_adjust(hspace=-0.2, bottom=0.125, top=.85, left=0.05, right=0.95)
+plt.subplots_adjust(hspace=-0.2, bottom=0.125, top=0.85, left=0.05, right=0.95)
 
 plt.show(block=False)
-plt.savefig('alaska_event.pdf')
+plt.savefig("alaska_event.pdf")

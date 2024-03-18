@@ -185,30 +185,43 @@ headerdict = dict(
     # fontsize='small'
 )
 
+
 plotdict = dict(
+    ls=["-", "-"],
+    lw=[0.75, 0.75],
+    colors=["k", "darkgray"],
     limits=(0, 10800),
     nooffset=False,
-    components=["Z"],
     absmax=1.3e-4,
-    event_origin_time=cmt.origin_time,
+    origin_time=cmt.origin_time,
+    plot_labels=False,
+)
+
+plotdict = dict(
+    ls=["-", ":"],
+    lw=[0.75, 0.75],
+    colors=["k", "k"],
+    limits=(0, 10800),
+    nooffset=False,
+    absmax=1.3e-4,
+    origin_time=cmt.origin_time,
+    plot_labels=False,
 )
 
 # %%
-fig = plt.figure(figsize=(8, 4))
+fig = plt.figure(figsize=(8, 5))
 
 
 ax1 = plt.subplot(2, 1, 1)
 opl.trace(
-    [obs, is_syn],
-    ax=ax1,
+    [obs.select(component="z")[0], is_syn.select(component="z")[0]],
     labels=["Observed", "Instaseis PREM 1D"],
-    # headerdict=headerdict,
     **plotdict,
 )
 
-# %%
 ax1.spines["bottom"].set_visible(False)
 ax1.tick_params(bottom=False, labelbottom=False)
+ax1.set_xlabel("")
 
 misfit = traceL2(
     obs.select(component="Z")[0], is_syn.select(component="Z")[0], norm=True
@@ -216,17 +229,20 @@ misfit = traceL2(
 
 putil.plot_label(
     ax1,
-    f"L2_N: {misfit:4g}\nBP: {bp[0]:d}-{bp[1]:d}s",
+    f"L2: {misfit:4g}\nBP: {bp[0]:d}-{bp[1]:d}s",
     location=1,
     box=False,
-    fontsize="small",
+    # fontsize="small",
     dist=0.0,
 )
 
 
 ax2 = plt.subplot(2, 1, 2)
-plotseismogram(
-    [obs, rp_syn], ax=ax2, labels=["Observed", "SPECFEM3D_GLOBE GLAD-M25"], **plotdict
+opl.trace(
+    [obs.select(component="Z")[0], rp_syn.select(component="Z")[0]],
+    ax=ax2,
+    labels=["Observed", "SPECFEM3D_GLOBE GLAD-M25"],
+    **plotdict,
 )
 
 misfit = traceL2(
@@ -235,11 +251,11 @@ misfit = traceL2(
 
 putil.plot_label(
     ax2,
-    f"L2_N: {misfit:4g}\nBP: {bp[0]:d}-{bp[1]:d}s",
+    f"L2: {misfit:4g}\nBP: {bp[0]:d}-{bp[1]:d}s",
     location=1,
     box=False,
     dist=0.0,
-    fontsize="small",
+    # fontsize="small",
 )
 
 plt.subplots_adjust(hspace=-0.2, bottom=0.125, top=0.85, left=0.05, right=0.95)

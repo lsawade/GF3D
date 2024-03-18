@@ -8,28 +8,34 @@ from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
 def adjust_spines(ax: Axes, spines):
     for loc, spine in ax.spines.items():
         if loc in spines:
-            spine.set_position(('outward', 10))  # outward by 10 points
+            spine.set_position(("outward", 10))  # outward by 10 points
         else:
-            spine.set_color('none')  # don't draw spine
+            spine.set_color("none")  # don't draw spine
 
     # turn off ticks where there is no spine
-    if 'left' in spines:
-        ax.yaxis.set_ticks_position('left')
+    if "left" in spines:
+        ax.yaxis.set_ticks_position("left")
     else:
         # no yaxis ticks
         ax.yaxis.set_ticks([])
 
-    if 'bottom' in spines:
-        ax.xaxis.set_ticks_position('bottom')
+    if "bottom" in spines:
+        ax.xaxis.set_ticks_position("bottom")
     else:
         # no xaxis ticks
         ax.xaxis.set_ticks([])
 
 
-def plot_label(ax: Axes, label: str, aspect: float = 1,
-               location: int = 1, dist: float = 0.025,
-               box: tp.Union[bool, dict] = True, fontdict: dict = {},
-               **kwargs):
+def plot_label(
+    ax: Axes,
+    label: str,
+    aspect: float = 1,
+    location: int = 1,
+    dist: float = 0.025,
+    box: tp.Union[bool, dict] = True,
+    fontdict: dict = {},
+    **kwargs
+):
     """Plots label one of the corners of the plot.
     Plot locations are set as follows::
 
@@ -64,140 +70,324 @@ def plot_label(ax: Axes, label: str, aspect: float = 1,
     """
     if type(box) is bool:
         if box:
-            boxdict = {'facecolor': 'w', 'edgecolor': 'k'}
+            boxdict = {"facecolor": "w", "edgecolor": "k"}
         else:
-            boxdict = {'facecolor': 'none', 'edgecolor': 'none'}
+            boxdict = {"facecolor": "none", "edgecolor": "none"}
     else:
         boxdict = box
 
     # Get aspect of the axes
-    aspect = 1.0/get_aspect(ax)
+    aspect = 1.0 / get_aspect(ax)
 
     # Inside
     if location == 0:
-        ax.text(0.5, 0.5, label,
-                horizontalalignment='center', verticalalignment='center_baseline',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            0.5,
+            0.5,
+            label,
+            horizontalalignment="center",
+            verticalalignment="center_baseline",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 1:
-        ax.text(dist, 1.0 - dist * aspect, label, horizontalalignment='left',
-                verticalalignment='top', transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            dist,
+            1.0 - dist * aspect,
+            label,
+            horizontalalignment="left",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 2:
-        ax.text(1.0 - dist, 1.0 - dist * aspect, label,
-                horizontalalignment='right', verticalalignment='top',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            1.0 - dist,
+            1.0 - dist * aspect,
+            label,
+            horizontalalignment="right",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 3:
-        ax.text(dist, dist * aspect, label, horizontalalignment='left',
-                verticalalignment='bottom', transform=ax.transAxes,
-                bbox=boxdict, fontdict=fontdict, **kwargs)
+        ax.text(
+            dist,
+            dist * aspect,
+            label,
+            horizontalalignment="left",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 4:
-        ax.text(1.0 - dist, dist * aspect, label,
-                horizontalalignment='right', verticalalignment='bottom',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            1.0 - dist,
+            dist * aspect,
+            label,
+            horizontalalignment="right",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     # Outside
     elif location == 5:
-        ax.text(-dist, 1.0, label, horizontalalignment='right',
-                verticalalignment='top', transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            -dist,
+            1.0,
+            label,
+            horizontalalignment="right",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 6:
-        ax.text(0, 1.0 + dist * aspect, label, horizontalalignment='left',
-                verticalalignment='bottom', transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            0,
+            1.0 + dist * aspect,
+            label,
+            horizontalalignment="left",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 7:
-        ax.text(1.0, 1.0 + dist * aspect, label,
-                horizontalalignment='right', verticalalignment='bottom',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            1.0,
+            1.0 + dist * aspect,
+            label,
+            horizontalalignment="right",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 8:
-        ax.text(1.0 + dist, 1.0, label,
-                horizontalalignment='left', verticalalignment='top',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            1.0 + dist,
+            1.0,
+            label,
+            horizontalalignment="left",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 9:
-        ax.text(1.0 + dist, 0.0, label,
-                horizontalalignment='left', verticalalignment='bottom',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            1.0 + dist,
+            0.0,
+            label,
+            horizontalalignment="left",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 10:
-        ax.text(1.0, - dist * aspect, label,
-                horizontalalignment='right', verticalalignment='top',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            1.0,
+            -dist * aspect,
+            label,
+            horizontalalignment="right",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 11:
-        ax.text(0.0, -dist * aspect, label, horizontalalignment='left',
-                verticalalignment='top', transform=ax.transAxes,
-                bbox=boxdict, fontdict=fontdict, **kwargs)
+        ax.text(
+            0.0,
+            -dist * aspect,
+            label,
+            horizontalalignment="left",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 12:
-        ax.text(-dist, 0.0, label, horizontalalignment='right',
-                verticalalignment='bottom', transform=ax.transAxes,
-                bbox=boxdict, fontdict=fontdict, **kwargs)
+        ax.text(
+            -dist,
+            0.0,
+            label,
+            horizontalalignment="right",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 13:
-        ax.text(-dist, 0.5, label, horizontalalignment='right',
-                verticalalignment='center_baseline', transform=ax.transAxes,
-                bbox=boxdict, fontdict=fontdict, **kwargs)
+        ax.text(
+            -dist,
+            0.5,
+            label,
+            horizontalalignment="right",
+            verticalalignment="center_baseline",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 14:
-        ax.text(0.5, 1.0 + dist * aspect, label, horizontalalignment='center',
-                verticalalignment='bottom', transform=ax.transAxes,
-                bbox=boxdict, fontdict=fontdict, **kwargs)
+        ax.text(
+            0.5,
+            1.0 + dist * aspect,
+            label,
+            horizontalalignment="center",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 15:
-        ax.text(1 + dist, 0.5, label, horizontalalignment='left',
-                verticalalignment='center_baseline', transform=ax.transAxes,
-                bbox=boxdict, fontdict=fontdict, **kwargs)
+        ax.text(
+            1 + dist,
+            0.5,
+            label,
+            horizontalalignment="left",
+            verticalalignment="center_baseline",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 16:
-        ax.text(0.5, -dist * aspect, label, horizontalalignment='center',
-                verticalalignment='top', transform=ax.transAxes,
-                bbox=boxdict, fontdict=fontdict, **kwargs)
+        ax.text(
+            0.5,
+            -dist * aspect,
+            label,
+            horizontalalignment="center",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 17:
-        ax.text(- dist, 1.0 + dist * aspect, label,
-                horizontalalignment='right', verticalalignment='bottom',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            -dist,
+            1.0 + dist * aspect,
+            label,
+            horizontalalignment="right",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 18:
-        ax.text(1.0 + dist, 1.0 + dist * aspect, label,
-                horizontalalignment='left', verticalalignment='bottom',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            1.0 + dist,
+            1.0 + dist * aspect,
+            label,
+            horizontalalignment="left",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 19:
-        ax.text(1.0 + dist, 0.0 - dist * aspect, label,
-                horizontalalignment='left', verticalalignment='top',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            1.0 + dist,
+            0.0 - dist * aspect,
+            label,
+            horizontalalignment="left",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 20:
-        ax.text(0.0 - dist, 0.0 - dist * aspect, label,
-                horizontalalignment='right', verticalalignment='top',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            0.0 - dist,
+            0.0 - dist * aspect,
+            label,
+            horizontalalignment="right",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 21:
-        ax.text(0.0 + dist, 0.5, label,
-                horizontalalignment='left', verticalalignment='center_baseline',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            0.0 + dist,
+            0.5,
+            label,
+            horizontalalignment="left",
+            verticalalignment="center_baseline",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 22:
-        ax.text(0.5, 1.0 - dist * aspect, label,
-                horizontalalignment='center', verticalalignment='top',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            0.5,
+            1.0 - dist * aspect,
+            label,
+            horizontalalignment="center",
+            verticalalignment="top",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 23:
-        ax.text(1.0 - dist, 0.5, label,
-                horizontalalignment='right', verticalalignment='center_baseline',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            1.0 - dist,
+            0.5,
+            label,
+            horizontalalignment="right",
+            verticalalignment="center_baseline",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     elif location == 24:
-        ax.text(0.5, 0.0 + dist * aspect, label,
-                horizontalalignment='center', verticalalignment='bottom',
-                transform=ax.transAxes, bbox=boxdict,
-                fontdict=fontdict, **kwargs)
+        ax.text(
+            0.5,
+            0.0 + dist * aspect,
+            label,
+            horizontalalignment="center",
+            verticalalignment="bottom",
+            transform=ax.transAxes,
+            bbox=boxdict,
+            fontdict=fontdict,
+            **kwargs
+        )
     else:
         raise ValueError("Other corners not defined.")
 
 
 def axes_from_axes(
-        ax: Axes, n: int,
-        extent: tp.Iterable = [0.2, 0.2, 0.6, 1.0],
-        **kwargs) -> Axes:
+    ax: Axes, n: int, extent: tp.Iterable = [0.2, 0.2, 0.6, 1.0], **kwargs
+) -> Axes:
     """Uses the location of an existing axes to create another axes in relative
     coordinates. IMPORTANT: Unlike ``inset_axes``, this function propagates
     ``*args`` and ``**kwargs`` to the ``pyplot.axes()`` function, which allows
@@ -270,25 +460,25 @@ def get_aspect(ax: Axes) -> float:
 
 
 def set_default_color(COLOR):
-    plt.rcParams['axes.edgecolor'] = COLOR
-    plt.rcParams['text.color'] = COLOR
-    plt.rcParams['axes.labelcolor'] = COLOR
-    plt.rcParams['xtick.color'] = COLOR
-    plt.rcParams['ytick.color'] = COLOR
+    plt.rcParams["axes.edgecolor"] = COLOR
+    plt.rcParams["text.color"] = COLOR
+    plt.rcParams["axes.labelcolor"] = COLOR
+    plt.rcParams["xtick.color"] = COLOR
+    plt.rcParams["ytick.color"] = COLOR
 
 
 def reset_mpl(gallery_conf, fname):
-    """Function to set default look of the figures.
-    """
+    """Function to set default look of the figures."""
     import matplotlib as mpl
-    COLOR = 'k'
+
+    COLOR = "k"
     mpl.rcParams["font.family"] = "monospace"
     mpl.rcParams["savefig.transparent"] = False
     mpl.rcParams["savefig.dpi"] = 300
-    mpl.rcParams["savefig.format"] = 'svg'
-    mpl.rcParams['axes.edgecolor'] = COLOR
+    mpl.rcParams["savefig.format"] = "svg"
+    mpl.rcParams["axes.edgecolor"] = COLOR
     # mpl.rcParams['axes.backgroundcolor'] = 'w'
-    mpl.rcParams['text.color'] = COLOR
-    mpl.rcParams['axes.labelcolor'] = COLOR
-    mpl.rcParams['xtick.color'] = COLOR
-    mpl.rcParams['ytick.color'] = COLOR
+    mpl.rcParams["text.color"] = COLOR
+    mpl.rcParams["axes.labelcolor"] = COLOR
+    mpl.rcParams["xtick.color"] = COLOR
+    mpl.rcParams["ytick.color"] = COLOR

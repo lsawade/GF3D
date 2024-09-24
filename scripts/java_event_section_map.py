@@ -1,6 +1,7 @@
 # %%
 # Get data from syngine
 import os
+from glob import glob
 from gf3d.seismograms import GFManager
 from gf3d.client import GF3DClient
 from gf3d.source import CMTSOLUTION
@@ -14,8 +15,12 @@ from gf3d.plot import util as putil
 import matplotlib as mpl
 import obsplotlib.plot as opl
 
-plt.style.use("dark_background")
-mpl.rcParams["font.family"] = "Times"
+# For JT
+# plt.style.use("dark_background")
+mpl.rcParams["font.family"] = "Serif"
+
+# Standard
+# mpl.rcParams["font.family"] = "Monospace"
 
 # %%
 
@@ -39,9 +44,28 @@ cmt = CMTSOLUTION.read(cmtfile)
 # %%
 # Get data from database
 
-if not os.path.exists("java.h5"):
-    gfc = GF3DClient(db="glad-m25")
-    gfc.get_subset("java.h5", cmt.latitude, cmt.longitude, cmt.depth, radius_in_km=70)
+if not os.path.exists("/lustre/orion/geo111/scratch/lsawade/java.h5"):
+
+    # Client for downloading data
+    # gfc = GF3DClient(db="glad-m25")
+    # gfc.get_subset("java.h5", cmt.latitude, cmt.longitude, cmt.depth, radius_in_km=70)
+
+    # Local file
+    databasename = '/lustre/orion/geo111/scratch/lsawade/DB/GLAD-M35/256_TEST'
+
+    # Check for files given database path
+    db_globstr = os.path.join(databasename, '*', '*', '*.h5')
+
+    # Get all files
+    db_files = glob(db_globstr)
+
+    # Get subset
+    GFM = GFManager(db_files)
+    GFM.load_header_variables()
+    GFM.write_subset_directIO('/lustre/orion/geo111/scratch/lsawade/java.h5', cmt.latitude, cmt.longitude,
+                              cmt.depth, 70.0, NGLL=5,
+                              fortran=False)
+
 
 # %%
 # Download data from IRIS
@@ -83,7 +107,8 @@ def process(
 
     if inv is not None and remove_response:
         out.remove_response(
-            inventory=inv, output="DISP", pre_filt=(0.001, 0.005, 0.1, 0.2)
+            inventory=inv, output="DISP", pre_filt=(0.001, 0.005, 0.1, 0.2),
+            water_level=100
         )
 
     if inv is not None:
@@ -106,13 +131,13 @@ def process(
 
     return out
 
-
+bp = [17, 150]
 dt_proc = process(
     raw.select(component="Z"),
     0,
     starttime=cmt.origin_time,
     npts=7200,
-    bandpass=[50, 150],
+    bandpass=bp,
     inv=inv,
     remove_response=True,
 )
@@ -122,7 +147,7 @@ rp_proc = process(
     0,
     starttime=cmt.origin_time,
     npts=7200,
-    bandpass=[50, 150],
+    bandpass=bp,
 )
 
 
@@ -135,10 +160,10 @@ opl.attach_geometry(dt_proc, cmt.latitude, cmt.longitude)
 
 # %%
 # Select intersections
-dt_plot, rp_plot = opl.select_intersection([dt_proc, rp_proc])
-opl.attach_geometry(rp_plot, cmt.latitude, cmt.longitude)
-opl.attach_geometry(dt_plot, cmt.latitude, cmt.longitude)
-opl.copy_geometry(rp_plot, dt_plot)
+rp_proc.sort(keys=["distance", "network", "station"])
+rp_plot = rp_proc[::3].copy()
+dt_plot, rp_plot = opl.select_intersection([dt_proc, rp_plot])
+# opl.attach_geometry(dt_plot, cmt.latitude, cmt.longitude)
 
 for tr in dt_plot.select(station="TIXI"):
     dt_plot.remove(tr)
@@ -153,22 +178,22 @@ fig = plt.figure(figsize=(9, 11))
 (axl, axr) = opl.section(
     [dt_plot, rp_plot],
     labels=["Observed", "3D Numerical"],
-    colors=["w", (0.9, 0.15, 0.15)],
+    colors=["k", (0.9, 0.15, 0.15)],
     ls=["-", "-"],
     origin_time=cmt.origin_time,
     plot_geometry=False,
     lw=[0.625, 0.625],
     plot_amplitudes=False,
     scale=4,
-    skip_station=2,
+    skip_station=0,
     plot_stations_right=True,  # Skip station must be even!
     legendargs=None,
     # legendargs=dict(loc="lower right", ncol=2, frameon=False, bbox_to_anchor=(1, 1)),
     limits=(0, 7200),
     invert=True,
 )
-axl.tick_params(labelleft=False, bottom=False, labelbottom=False)
-axr.tick_params(labelright=False)
+# axl.tick_params(labelleft=False, bottom=False, labelbottom=False)
+# axr.tick_params(labelright=False)
 
 # opl.plot_label(
 #     ax,
@@ -178,23 +203,29 @@ axr.tick_params(labelright=False)
 #     fontsize="medium",
 #     dist=0.025,
 # )
-# axl.set_ylim(None, -1.5)
-axl.set_xlabel("")
-axl.spines["bottom"].set_visible(False)
+axl.set_ylim(None, 1)
+# axl.set_xlabel("")
+# axl.spines["bottom"].set_visible(False)
+
+# Compute station event distance
 
 headerdict = dict(
     event=cmt.eventname,
-    event_time=None,
+    event_time=cmt.origin_time,
     event_latitude=cmt.latitude,
     event_longitude=cmt.longitude,
     event_depth_in_km=cmt.depth,
+    event_Mw=cmt.Mw,
+    bandpass=bp,
     location=6,
-    # fontsize='small'
+    fontsize='small',
+    color='black'
 )
-# opl.add_header(ax, **headerdict)
-plt.subplots_adjust(left=0.075, right=0.925, bottom=0.0, top=1.0)
+opl.add_header(axl, **headerdict)
+# plt.subplots_adjust(left=0.075, right=0.925, bottom=0.0, top=1.0)
 plt.show(block=False)
 plt.savefig("java_station_section.pdf")
+
 
 # %%
 
@@ -274,6 +305,7 @@ def plot_event_geometry(gfm: GFManager, cmt: CMTSOLUTION):
                 lw=0.15,
                 transform=ccrs.Geodetic(),
                 zorder=0,
+                alpha=0.25
             )
 
     for _i, net in enumerate(net_dict):

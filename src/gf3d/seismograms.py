@@ -90,19 +90,24 @@ def stationIO(
             # Get displacement getting the output in ascending order
             t0 = time()
             array = db[f"displacement/{comp}/array"][:, nglob2sub[sglob], :]
-            print(f"{_i:>05d} reading: {time()-t0}")
+            # print(f"{_i:>05d} reading: {time()-t0}")
 
             t0 = time()
             array = array.astype(np.float64)
-            print(f"{_i:>05d} convert: {time()-t0}")
+            # print(f"{_i:>05d} convert: {time()-t0}")
 
             t0 = time()
             array = array[:, rsglob, :] * norm / factor
-            print(f"{_i:>05d} resort:  {time()-t0}")
+            # print(f"{_i:>05d} resort:  {time()-t0}")
 
             t0 = time()
             displacement[_j, :, :, :] = array
-            print(f"{_i:>05d} assign:  {time()-t0}")
+            # print(f"{_i:>05d} assign:  {time()-t0}")
+            
+    if fortran:
+        print("shape", displacement.shape)
+        displacement = displacement[:, :, :, :].transpose((3, 2, 1, 0))
+        print(f"{_i:>05d} transpose:  {time()-t0} -- {displacement.shape}")
 
     lock.acquire()
     t0 = time()
@@ -116,11 +121,9 @@ def stationIO(
         db["latitudes"][_i] = latitude
         db["longitudes"][_i] = longitude
         db["burials"][_i] = burials
-
+        
         if fortran:
-            db[f"displacement"][:, :, :, :, _i] = displacement[:, :, :, :].transpose(
-                (3, 2, 1, 0)
-            )
+            db[f"displacement"][:, :, :, :, _i] = displacement[:, :, :, :]
         else:
             db[f"displacement"][_i, :, :, :, :] = displacement[:, :, :, :]
 
@@ -1892,7 +1895,9 @@ class GFManager(object):
         for process in processes:
             process.join()
 
-    def get_seismograms(self, cmt: CMTSOLUTION) -> Stream:
+    def get_seismograms(self, cmt: CMTSOLUTION, gaussian: bool = False,
+                        raw: bool = False, array: bool = False) -> Stream:
+
         # Get moment tensor
         x_target, y_target, z_target, Mx = source2xyz(
             cmt.latitude,
@@ -2052,7 +2057,7 @@ class GFManager(object):
             self.header["dt"],
             hdur_diff,
             cutoff=None,
-            gaussian=False,
+            gaussian=gaussian,
             lpfilter="butter",
         )
 
@@ -2067,6 +2072,33 @@ class GFManager(object):
 
         logger.debug(f"Lengths: {self.header['nsteps']}, {NP2}")
 
+        if array:
+            if raw:
+                data = seismograms
+            else:
+                data = (
+                    np.real(
+                        fft.ifft(
+                            fft.fft(seismograms, n=NP2, axis=2) * STF_R[None, None, :] * phshift[None, None, :]
+                        )[:, :, :self.header["nsteps"]]
+                    )
+                    * self.header["dt"]
+                )
+
+            meta = dict(
+                starttime = cmt.origin_time - self.header["tc"],
+                delta = self.header["dt"],
+                npts = self.header["nsteps"],
+                origin = cmt.origin_time,
+                latitudes = self.latitudes,
+                longitudes = self.longitudes,
+                stations = [f"{net}.{sta}" for net, sta in zip(self.networks, self.stations)],
+                components = ["N", "E", "Z"],
+                burials = self.burials,
+            )
+
+            return data, meta
+
         # Add traces to the
         traces = []
         for _h in range(len(self.stations)):
@@ -2074,15 +2106,17 @@ class GFManager(object):
                 # Convolution with the STF and correctional timeshift
                 # data = butter_band_two_pass_filter(
                 #     seismograms[_h, _i, :], [0.001, 1/self.header['dt']/2.1], 1/self.header['dt'])
-
-                data = (
-                    np.real(
-                        fft.ifft(
-                            fft.fft(seismograms[_h, _i, :], n=NP2) * STF_R * phshift
-                        )[: self.header["nsteps"]]
+                if raw:
+                    data = seismograms[_h, _i, :]
+                else:
+                    data = (
+                        np.real(
+                            fft.ifft(
+                                fft.fft(seismograms[_h, _i, :], n=NP2) * STF_R * phshift
+                            )[: self.header["nsteps"]]
+                        )
+                        * self.header["dt"]
                     )
-                    * self.header["dt"]
-                )
 
                 stats = Stats()
                 stats.delta = self.header["dt"]

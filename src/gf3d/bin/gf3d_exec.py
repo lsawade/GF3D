@@ -71,14 +71,43 @@ def query():
 @query.command(name='info')
 @click.argument('databasename', type=str)
 @click.option('--debug',  is_flag=True, show_default=True, default=False, help='Only print query url', type=bool)
-def query_info(databasename: str, debug: bool = False):
+@click.option('--local',  is_flag=True, show_default=True, default=False, help='flag to define databasename islocal ', type=bool)
+def query_info(databasename: str, debug: bool = False, local: bool = False):
     '''Query info from a hosted database server.'''
     from gf3d.client import GF3DClient
     from pprint import pprint
-    gfcl = GF3DClient(databasename, debug=debug)
-    info = gfcl.get_info()
-    if info:
-        pprint(info)
+
+    if local:
+        import os
+        from glob import glob
+        from pprint import pprint
+
+        # Get station files
+        station_files = glob(os.path.join(databasename, '*', '*', '*.h5'))
+        station_files.sort()
+        station_names = [os.path.basename(_file)[:-3] for _file in station_files]
+
+        # Check if stations are available
+        if len(station_files) < 1:
+            print(f"No stations found in {databasename}.")
+            return
+
+        # Get single station's header
+        station0 = station_files[0]
+
+        # Load header
+        gfm = GFManager([station0])
+        header = gfm.load_scalar_header_parameters()
+        header['stations'] = station_names
+
+        pprint(header)
+
+
+    else:
+        gfcl = GF3DClient(databasename, debug=debug)
+        info = gfcl.get_info()
+        if info:
+            pprint(info)
 
 
 @query.command(name='stations')
@@ -336,7 +365,7 @@ def plot_station(databaseroot, cmtsolutionfilename, network, station, outfile=No
     limits = rp[0].stats.starttime, rp[0].stats.endtime
 
     plotseismogram(rp, None, cmt, limits=limits)
-    
+
     if outfile:
         plt.savefig(outfile, dpi=300)
     else:

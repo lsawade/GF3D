@@ -124,6 +124,12 @@ class MPISubset(object):
                 self.NGLL = self.header['NGLLX']
                 self.networks = db['Networks'][:].astype('U13').tolist()
                 self.stations = db['Stations'][:].astype('U13').tolist()
+                # Loading the header
+                print("Loading the header!!!!!")
+                print("--------------------------------------------------")
+                for _net, _sta in zip(self.networks, self.stations):
+                    print(_net, '.', _sta)
+                print("Loading the header!!!!!")
                 self.latitudes = db['latitudes'][:]
                 self.longitudes = db['longitudes'][:]
                 self.burials = db['burials'][:]

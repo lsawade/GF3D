@@ -474,6 +474,74 @@ class CMTSOLUTION:
             Mrp=Mrp,
             Mtp=Mtp)
 
+    @classmethod
+    def from_sdr(cls, s, d, r, M0=1.0, **kwargs):
+        """definition from Stein and Wysession
+        s is the strike (phi_f), d is the dip (delta), and r is the slip angle
+        (lambda). IM ASSIGNING THE COMPONENTS WRONG. SEE EMAIL TO YURI!!!!!
+
+        Note How in Stein and Wysession the z-axis points UP (Figure 4.2-2) and
+        in Aki and Richards the z-axis points down (Figure 4.20).
+        This results in a sign changes for the fault normal and slip vector.
+
+        Convention for the code here is
+        X-North, Y-East, Z-Down
+        R-Down, Theta-North, Phi-East
+
+
+        """
+
+        # To radians
+        s = np.radians(s)
+        d = np.radians(d)
+        r = np.radians(r)
+
+        # Fault normal
+        n = np.array([
+            - np.sin(d) * np.sin(s),
+            + np.sin(d) * np.cos(s),
+            - np.cos(d)
+        ])
+
+        # Slip vector
+        d = np.array([
+            np.cos(r) * np.cos(s) + np.cos(d) * np.sin(r) * np.sin(s),
+            np.cos(r) * np.sin(s) - np.cos(d) * np.sin(r) * np.cos(s),
+            - np.sin(r) * np.sin(d)
+        ])
+
+        # Compute moment tensor Stein and Wysession Style
+        Mx = M0 * (np.outer(n, d) + np.outer(d, n))
+
+        # # Full terms from AKI & Richards (Box 4.4)
+        # Mxx = -M0 * (np.sin(d) * np.cos(r)
+        #   * np.sin(2*s) + np.sin(2*d) * np.sin(r) * np.sin(s)**2)
+        # Mxy = +M0 * (np.sin(d) * np.cos(r)
+        #   * np.cos(2*s) + 0.5 * np.sin(2*d) * np.sin(r) * np.sin(2*s))
+        # Mxz = -M0 * (np.cos(d) * np.cos(r)
+        #   * np.cos(s) + np.cos(2*d) * np.sin(r) * np.sin(s))
+        # Myy = +M0 * (np.sin(d) * np.cos(r)
+        #   * np.sin(2*s) - np.sin(2*d) * np.sin(r) * np.cos(s)**2)
+        # Myz = -M0 * (np.cos(d) * np.cos(r)
+        #   * np.sin(s) - np.cos(2*d) * np.sin(r) * np.cos(s))
+        # Mzz = +M0 * np.sin(2*d) * np.sin(r)
+
+        # # Moment tensor creation
+        # Mx = np.array( [
+        #     [Mxx, Mxy, Mxz],
+        #     [Mxy, Myy, Myz],
+        #     [Mxz, Myz, Mzz]
+        # ])
+
+        Mr = np.array([
+            [Mx[2, 2],  Mx[2, 0], -Mx[2, 1]],
+            [Mx[0, 2],  Mx[0, 0], -Mx[0, 1]],
+            [-Mx[1, 2], -Mx[1, 0],  Mx[1, 1]],
+        ])
+
+        return cls(Mrr=Mr[0, 0], Mtt=Mr[1, 1], Mpp=Mr[2, 2], Mrt=Mr[0, 1],
+                   Mrp=Mr[0, 2], Mtp=Mr[1, 2], **kwargs)
+
     @property
     def tensor(self):
         """6 element moment tensor"""

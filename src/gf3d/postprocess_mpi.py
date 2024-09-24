@@ -382,6 +382,7 @@ class Adios2HDF5(object):
             self.tc = None
             self.hdur = None
 
+
         self.setup_broadcast()
 
         # Get subspace if needed

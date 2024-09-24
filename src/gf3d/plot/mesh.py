@@ -17,6 +17,12 @@ def ms(x, y, z, radius, resolution=20):
     return (X, Y, Z)
 
 
+def cart2geo(x,y,z):
+    r = np.sqrt(x**2 + y**2 + z**2)
+    lat = np.arcsin(z/r)
+    lon = np.arctan2(y,x)
+    return np.degrees(lat), np.degrees(lon)
+
 def meshplot(stationfile, outfile, land=None):
 
     with h5py.File(stationfile, 'r') as db:
@@ -157,12 +163,13 @@ def meshplot(stationfile, outfile, land=None):
 
     fig = go.Figure(data=data)
 
+    fig.write_html(outfile)
     fig.update_layout(
         scene=dict(
             xaxis=axdict, yaxis=axdict, zaxis=axdict),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        width=800, height=800,
+        width=2560, height=1440,
     )
     # fig.update_scences(
     #     scene=dict(
@@ -172,5 +179,5 @@ def meshplot(stationfile, outfile, land=None):
 
     #     )
     # )
-
+    fig.write_html(outfile)
     fig.show()

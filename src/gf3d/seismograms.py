@@ -2761,11 +2761,6 @@ class GFManager(object):
             self.burials = db["burials"][:]
             self.ibool = db["ibool"][:]
             self.xyz = db["xyz"][:]
-            self.kdtree = KDTree(
-                self.xyz[
-                    self.ibool[self.NGLL // 2, self.NGLL // 2, self.NGLL // 2, :], :
-                ]
-            )
 
             self.do_adjacency_search = db["do_adjacency_search"][()]
 
@@ -2803,6 +2798,13 @@ class GFManager(object):
                 self.header["itopo"] = self.header["itopo"].transpose((1, 0))
                 self.xyz = self.xyz.transpose((1, 0))
                 self.ibool = self.ibool.transpose((3, 2, 1, 0))
+
+            # Create KDTree for adjacency search
+            self.kdtree = KDTree(
+                self.xyz[
+                    self.ibool[self.NGLL // 2, self.NGLL // 2, self.NGLL // 2, :], :
+                ]
+            )
 
     def load_subset_header_only(self):
         """Given the files in the database, get a set of strains and write it

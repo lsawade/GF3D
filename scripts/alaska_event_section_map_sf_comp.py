@@ -15,8 +15,6 @@ import matplotlib as mpl
 import obsplotlib.plot as opl
 
 mpl.rcParams["font.family"] = "monospace"
-
-
 # %%
 
 cmtfile = """ PDEW2018  1 23  9 31 40.90  56.0000 -149.1700  14.1 0.0 7.9 GULF OF ALASKA
@@ -37,6 +35,12 @@ Mtp:       7.910000e+27
 cmt = CMTSOLUTION.read(cmtfile)
 
 # %%
+# Load seismograms
+
+sfs = obspy.read("DATA/alaska_seismos/*.sac")
+
+
+# %%
 # Get data from database
 if not os.path.exists("alaska.h5"):
     gfc = GF3DClient(db="glad-m25")
@@ -44,7 +48,7 @@ if not os.path.exists("alaska.h5"):
 
 # %%
 
-gfm = GFManager("alaska.h5")
+gfm = GFManager("alaska_subset.h5")
 gfm.load()
 rp = gfm.get_seismograms(cmt)
 
@@ -52,6 +56,8 @@ rp = gfm.get_seismograms(cmt)
 # Attach geometry
 
 opl.attach_geometry(rp, cmt.latitude, cmt.longitude)
+opl.attach_geometry(sfs, cmt.latitude, cmt.longitude)
+
 
 
 # %%
@@ -96,25 +102,34 @@ def process(
 
     return out
 
+#%%
 
 rp_proc = process(
-    rp, 0, starttime=rp[0].stats.starttime, npts=10800, bandpass=[50, 500]
+    rp, 0, starttime=cmt.origin_time, npts=10800, bandpass=[50, 500]
 ).select(component="Z")
+
+sf_proc = process(
+    sfs, 0, starttime=cmt.origin_time, npts=10800, bandpass=[50, 500]
+).select(component="Z")
+
+# %%
 
 # %%
 # Plot section
 plt.close("all")
 fig = plt.figure(figsize=(8, 5))
 (ax, _) = opl.section(
-    [rp_proc],
+    [sf_proc, rp_proc],
     origin_time=cmt.origin_time,
     plot_geometry=False,
-    lw=0.5,
+    lw=[0.5, 0.5],
     colors="k",
     plot_amplitudes=False,
     scale=4,
-    skip_station=5,
-    limits=(-10, 10800),
+    skip_station=1,
+    limits=(0, 10800),
+    labels=["Forward", "Reciprocal"],
+        
 )
 opl.plot_label(
     ax,

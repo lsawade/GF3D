@@ -526,7 +526,7 @@ class CMTSOLUTION:
         #   * np.sin(s) - np.cos(2*d) * np.sin(r) * np.cos(s))
         # Mzz = +M0 * np.sin(2*d) * np.sin(r)
 
-        # # Moment tensor creation
+        # # Moment tensor creationmessage:%3CDM8PR09MB7032F5E75851227BE6F3B7A5A789A@DM8PR09MB7032.namprd09.prod.outlook.com%3E
         # Mx = np.array( [
         #     [Mxx, Mxy, Mxz],
         #     [Mxy, Myy, Myz],

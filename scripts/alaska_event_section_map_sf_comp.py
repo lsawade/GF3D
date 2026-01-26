@@ -37,7 +37,7 @@ cmt = CMTSOLUTION.read(cmtfile)
 # %%
 # Load seismograms
 
-sfs = obspy.read("DATA/alaska_seismos/*.sac")
+sfs = obspy.read("DATA/alaska_seismograms/*.sac")
 
 
 # %%
@@ -48,7 +48,7 @@ if not os.path.exists("alaska.h5"):
 
 # %%
 
-gfm = GFManager("alaska_subset.h5")
+gfm = GFManager("/lustre/orion/geo111/scratch/lsawade/alaska_subset.h5")
 gfm.load()
 rp = gfm.get_seismograms(cmt)
 
@@ -113,24 +113,33 @@ sf_proc = process(
 ).select(component="Z")
 
 # %%
+# remove stations closer than 30 degrees
+rp_blub = obspy.Stream([tr for tr in rp_proc if tr.stats.distance>30])
+sf_blub = obspy.Stream([tr for tr in sf_proc if tr.stats.distance>30])
+
+# %%
+
+rp_plot, sf_plot = opl.select_intersection([rp_blub, sf_blub], components=["Z",])
 
 # %%
 # Plot section
 plt.close("all")
 fig = plt.figure(figsize=(8, 5))
 (ax, _) = opl.section(
-    [sf_proc, rp_proc],
+    [sf_plot[::3], rp_plot[::3]],
     origin_time=cmt.origin_time,
     plot_geometry=False,
-    lw=[0.5, 0.5],
-    colors="k",
+    lw=[1.25, 0.5],
+    ls=['-', '-'],
+    colors=["k", 'w'],
     plot_amplitudes=False,
     scale=4,
-    skip_station=1,
+    skip_station=5,
     limits=(0, 10800),
     labels=["Forward", "Reciprocal"],
         
 )
+
 opl.plot_label(
     ax,
     "Bandpass: 50-500s -- Mw: 7.9",

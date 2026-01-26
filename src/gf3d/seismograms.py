@@ -1455,7 +1455,7 @@ class GFManager(object):
             self.ispec_subset = np.array([self.ispec_subset], dtype="i")
         elif isinstance(self.ispec_subset, list):
             if len(self.ispec_subset) == 0:
-                raise ValueError("Could not find any elements within the radius.")
+                raise ValueError(f"Could not find any elements within the radius of {dist_in_km} km.")
             else:
                 self.ispec_subset = np.sort(self.ispec_subset)
 

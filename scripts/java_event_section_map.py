@@ -131,7 +131,7 @@ def process(
 
     return out
 
-bp = [17, 150]
+bp = [50, 150]
 dt_proc = process(
     raw.select(component="Z"),
     0,
